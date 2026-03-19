@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.trainerclienthub.controller.ClientController"
+            styleClass="root-pane"
+            stylesheets="@css/neon-theme.css">
+
+    <!-- ── LEFT: Sidebar (shared) ── -->
+    <left>
+        <VBox styleClass="sidebar" spacing="0">
+            <VBox styleClass="sidebar-logo-box" spacing="4">
+                <Label styleClass="sidebar-logo-title" text="TCH"/>
+                <Label styleClass="sidebar-logo-sub"   text="TRAINER CLIENT HUB"/>
+            </VBox>
+            <Region styleClass="sidebar-divider"/>
+            <Label styleClass="sidebar-section-label" text="MAIN MENU"/>
+            <HBox fx:id="navDashboard" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavDashboard">
+                <Label styleClass="nav-icon" text="⊞"/><Label text="Dashboard"/>
+            </HBox>
+            <HBox styleClass="nav-item, nav-item-active" spacing="12" alignment="CENTER_LEFT">
+                <Label styleClass="nav-icon" text="👥"/><Label text="Clients"/>
+            </HBox>
+            <HBox fx:id="navWorkouts" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavWorkouts">
+                <Label styleClass="nav-icon" text="🏋"/><Label text="Workouts"/>
+            </HBox>
+            <HBox fx:id="navMemberships" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavMemberships">
+                <Label styleClass="nav-icon" text="🪪"/><Label text="Memberships"/>
+            </HBox>
+            <HBox fx:id="navSessions" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavSessions">
+                <Label styleClass="nav-icon" text="📅"/><Label text="Sessions"/>
+            </HBox>
+            <HBox fx:id="navReports" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavReports">
+                <Label styleClass="nav-icon" text="📊"/><Label text="Reports"/>
+            </HBox>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Region styleClass="sidebar-divider"/>
+            <HBox styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleLogout">
+                <Label styleClass="nav-icon" text="⏻"/><Label text="Logout" style="-fx-text-fill:#AAAAAA;"/>
+            </HBox>
+        </VBox>
+    </left>
+
+    <!-- ── TOP: Top bar ── -->
+    <top>
+        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="0">
+            <VBox spacing="2">
+                <Label styleClass="top-bar-title" text="Client Management"/>
+                <Label styleClass="top-bar-subtitle" text="Add, edit and manage gym members"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <StackPane styleClass="avatar-circle">
+                <Label fx:id="avatarLabel" styleClass="avatar-label" text="T"/>
+            </StackPane>
+        </HBox>
+    </top>
+
+    <!-- ── CENTER: Main content ── -->
+    <center>
+        <VBox styleClass="content-area" spacing="20">
+
+            <!-- Action bar -->
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <!-- Search -->
+                <StackPane>
+                    <TextField fx:id="searchField"
+                               styleClass="search-field"
+                               promptText="Search clients by name, email or phone..."/>
+                </StackPane>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="addClientBtn" styleClass="btn-primary"
+                        text="+ Add Client" onAction="#handleAddClient"/>
+                <Button fx:id="editClientBtn" styleClass="btn-secondary"
+                        text="Edit" onAction="#handleEditClient"/>
+                <Button fx:id="deleteClientBtn" styleClass="btn-danger"
+                        text="Delete" onAction="#handleDeleteClient"/>
+            </HBox>
+
+            <!-- Table -->
+            <TableView fx:id="clientTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                <columns>
+                    <TableColumn fx:id="colId"             text="ID"         prefWidth="60"/>
+                    <TableColumn fx:id="colName"           text="NAME"       prefWidth="160"/>
+                    <TableColumn fx:id="colAge"            text="AGE"        prefWidth="60"/>
+                    <TableColumn fx:id="colGender"         text="GENDER"     prefWidth="90"/>
+                    <TableColumn fx:id="colPhone"          text="PHONE"      prefWidth="150"/>
+                    <TableColumn fx:id="colEmail"          text="EMAIL"      prefWidth="200"/>
+                    <TableColumn fx:id="colWeight"         text="WEIGHT (KG)" prefWidth="110"/>
+                    <TableColumn fx:id="colSessionBalance" text="SESSIONS"   prefWidth="90"/>
+                    <TableColumn fx:id="colStatus"         text="STATUS"     prefWidth="100"/>
+                </columns>
+                <placeholder>
+                    <Label text="No clients found." style="-fx-text-fill:#555555; -fx-font-size:14px;"/>
+                </placeholder>
+            </TableView>
+
+            <!-- Status bar -->
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Label fx:id="clientCountLabel"
+                       style="-fx-text-fill:#555555; -fx-font-size:12px;"
+                       text="0 clients"/>
+            </HBox>
+
+        </VBox>
+    </center>
+
+    <!-- ── RIGHT: Add/Edit Form panel ── -->
+    <right>
+        <VBox fx:id="formPanel" styleClass="form-panel"
+              minWidth="340" maxWidth="340" managed="false" visible="false">
+
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS"
+                        style="-fx-background: transparent; -fx-background-color: transparent;">
+
+                <VBox spacing="12" minHeight="-Infinity" style= "fx-padding:0, 5, 20, 0;">
+
+                    <Label fx:id="formTitle" styleClass="form-panel-title" text="Add New Client"/>
+                    <Region styleClass="divider-line"/>
+
+                    <VBox spacing="5">
+                        <Label styleClass="form-label" text="FULL NAME *"/>
+                        <TextField fx:id="fName" styleClass="text-field" promptText="e.g. Smaran Aryal"/>
+                    </VBox>
+
+                    <HBox spacing="10">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label styleClass="form-label" text="AGE *"/>
+                            <TextField fx:id="fAge" styleClass="text-field" promptText="22"/>
+                        </VBox>
+                        <VBox spacing="10" HBox.hgrow="ALWAYS">
+                            <Label styleClass="form-label" text="GENDER *"/>
+                            <ComboBox fx:id="fGender" styleClass="combo-box" maxWidth="Infinity" promptText="Select"/>
+                        </VBox>
+                    </HBox>
+
+                    <VBox spacing="5">
+                        <Label styleClass="form-label" text="WEIGHT (KG) *"/>
+                        <TextField fx:id="fWeight" styleClass="text-field" promptText="e.g. 72.50"/>
+                    </VBox>
+
+                    <VBox spacing="5">
+                        <Label styleClass="form-label" text="PHONE *"/>
+                        <TextField fx:id="fPhone" styleClass="text-field" promptText="+977XXXXXXXXXX"/>
+                    </VBox>
+
+                    <VBox spacing="5">
+                        <Label styleClass="form-label" text="EMAIL *"/>
+                        <TextField fx:id="fEmail" styleClass="text-field" promptText="client@example.com"/>
+                    </VBox>
+
+                    <VBox spacing="5">
+                        <Label styleClass="form-label" text="SESSION BALANCE"/>
+                        <TextField fx:id="fSessionBalance" styleClass="text-field" promptText="0"/>
+                    </VBox>
+
+                    <Label fx:id="formErrorLabel" styleClass="text-danger"
+                           text="" wrapText="true" style="-fx-font-size:12px;"/>
+
+                    <Region VBox.vgrow="ALWAYS" minHeight="20"/>
+
+                    <HBox spacing="10" minHeight="40">
+                        <Button fx:id="formSaveBtn" styleClass="btn-primary"
+                                text="Save Client" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                                onAction="#handleSaveClient" minHeight="30"/>
+
+                        <Button fx:id="formCancelBtn"
+                                styleClass="btn-secondary"
+                                text="Cancel"
+                                HBox.hgrow="ALWAYS"
+                                maxWidth="Infinity"
+                                onAction="#handleCancelForm"
+                                minHeight="40"/>
+                    </HBox>
+
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </right>
+
+</BorderPane>

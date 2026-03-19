@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.trainerclienthub.controller.ReportController"
+            styleClass="root-pane"
+            stylesheets="@css/neon-theme.css">
+
+    <!-- ══════════════════════════════════════════════════════
+         LEFT: Sidebar navigation
+    ══════════════════════════════════════════════════════════ -->
+    <left>
+        <VBox styleClass="sidebar" spacing="0">
+            <VBox styleClass="sidebar-logo-box" spacing="4">
+                <Label styleClass="sidebar-logo-title" text="TCH"/>
+                <Label styleClass="sidebar-logo-sub"   text="TRAINER CLIENT HUB"/>
+            </VBox>
+            <Region styleClass="sidebar-divider"/>
+            <Label styleClass="sidebar-section-label" text="MAIN MENU"/>
+
+            <HBox fx:id="navDashboard" styleClass="nav-item" spacing="12"
+                  alignment="CENTER_LEFT" onMouseClicked="#handleNavDashboard">
+                <Label styleClass="nav-icon" text="⊞"/>
+                <Label text="Dashboard"/>
+            </HBox>
+            <HBox fx:id="navClients" styleClass="nav-item" spacing="12"
+                  alignment="CENTER_LEFT" onMouseClicked="#handleNavClients">
+                <Label styleClass="nav-icon" text="👥"/>
+                <Label text="Clients"/>
+            </HBox>
+            <HBox fx:id="navWorkouts" styleClass="nav-item" spacing="12"
+                  alignment="CENTER_LEFT" onMouseClicked="#handleNavWorkouts">
+                <Label styleClass="nav-icon" text="🏋"/>
+                <Label text="Workouts"/>
+            </HBox>
+            <HBox fx:id="navMemberships" styleClass="nav-item" spacing="12"
+                  alignment="CENTER_LEFT" onMouseClicked="#handleNavMemberships">
+                <Label styleClass="nav-icon" text="🪪"/>
+                <Label text="Memberships"/>
+            </HBox>
+            <HBox fx:id="navSessions" styleClass="nav-item" spacing="12"
+                  alignment="CENTER_LEFT" onMouseClicked="#handleNavSessions">
+                <Label styleClass="nav-icon" text="📅"/>
+                <Label text="Sessions"/>
+            </HBox>
+            <!-- Active nav item -->
+            <HBox styleClass="nav-item, nav-item-active" spacing="12" alignment="CENTER_LEFT">
+                <Label styleClass="nav-icon" text="📊"/>
+                <Label text="Reports"/>
+            </HBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+            <Region styleClass="sidebar-divider"/>
+
+            <HBox styleClass="nav-item" spacing="12"
+                  alignment="CENTER_LEFT" onMouseClicked="#handleLogout">
+                <Label styleClass="nav-icon" text="⏻"/>
+                <Label text="Logout" style="-fx-text-fill:#AAAAAA;"/>
+            </HBox>
+        </VBox>
+    </left>
+
+    <!-- ══════════════════════════════════════════════════════
+         TOP: Top bar with date-range controls
+    ══════════════════════════════════════════════════════════ -->
+    <top>
+        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="0">
+            <VBox spacing="2">
+                <Label styleClass="top-bar-title" text="Reports &amp; Analytics"/>
+                <Label styleClass="top-bar-subtitle"
+                       text="Workout progress, gym volume and client activity"/>
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Date range picker + generate button -->
+            <HBox spacing="8" alignment="CENTER_RIGHT">
+                <Label style="-fx-text-fill:#AAAAAA; -fx-font-size:12px;" text="From"/>
+                <DatePicker fx:id="fromDate" styleClass="date-picker" prefWidth="140"/>
+                <Label style="-fx-text-fill:#AAAAAA; -fx-font-size:12px;" text="To"/>
+                <DatePicker fx:id="toDate"   styleClass="date-picker" prefWidth="140"/>
+                <Button fx:id="generateBtn"
+                        styleClass="btn-primary"
+                        text="Generate"
+                        onAction="#handleGenerate"/>
+            </HBox>
+
+            <Region minWidth="16"/>
+
+            <!-- Avatar -->
+            <StackPane styleClass="avatar-circle">
+                <Label fx:id="avatarLabel" styleClass="avatar-label" text="T"/>
+            </StackPane>
+        </HBox>
+    </top>
+
+    <!-- ══════════════════════════════════════════════════════
+         CENTER: Scrollable charts area
+    ══════════════════════════════════════════════════════════ -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+            <VBox styleClass="content-area" spacing="24">
+
+                <!-- ── Stat cards row ────────────────────────────────────── -->
+                <HBox spacing="16">
+                    <VBox styleClass="summary-card" spacing="8"
+                          HBox.hgrow="ALWAYS" prefHeight="90">
+                        <Label styleClass="card-label" text="TOTAL REVENUE (PERIOD)"/>
+                        <Label fx:id="totalRevenueStat" styleClass="card-value" text="Rs 0"/>
+                    </VBox>
+                    <VBox styleClass="summary-card" spacing="8"
+                          HBox.hgrow="ALWAYS" prefHeight="90">
+                        <Label styleClass="card-label" text="NEW MEMBERS (PERIOD)"/>
+                        <Label fx:id="newMembersStat" styleClass="card-value" text="0"/>
+                    </VBox>
+                    <VBox styleClass="summary-card" spacing="8"
+                          HBox.hgrow="ALWAYS" prefHeight="90">
+                        <Label styleClass="card-label" text="SESSIONS COMPLETED"/>
+                        <Label fx:id="sessionsCompletedStat"
+                               style="-fx-text-fill:#00CC66;
+                                      -fx-font-size:36px;
+                                      -fx-font-weight:bold;"
+                               text="0"/>
+                    </VBox>
+                    <VBox styleClass="summary-card" spacing="8"
+                          HBox.hgrow="ALWAYS" prefHeight="90">
+                        <Label styleClass="card-label" text="AVG WORKOUTS / MEMBER"/>
+                        <Label fx:id="avgWorkoutsStat" styleClass="card-value" text="0"/>
+                    </VBox>
+                </HBox>
+
+                <!-- ── Row 1: Client Workout Progress (LineChart) full-width ─ -->
+                <VBox styleClass="chart-container" spacing="12">
+
+                    <!-- Chart header -->
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Client Workout Progress"
+                                   style="-fx-text-fill:#FFFFFF;
+                                          -fx-font-size:15px;
+                                          -fx-font-weight:bold;"/>
+                            <Label text="Weekly total volume (kg) — sets × reps × weight"
+                                   style="-fx-text-fill:#555555; -fx-font-size:11px;"/>
+                        </VBox>
+
+                        <!-- Client selector -->
+                        <ComboBox fx:id="workoutClientFilter"
+                                  styleClass="combo-box"
+                                  promptText="All clients"
+                                  prefWidth="220"/>
+                    </HBox>
+
+                    <!--
+                        Chart 1 — Client Workout Progress
+                        LineChart: X = week label, Y = total volume (kg)
+                        fx:id wired to workoutProgressChart in ReportController
+                    -->
+                    <LineChart fx:id="workoutProgressChart"
+                               prefHeight="240"
+                               animated="false"
+                               legendVisible="false"
+                               styleClass="chart"
+                               VBox.vgrow="ALWAYS">
+                        <xAxis>
+                            <CategoryAxis fx:id="lineXAxis" label="Week"/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis fx:id="lineYAxis" label="Volume (kg)"
+                                        minorTickVisible="false"/>
+                        </yAxis>
+                    </LineChart>
+
+                </VBox>
+
+                <!-- ── Row 2: Gym Volume + Most Active side-by-side ──────── -->
+                <HBox spacing="16" alignment="TOP_LEFT">
+
+                    <!--
+                        Chart 2 — Gym Workout Volume
+                        BarChart: X = week label, Y = total volume across all clients
+                        fx:id wired to gymVolumeChart in ReportController
+                    -->
+                    <VBox styleClass="chart-container" spacing="12" HBox.hgrow="ALWAYS">
+                        <Label text="Gym Workout Volume"
+                               style="-fx-text-fill:#FFFFFF;
+                                      -fx-font-size:15px;
+                                      -fx-font-weight:bold;"/>
+                        <Label text="Total kg lifted across all clients per week"
+                               style="-fx-text-fill:#555555; -fx-font-size:11px;"/>
+
+                        <BarChart fx:id="gymVolumeChart"
+                                  prefHeight="240"
+                                  animated="false"
+                                  legendVisible="false"
+                                  barGap="2"
+                                  categoryGap="14"
+                                  styleClass="chart"
+                                  VBox.vgrow="ALWAYS">
+                            <xAxis>
+                                <CategoryAxis label="Week"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="Volume (kg)"
+                                            minorTickVisible="false"/>
+                            </yAxis>
+                        </BarChart>
+                    </VBox>
+
+                    <!--
+                        Chart 3 — Most Active Clients
+                        BarChart: X = client name, Y = completed session count
+                        fx:id wired to activeClientsChart in ReportController
+                    -->
+                    <VBox styleClass="chart-container" spacing="12"
+                          prefWidth="380" minWidth="340">
+                        <Label text="Most Active Clients"
+                               style="-fx-text-fill:#FFFFFF;
+                                      -fx-font-size:15px;
+                                      -fx-font-weight:bold;"/>
+                        <Label text="Ranked by completed sessions in period"
+                               style="-fx-text-fill:#555555; -fx-font-size:11px;"/>
+
+                        <BarChart fx:id="activeClientsChart"
+                                  prefHeight="240"
+                                  animated="false"
+                                  legendVisible="false"
+                                  barGap="2"
+                                  categoryGap="10"
+                                  styleClass="chart"
+                                  VBox.vgrow="ALWAYS">
+                            <xAxis>
+                                <CategoryAxis label="Client"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="Sessions"
+                                            minorTickVisible="false"
+                                            tickUnit="1"
+                                            minorTickCount="0"/>
+                            </yAxis>
+                        </BarChart>
+                    </VBox>
+
+                </HBox>
+
+                <!-- ── Row 3: Pie + Revenue trend (original, unchanged) ─── -->
+                <HBox spacing="16" alignment="TOP_LEFT">
+
+                    <VBox styleClass="chart-container" spacing="10"
+                          prefWidth="320" minWidth="320">
+                        <Label text="Membership Distribution"
+                               style="-fx-text-fill:#FFFFFF;
+                                      -fx-font-size:14px;
+                                      -fx-font-weight:bold;"/>
+                        <Label text="By plan type"
+                               style="-fx-text-fill:#555555; -fx-font-size:11px;"/>
+                        <PieChart fx:id="membershipPieChart"
+                                  prefHeight="220"
+                                  animated="false"
+                                  styleClass="chart"
+                                  labelsVisible="true"/>
+                    </VBox>
+
+                    <VBox styleClass="chart-container" spacing="10" HBox.hgrow="ALWAYS">
+                        <Label text="Monthly Revenue Trend"
+                               style="-fx-text-fill:#FFFFFF;
+                                      -fx-font-size:14px;
+                                      -fx-font-weight:bold;"/>
+                        <Label text="Total payments collected per month (NPR)"
+                               style="-fx-text-fill:#555555; -fx-font-size:11px;"/>
+                        <BarChart fx:id="revenueTrendChart"
+                                  prefHeight="220"
+                                  animated="false"
+                                  legendVisible="false"
+                                  styleClass="chart">
+                            <xAxis><CategoryAxis/></xAxis>
+                            <yAxis><NumberAxis/></yAxis>
+                        </BarChart>
+                    </VBox>
+
+                </HBox>
+
+                <!-- ── Export ─────────────────────────────────────────────── -->
+                <HBox alignment="CENTER_RIGHT">
+                    <Button fx:id="exportBtn"
+                            styleClass="btn-secondary"
+                            text="Export Report (PDF)"
+                            onAction="#handleExportReport"/>
+                </HBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

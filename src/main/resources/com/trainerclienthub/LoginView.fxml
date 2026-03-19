@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.trainerclienthub.controller.LoginController"
+           styleClass="login-root"
+           stylesheets="@css/neon-theme.css">
+
+    <!-- Full-screen background -->
+    <VBox alignment="CENTER" spacing="0">
+
+        <!-- Decorative top accent bar -->
+        <HBox minHeight="4" maxHeight="4" style="-fx-background-color: #CCFF00;" />
+
+        <!-- Center content -->
+        <StackPane VBox.vgrow="ALWAYS">
+
+            <!-- Login card -->
+            <VBox styleClass="login-card" alignment="TOP_CENTER" spacing="0"
+                  StackPane.alignment="CENTER">
+
+                <!-- Logo / Branding -->
+                <VBox alignment="CENTER" spacing="6">
+                    <Label text="TCH" style="-fx-text-fill:#CCFF00; -fx-font-size:40px; -fx-font-weight:bold;"/>
+                    <Label styleClass="login-title" text="TRAINER CLIENT HUB"/>
+                    <Label styleClass="login-subtitle" text="Gym Management System"/>
+                </VBox>
+
+                <Region minHeight="32" />
+
+                <!-- Email or Phone field -->
+                <VBox spacing="6">
+                    <Label styleClass="login-field-label" text="EMAIL OR PHONE NUMBER"/>
+                    <TextField fx:id="emailField"
+                               styleClass="text-field"
+                               promptText="trainer@gymhub.com / +977XXXXXXXXXX"
+                               prefWidth="332"/>
+                </VBox>
+
+                <Region minHeight="16" />
+
+                <!-- Password field -->
+                <VBox spacing="6">
+                    <Label styleClass="login-field-label" text="PASSWORD"/>
+                    <PasswordField fx:id="passwordField"
+                                   styleClass="password-field"
+                                   promptText="Enter your password"
+                                   prefWidth="332"/>
+                </VBox>
+
+                <Region minHeight="8" />
+
+                <!-- Error label -->
+                <Label fx:id="errorLabel"
+                       styleClass="text-danger"
+                       text=""
+                       wrapText="true"
+                       prefWidth="332"
+                       style="-fx-font-size:12px;"/>
+
+                <Region minHeight="20" />
+
+                <!-- Login button -->
+                <Button fx:id="loginButton"
+                        styleClass="btn-primary"
+                        text="LOGIN"
+                        prefWidth="332"
+                        prefHeight="46"
+                        onAction="#handleLogin"/>
+
+                <Region minHeight="20" />
+
+                <!-- Register link -->
+                <HBox alignment="CENTER" spacing="4">
+                    <Label text="Don't have an account?"
+                           style="-fx-text-fill:#AAAAAA; -fx-font-size:13px;"/>
+                    <Hyperlink fx:id="registerLink"
+                               styleClass="hyperlink"
+                               text="Register here"
+                               onAction="#handleRegisterLink"/>
+                </HBox>
+
+            </VBox>
+        </StackPane>
+
+    </VBox>
+</StackPane>

@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.trainerclienthub.controller.WorkoutController"
+            styleClass="root-pane"
+            stylesheets="@css/neon-theme.css">
+
+    <!-- ── LEFT: Sidebar ── -->
+    <left>
+        <VBox styleClass="sidebar" spacing="0">
+            <VBox styleClass="sidebar-logo-box" spacing="4">
+                <Label styleClass="sidebar-logo-title" text="TCH"/>
+                <Label styleClass="sidebar-logo-sub"   text="TRAINER CLIENT HUB"/>
+            </VBox>
+            <Region styleClass="sidebar-divider"/>
+            <Label styleClass="sidebar-section-label" text="MAIN MENU"/>
+            <HBox fx:id="navDashboard" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavDashboard">
+                <Label styleClass="nav-icon" text="⊞"/><Label text="Dashboard"/>
+            </HBox>
+            <HBox fx:id="navClients" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavClients">
+                <Label styleClass="nav-icon" text="👥"/><Label text="Clients"/>
+            </HBox>
+            <HBox styleClass="nav-item, nav-item-active" spacing="12" alignment="CENTER_LEFT">
+                <Label styleClass="nav-icon" text="🏋"/><Label text="Workouts"/>
+            </HBox>
+            <HBox fx:id="navMemberships" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavMemberships">
+                <Label styleClass="nav-icon" text="🪪"/><Label text="Memberships"/>
+            </HBox>
+            <HBox fx:id="navSessions" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavSessions">
+                <Label styleClass="nav-icon" text="📅"/><Label text="Sessions"/>
+            </HBox>
+            <HBox fx:id="navReports" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavReports">
+                <Label styleClass="nav-icon" text="📊"/><Label text="Reports"/>
+            </HBox>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Region styleClass="sidebar-divider"/>
+            <HBox styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleLogout">
+                <Label styleClass="nav-icon" text="⏻"/><Label text="Logout" style="-fx-text-fill:#AAAAAA;"/>
+            </HBox>
+        </VBox>
+    </left>
+
+    <!-- ── TOP: Top bar ── -->
+    <top>
+        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="0">
+            <VBox spacing="2">
+                <Label styleClass="top-bar-title" text="Workout Tracking"/>
+                <Label styleClass="top-bar-subtitle" text="Record and review client workout sessions"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <StackPane styleClass="avatar-circle">
+                <Label fx:id="avatarLabel" styleClass="avatar-label" text="T"/>
+            </StackPane>
+        </HBox>
+    </top>
+
+    <!-- ── CENTER: Split pane — workout list top, exercise details bottom ── -->
+    <center>
+        <VBox styleClass="content-area" spacing="20">
+
+            <!-- Client selector + action bar -->
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Label styleClass="form-label" text="CLIENT:" style="-fx-text-fill:#AAAAAA;"/>
+                <ComboBox fx:id="clientSelector" styleClass="combo-box"
+                          promptText="Select a client..." prefWidth="240"
+                          onAction="#handleClientSelected"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="addWorkoutBtn" styleClass="btn-primary"
+                        text="+ Log Workout" onAction="#handleAddWorkout"/>
+                <Button fx:id="deleteWorkoutBtn" styleClass="btn-danger"
+                        text="Delete" onAction="#handleDeleteWorkout"/>
+            </HBox>
+
+            <!-- Top: Workout history table -->
+            <VBox spacing="10" VBox.vgrow="ALWAYS">
+                <Label text="Workout History"
+                       style="-fx-text-fill:#FFFFFF; -fx-font-size:14px; -fx-font-weight:bold;"/>
+                <TableView fx:id="workoutTable" VBox.vgrow="ALWAYS" styleClass="table-view"
+                           prefHeight="220" onMouseClicked="#handleWorkoutSelected">
+                    <columns>
+                        <TableColumn fx:id="colWorkoutId"     text="ID"           prefWidth="60"/>
+                        <TableColumn fx:id="colWorkoutDate"   text="DATE"         prefWidth="120"/>
+                        <TableColumn fx:id="colWorkoutTrainer" text="TRAINER"     prefWidth="150"/>
+                        <TableColumn fx:id="colTotalVolume"   text="TOTAL VOLUME" prefWidth="140"/>
+                        <TableColumn fx:id="colWorkoutNotes"  text="NOTES"        prefWidth="250"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="Select a client to view workout history."
+                               style="-fx-text-fill:#555555; -fx-font-size:13px;"/>
+                    </placeholder>
+                </TableView>
+            </VBox>
+
+            <Region styleClass="divider-line"/>
+
+            <!-- Bottom: Exercise entries for selected workout -->
+            <VBox spacing="10" VBox.vgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <Label fx:id="exerciseSectionLabel"
+                           text="Exercises"
+                           style="-fx-text-fill:#FFFFFF; -fx-font-size:14px; -fx-font-weight:bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="addExerciseBtn" styleClass="btn-secondary"
+                            text="+ Add Exercise" onAction="#handleAddExercise"
+                            managed="false" visible="false"/>
+                    <Button fx:id="deleteExerciseBtn" styleClass="btn-danger"
+                            text="Remove" onAction="#handleDeleteExercise"
+                            managed="false" visible="false"/>
+                </HBox>
+
+                <TableView fx:id="exerciseTable" VBox.vgrow="ALWAYS" styleClass="table-view"
+                           prefHeight="180">
+                    <columns>
+                        <TableColumn fx:id="colExerciseName" text="EXERCISE"  prefWidth="180"/>
+                        <TableColumn fx:id="colSets"         text="SETS"      prefWidth="80"/>
+                        <TableColumn fx:id="colReps"         text="REPS"      prefWidth="80"/>
+                        <TableColumn fx:id="colWeight"       text="WEIGHT KG" prefWidth="110"/>
+                        <TableColumn fx:id="colVolume"       text="VOLUME"    prefWidth="110"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="Select a workout to see exercises."
+                               style="-fx-text-fill:#555555; -fx-font-size:13px;"/>
+                    </placeholder>
+                </TableView>
+            </VBox>
+
+        </VBox>
+    </center>
+
+    <!-- ── RIGHT: Log Workout / Add Exercise form ── -->
+    <right>
+        <VBox fx:id="workoutFormPanel" styleClass="form-panel" spacing="16"
+              minWidth="300" maxWidth="300" managed="false" visible="false">
+
+            <Label fx:id="workoutFormTitle" styleClass="form-panel-title" text="Log Workout"/>
+            <Region styleClass="divider-line"/>
+
+            <!-- Workout date -->
+            <VBox spacing="5">
+                <Label styleClass="form-label" text="WORKOUT DATE *"/>
+                <DatePicker fx:id="fWorkoutDate" styleClass="date-picker" prefWidth="Infinity"/>
+            </VBox>
+
+            <!-- Notes -->
+            <VBox spacing="5">
+                <Label styleClass="form-label" text="SESSION NOTES"/>
+                <TextArea fx:id="fWorkoutNotes" styleClass="text-area"
+                          promptText="e.g. Push day — chest and triceps"
+                          prefRowCount="3" wrapText="true"/>
+            </VBox>
+
+            <Region styleClass="divider-line"/>
+
+            <!-- Inline exercise entry -->
+            <Label text="ADD EXERCISE"
+                   style="-fx-text-fill:#CCFF00; -fx-font-size:11px; -fx-font-weight:bold;"/>
+
+            <VBox spacing="5">
+                <Label styleClass="form-label" text="EXERCISE NAME *"/>
+                <TextField fx:id="fExerciseName" styleClass="text-field" promptText="e.g. Bench Press"/>
+            </VBox>
+
+            <HBox spacing="8">
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label styleClass="form-label" text="SETS *"/>
+                    <TextField fx:id="fSets" styleClass="text-field" promptText="4"/>
+                </VBox>
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label styleClass="form-label" text="REPS *"/>
+                    <TextField fx:id="fReps" styleClass="text-field" promptText="8"/>
+                </VBox>
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label styleClass="form-label" text="KG *"/>
+                    <TextField fx:id="fWeightKg" styleClass="text-field" promptText="60"/>
+                </VBox>
+            </HBox>
+
+            <Button fx:id="addExerciseInlineBtn" styleClass="btn-secondary"
+                    text="+ Add Exercise to List" prefWidth="Infinity"
+                    onAction="#handleAddExerciseInline"/>
+
+            <!-- Exercise list preview -->
+            <ListView fx:id="exercisePreviewList" styleClass="table-view"
+                      prefHeight="120"
+                      style="-fx-background-radius:8; -fx-border-radius:8;"/>
+
+            <!-- Validation error -->
+            <Label fx:id="workoutFormErrorLabel" styleClass="text-danger"
+                   text="" wrapText="true" style="-fx-font-size:12px;"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <HBox spacing="10" minHeight="10" alignment="CENTER">
+                <Button fx:id="saveWorkoutBtn"
+                        styleClass="btn-primary"
+                        text="Save Workout"
+                        HBox.hgrow="ALWAYS"
+                        maxWidth="Infinity"
+                        onAction="#handleSaveWorkout"
+                        minHeight="10"/>
+
+                <Button fx:id="cancelWorkoutBtn"
+                        styleClass="btn-secondary"
+                        text="Cancel"
+                        HBox.hgrow="ALWAYS"
+                        maxWidth="Infinity"
+                        onAction="#handleCancelWorkoutForm"
+                        minHeight="10"/>
+            </HBox>
+
+        </VBox>
+    </right>
+
+</BorderPane>

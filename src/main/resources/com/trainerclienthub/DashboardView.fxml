@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.trainerclienthub.controller.DashboardController"
+            styleClass="root-pane"
+            stylesheets="@css/neon-theme.css">
+
+    <!-- ── LEFT: Sidebar ── -->
+    <left>
+        <VBox styleClass="sidebar" spacing="0">
+
+            <!-- Logo -->
+            <VBox styleClass="sidebar-logo-box" spacing="4">
+                <Label styleClass="sidebar-logo-title" text="TCH"/>
+                <Label styleClass="sidebar-logo-sub"   text="TRAINER CLIENT HUB"/>
+            </VBox>
+
+            <Region styleClass="sidebar-divider"/>
+
+            <Label styleClass="sidebar-section-label" text="MAIN MENU"/>
+
+            <!-- Nav items -->
+            <HBox styleClass="nav-item, nav-item-active" spacing="12" alignment="CENTER_LEFT">
+                <Label styleClass="nav-icon" text="⊞"/>
+                <Label text="Dashboard"/>
+            </HBox>
+            <HBox fx:id="navClients" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavClients">
+                <Label styleClass="nav-icon" text="👥"/>
+                <Label text="Clients"/>
+            </HBox>
+            <HBox fx:id="navWorkouts" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavWorkouts">
+                <Label styleClass="nav-icon" text="🏋"/>
+                <Label text="Workouts"/>
+            </HBox>
+            <HBox fx:id="navMemberships" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavMemberships">
+                <Label styleClass="nav-icon" text="🪪"/>
+                <Label text="Memberships"/>
+            </HBox>
+            <HBox fx:id="navSessions" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavSessions">
+                <Label styleClass="nav-icon" text="📅"/>
+                <Label text="Sessions"/>
+            </HBox>
+            <HBox fx:id="navReports" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavReports">
+                <Label styleClass="nav-icon" text="📊"/>
+                <Label text="Reports"/>
+            </HBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Region styleClass="sidebar-divider"/>
+
+            <!-- Logout -->
+            <HBox styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleLogout">
+                <Label styleClass="nav-icon" text="⏻"/>
+                <Label text="Logout" style="-fx-text-fill:#AAAAAA;"/>
+            </HBox>
+
+        </VBox>
+    </left>
+
+    <!-- ── TOP: Top bar ── -->
+    <top>
+        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="0">
+            <VBox spacing="2">
+                <Label styleClass="top-bar-title" text="Dashboard"/>
+                <Label fx:id="greetingLabel" styleClass="top-bar-subtitle" text="Good morning, Trainer"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <!-- Avatar -->
+            <StackPane styleClass="avatar-circle">
+                <Label fx:id="avatarLabel" styleClass="avatar-label" text="T"/>
+            </StackPane>
+        </HBox>
+    </top>
+
+    <!-- ── CENTER: Dashboard content ── -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+            <VBox styleClass="content-area" spacing="28">
+
+                <!-- Page heading -->
+                <VBox spacing="4">
+                    <Label styleClass="section-title" text="Overview"/>
+                    <Label fx:id="dateLabel" styleClass="section-subtitle" text=""/>
+                </VBox>
+
+                <!-- Summary cards row -->
+                <HBox spacing="16">
+                    <!-- Card: Total Members -->
+                    <VBox styleClass="summary-card" spacing="12" HBox.hgrow="ALWAYS">
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <StackPane styleClass="card-icon-box">
+                                <Label styleClass="card-icon" text="👥"/>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <Label styleClass="card-label" text="TOTAL MEMBERS"/>
+                                <Label fx:id="totalMembersLabel" styleClass="card-value" text="0"/>
+                            </VBox>
+                        </HBox>
+                        <HBox spacing="6" alignment="CENTER_LEFT">
+                            <Region styleClass="card-accent-dot"/>
+                            <Label fx:id="totalMembersTrendLabel" styleClass="card-trend-up" text="+0 this month"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Card: Active Memberships -->
+                    <VBox styleClass="summary-card" spacing="12" HBox.hgrow="ALWAYS">
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <StackPane styleClass="card-icon-box">
+                                <Label styleClass="card-icon" text="🪪"/>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <Label styleClass="card-label" text="ACTIVE MEMBERSHIPS"/>
+                                <Label fx:id="activeMembershipsLabel" styleClass="card-value" text="0"/>
+                            </VBox>
+                        </HBox>
+                        <HBox spacing="6" alignment="CENTER_LEFT">
+                            <Region styleClass="card-accent-dot"/>
+                            <Label fx:id="membershipsTrendLabel" styleClass="card-trend-up" text="0 expiring soon"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Card: Sessions Today -->
+                    <VBox styleClass="summary-card" spacing="12" HBox.hgrow="ALWAYS">
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <StackPane styleClass="card-icon-box">
+                                <Label styleClass="card-icon" text="📅"/>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <Label styleClass="card-label" text="SESSIONS TODAY"/>
+                                <Label fx:id="sessionsTodayLabel" styleClass="card-value" text="0"/>
+                            </VBox>
+                        </HBox>
+                        <HBox spacing="6" alignment="CENTER_LEFT">
+                            <Region styleClass="card-accent-dot"/>
+                            <Label fx:id="sessionsCompletedLabel" styleClass="card-trend-up" text="0 completed"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Card: Revenue -->
+                    <VBox styleClass="summary-card" spacing="12" HBox.hgrow="ALWAYS">
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <StackPane styleClass="card-icon-box">
+                                <Label styleClass="card-icon" text="₨"/>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <Label styleClass="card-label" text="MONTHLY REVENUE"/>
+                                <Label fx:id="revenueLabel" styleClass="card-value" text="Rs 0"/>
+                            </VBox>
+                        </HBox>
+                        <HBox spacing="6" alignment="CENTER_LEFT">
+                            <Region styleClass="card-accent-dot"/>
+                            <Label fx:id="revenueTrendLabel" styleClass="card-trend-up" text="+0% vs last month"/>
+                        </HBox>
+                    </VBox>
+                </HBox>
+
+                <!-- Charts + Progress row -->
+                <HBox spacing="16" alignment="TOP_LEFT">
+
+                    <!-- Membership Growth Line Chart -->
+                    <VBox styleClass="chart-container" spacing="12" HBox.hgrow="ALWAYS">
+                        <Label text="Membership Growth"
+                               style="-fx-text-fill:#FFFFFF; -fx-font-size:15px; -fx-font-weight:bold;"/>
+                        <Label text="New members over the last 6 months"
+                               style="-fx-text-fill:#555555; -fx-font-size:11px;"/>
+                        <LineChart fx:id="membershipChart"
+                                   prefHeight="220"
+                                   animated="false"
+                                   legendVisible="false"
+                                   styleClass="chart">
+                            <xAxis>
+                                <CategoryAxis label="" tickLabelFill="AAAAAA"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="" tickLabelFill="AAAAAA"/>
+                            </yAxis>
+                        </LineChart>
+                    </VBox>
+
+                    <!-- Membership utilization progress -->
+                    <VBox styleClass="progress-container" spacing="16" alignment="CENTER"
+                          prefWidth="220" minWidth="220">
+                        <Label text="Membership Utilization"
+                               style="-fx-text-fill:#FFFFFF; -fx-font-size:14px; -fx-font-weight:bold;"/>
+                        <ProgressIndicator fx:id="utilizationIndicator"
+                                           progress="0"
+                                           prefWidth="120"
+                                           prefHeight="120"
+                                           styleClass="progress-indicator"/>
+                        <Label fx:id="utilizationLabel"
+                               style="-fx-text-fill:#CCFF00; -fx-font-size:22px; -fx-font-weight:bold;"
+                               text="0%"/>
+                        <Label text="Active / Total Members"
+                               style="-fx-text-fill:#555555; -fx-font-size:11px;"/>
+                        <HBox spacing="8" alignment="CENTER">
+                            <VBox alignment="CENTER" spacing="2">
+                                <Label fx:id="activeCountLabel"
+                                       style="-fx-text-fill:#CCFF00; -fx-font-size:18px; -fx-font-weight:bold;"
+                                       text="0"/>
+                                <Label text="Active" style="-fx-text-fill:#AAAAAA; -fx-font-size:11px;"/>
+                            </VBox>
+                            <Label text="/" style="-fx-text-fill:#2E2E2E; -fx-font-size:20px;"/>
+                            <VBox alignment="CENTER" spacing="2">
+                                <Label fx:id="totalCountLabel"
+                                       style="-fx-text-fill:#FFFFFF; -fx-font-size:18px; -fx-font-weight:bold;"
+                                       text="0"/>
+                                <Label text="Total" style="-fx-text-fill:#AAAAAA; -fx-font-size:11px;"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                </HBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>
