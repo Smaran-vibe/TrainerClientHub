@@ -17,7 +17,6 @@ import java.util.Optional;
  */
 public class ClientDAO {
 
-    // ── SQL ──────────────────────────────────────────────────────────────────
 
     private static final String INSERT =
             "INSERT INTO client (name, age, gender, phone, email, session_balance, weight_kg, trainer_id, created_at) " +
@@ -48,7 +47,6 @@ public class ClientDAO {
     private static final String SEARCH =
             "SELECT * FROM client WHERE name LIKE ? OR email LIKE ? OR phone LIKE ? ORDER BY name";
 
-    // ── Create ───────────────────────────────────────────────────────────────
 
     public void insert(Client client) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -75,7 +73,6 @@ public class ClientDAO {
         }
     }
 
-    // ── Read ─────────────────────────────────────────────────────────────────
 
     public Optional<Client> findById(int clientId) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -150,7 +147,6 @@ public class ClientDAO {
         return list;
     }
 
-    // ── Update ───────────────────────────────────────────────────────────────
 
     public void update(Client client) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -186,7 +182,6 @@ public class ClientDAO {
         }
     }
 
-    // ── Delete ───────────────────────────────────────────────────────────────
 
     public void delete(int clientId) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -200,7 +195,6 @@ public class ClientDAO {
         }
     }
 
-    // ── Mapper ───────────────────────────────────────────────────────────────
 
     private Client map(ResultSet rs) throws SQLException {
         return new Client(
