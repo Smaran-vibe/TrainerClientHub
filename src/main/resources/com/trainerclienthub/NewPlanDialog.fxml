@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.trainerclienthub.controller.NewPlanDialogController"
+      spacing="16"
+      alignment="TOP_LEFT"
+      stylesheets="@css/neon-theme.css"
+      style="-fx-background-color:#0B0B0B; -fx-padding:24; -fx-background-radius:14;">
+
+    <Label text="New Membership Plan" styleClass="form-panel-title"/>
+
+    <GridPane hgap="12" vgap="12">
+        <columnConstraints>
+            <ColumnConstraints minWidth="120" halignment="RIGHT"/>
+            <ColumnConstraints prefWidth="260"/>
+        </columnConstraints>
+
+        <Label text="Plan Name" styleClass="form-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="planNameField" promptText="Enter plan name" styleClass="combo-box"
+                   GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Plan Type" styleClass="form-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="planTypeCombo" styleClass="combo-box" prefWidth="220"
+                  GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Duration (days)" styleClass="form-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="durationField" promptText="e.g., 30" styleClass="combo-box"
+                   GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Price" styleClass="form-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <TextField fx:id="priceField" promptText="NPR 0.00" styleClass="combo-box"
+                   GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Sessions Included" styleClass="form-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <TextField fx:id="sessionsField" promptText="e.g., 8" styleClass="combo-box"
+                   GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <Label fx:id="errorLabel" styleClass="text-danger" text="" wrapText="true" visible="false" managed="false"/>
+
+    <HBox spacing="12" alignment="CENTER_RIGHT">
+        <Button text="Cancel" styleClass="btn-secondary" onAction="#handleCancel"/>
+        <Button fx:id="saveBtn" text="Save" styleClass="btn-primary" onAction="#handleSave"/>
+    </HBox>
+</VBox>
