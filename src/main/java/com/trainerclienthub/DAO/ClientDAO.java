@@ -41,6 +41,9 @@ public class ClientDAO {
     private static final String UPDATE_SESSION_BALANCE =
             "UPDATE client SET session_balance = ? WHERE client_id = ?";
 
+    private static final String INCREMENT_SESSION_BALANCE =
+            "UPDATE client SET session_balance = session_balance + ? WHERE client_id = ?";
+
     private static final String DELETE =
             "DELETE FROM client WHERE client_id = ?";
 
@@ -179,6 +182,19 @@ public class ClientDAO {
 
         } catch (SQLException e) {
             throw new DatabaseException("Failed to update session balance for client id: " + clientId, e);
+        }
+    }
+
+    public void incrementSessionBalance(int clientId, int delta) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(INCREMENT_SESSION_BALANCE)) {
+
+            ps.setInt(1, delta);
+            ps.setInt(2, clientId);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to increment session balance for client id: " + clientId, e);
         }
     }
 
