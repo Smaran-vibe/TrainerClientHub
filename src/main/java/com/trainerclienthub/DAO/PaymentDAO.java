@@ -33,8 +33,12 @@ public class PaymentDAO {
     private static final String SELECT_BY_DATE_RANGE =
             "SELECT * FROM payment WHERE payment_date BETWEEN ? AND ? ORDER BY payment_date DESC";
 
-    private static final String SELECT_ALL =
-            "SELECT * FROM payment ORDER BY payment_date DESC";
+    private static final String SELECT_ALL_WITH_CLIENT =
+            "SELECT p.payment_id, p.client_id, p.membership_id, p.amount, " +
+            "p.payment_date, p.payment_method, p.payment_status, c.name AS client_name " +
+            "FROM payment p " +
+            "JOIN client c ON p.client_id = c.client_id " +
+            "ORDER BY p.payment_date DESC";
 
     private static final String UPDATE =
             "UPDATE payment SET client_id = ?, membership_id = ?, amount = ?, payment_date = ?, " +
@@ -130,10 +134,10 @@ public class PaymentDAO {
     public List<Payment> findAll() {
         List<Payment> list = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_ALL);
+             PreparedStatement ps = conn.prepareStatement(SELECT_ALL_WITH_CLIENT);
              ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) list.add(map(rs));
+            while (rs.next()) list.add(map(rs, true));
         } catch (SQLException e) {
             throw new DatabaseException("Failed to fetch all payments.", e);
         }
@@ -188,7 +192,11 @@ public class PaymentDAO {
 
 
     private Payment map(ResultSet rs) throws SQLException {
-        return new Payment(
+        return map(rs, false);
+    }
+
+    private Payment map(ResultSet rs, boolean includeClientName) throws SQLException {
+        Payment payment = new Payment(
                 rs.getInt("payment_id"),
                 rs.getInt("client_id"),
                 rs.getInt("membership_id"),
@@ -197,6 +205,11 @@ public class PaymentDAO {
                 PaymentMethod.valueOf(rs.getString("payment_method").toUpperCase()),
                 PaymentStatus.valueOf(rs.getString("payment_status").toUpperCase())
         );
+        if (includeClientName) {
+            String clientName = rs.getString("client_name");
+            payment.setClientName(clientName);
+        }
+        return payment;
     }
 
     /**
