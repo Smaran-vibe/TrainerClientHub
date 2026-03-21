@@ -21,11 +21,11 @@ public class MembershipDAO {
 
 
     private static final String PLAN_INSERT =
-            "INSERT INTO membership_plan (plan_name, plan_type, duration_days, price) VALUES (?, ?, ?, ?)";
+            "INSERT INTO membership_plan (plan_name, plan_type, duration_days, price, sessions_included) VALUES (?, ?, ?, ?, ?)";
     private static final String PLAN_SELECT_BY_ID   = "SELECT * FROM membership_plan WHERE plan_id = ?";
     private static final String PLAN_SELECT_ALL     = "SELECT * FROM membership_plan ORDER BY plan_name";
     private static final String PLAN_UPDATE =
-            "UPDATE membership_plan SET plan_name = ?, plan_type = ?, duration_days = ?, price = ? WHERE plan_id = ?";
+            "UPDATE membership_plan SET plan_name = ?, plan_type = ?, duration_days = ?, price = ?, sessions_included = ? WHERE plan_id = ?";
     private static final String PLAN_DELETE         = "DELETE FROM membership_plan WHERE plan_id = ?";
 
 
@@ -55,6 +55,7 @@ public class MembershipDAO {
             ps.setString(2, plan.getPlanType().name());
             ps.setInt(3, plan.getDurationDays());
             ps.setBigDecimal(4, plan.getPrice());
+            ps.setInt(5, plan.getSessionsIncluded());
             ps.executeUpdate();
 
             try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -99,7 +100,8 @@ public class MembershipDAO {
             ps.setString(2, plan.getPlanType().name());
             ps.setInt(3, plan.getDurationDays());
             ps.setBigDecimal(4, plan.getPrice());
-            ps.setInt(5, plan.getPlanId());
+            ps.setInt(5, plan.getSessionsIncluded());
+            ps.setInt(6, plan.getPlanId());
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -263,7 +265,8 @@ public class MembershipDAO {
                 rs.getString("plan_name"),
                 PlanType.valueOf(rs.getString("plan_type").toUpperCase()),
                 rs.getInt("duration_days"),
-                rs.getBigDecimal("price")
+                rs.getBigDecimal("price"),
+                rs.getInt("sessions_included")
         );
     }
 
