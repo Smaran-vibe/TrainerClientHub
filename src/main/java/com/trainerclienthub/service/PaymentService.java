@@ -66,6 +66,17 @@ public class PaymentService {
     }
 
 
+    /**
+     * Updates the payment status. Allowed values: COMPLETED, PENDING, REFUNDED, FAILED.
+     */
+    public void updatePaymentStatus(int paymentId, String newStatus) {
+        ValidationUtil.requirePositiveInt(paymentId, "Payment ID");
+        if (newStatus == null || newStatus.isBlank()) {
+            throw new IllegalArgumentException("Payment status must not be null or blank.");
+        }
+        paymentDAO.updatePaymentStatus(paymentId, newStatus);
+    }
+
     public void refundPayment(int paymentId) {
         ValidationUtil.requirePositiveInt(paymentId, "Payment ID");
 
