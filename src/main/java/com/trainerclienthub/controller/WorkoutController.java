@@ -2,6 +2,7 @@ package com.trainerclienthub.controller;
 
 import com.trainerclienthub.model.Client;
 import com.trainerclienthub.model.Exercise;
+import com.trainerclienthub.model.TrainerRole;
 import com.trainerclienthub.model.Workout;
 import com.trainerclienthub.service.ClientService;
 import com.trainerclienthub.service.WorkoutService;
@@ -15,6 +16,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -34,15 +36,13 @@ import java.util.ResourceBundle;
  * <ul>
  *   <li>Populate the client selector ComboBox</li>
  *   <li>Load and display workout history for the selected client</li>
- *   <li>Show exercise breakdown when a workout row is selected</li>
- *   <li>Manage the slide-in form for logging a new workout with exercises</li>
- *   <li>Delegate all persistence to {@link WorkoutService}</li>
- * </ul>
  */
 public class WorkoutController implements Initializable {
 
-    // ── FXML — top bar ────────────────────────────────────────────────────────
+    // ── FXML — top bar + sidebar ───────────────────────────────────────────────
     @FXML private Label avatarLabel;
+    @FXML private HBox navMemberships;
+    @FXML private HBox navPayments;
 
     // ── FXML — client selector ────────────────────────────────────────────────
     @FXML private ComboBox<Client> clientSelector;
@@ -101,12 +101,19 @@ public class WorkoutController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         populateAvatarLabel();
+        applyRoleBasedUI();
         configureWorkoutTable();
         configureExerciseTable();
         loadClientSelector();
         hideFormPanel();
         hideFormError();
         exercisePreviewList.setItems(stagedLabels);
+    }
+
+    private void applyRoleBasedUI() {
+        boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
+        if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
+        if (navPayments != null)    { navPayments.setVisible(!isTrainer);    navPayments.setManaged(!isTrainer); }
     }
 
     // ── Table configuration ───────────────────────────────────────────────────
@@ -117,9 +124,7 @@ public class WorkoutController implements Initializable {
         colTotalVolume.setCellValueFactory(new PropertyValueFactory<>("totalVolume"));
         colWorkoutNotes.setCellValueFactory(new PropertyValueFactory<>("notes"));
         // Trainer column: display trainerId for now; swap with name lookup when TrainerService is wired
-        colWorkoutTrainer.setCellValueFactory(data ->
-                new javafx.beans.property.SimpleStringProperty(
-                        "Trainer #" + data.getValue().getTrainerId()));
+        colWorkoutTrainer.setCellValueFactory(new PropertyValueFactory<>("trainerName"));
         workoutTable.setItems(workouts);
     }
 
@@ -337,6 +342,7 @@ public class WorkoutController implements Initializable {
     @FXML private void handleNavClients(MouseEvent e)     { navigate("ClientManagementView.fxml",     "TCH — Clients"); }
     @FXML private void handleNavMemberships(MouseEvent e) { navigate("MembershipManagementView.fxml", "TCH — Memberships"); }
     @FXML private void handleNavSessions(MouseEvent e)    { navigate("SessionManagementView.fxml",    "TCH — Sessions"); }
+    @FXML private void handleNavPayments(MouseEvent e)    { navigate("Payments.fxml",                  "TCH — Payments"); }
     @FXML private void handleNavReports(MouseEvent e)     { navigate("ReportsView.fxml",              "TCH — Reports"); }
 
     @FXML private void handleLogout(MouseEvent e) {
