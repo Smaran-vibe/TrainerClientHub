@@ -1,7 +1,9 @@
 package com.trainerclienthub.controller;
 
 import com.trainerclienthub.model.Payment;
+import com.trainerclienthub.model.Session;
 import com.trainerclienthub.model.Trainer;
+import com.trainerclienthub.model.TrainerRole;
 import com.trainerclienthub.service.DashboardService;
 import com.trainerclienthub.util.SessionManager;
 import com.trainerclienthub.util.ViewLoader;
@@ -22,12 +24,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -57,8 +61,16 @@ public class DashboardController implements Initializable {
     @FXML private Label membershipsTrendLabel;
     @FXML private Label sessionsTodayLabel;
     @FXML private Label sessionsCompletedLabel;
+    @FXML private VBox  activeMembershipsCard;
+    @FXML private VBox  revenueCard;
+    @FXML private VBox  pendingSessionsCard;
+    @FXML private VBox  workoutsThisWeekCard;
     @FXML private Label revenueLabel;
     @FXML private Label revenueTrendLabel;
+    @FXML private Label pendingSessionsLabel;
+    @FXML private Label pendingSessionsTrendLabel;
+    @FXML private Label workoutsThisWeekLabel;
+    @FXML private Label workoutsThisWeekTrendLabel;
 
     //  FXML injections — revenue + recent payments section
 
@@ -70,7 +82,15 @@ public class DashboardController implements Initializable {
 
     //  FXML injections — chart + progress
 
-    @FXML private LineChart<String, Number> membershipChart;
+    @FXML private VBox                       adminDashboardView;
+    @FXML private VBox                       trainerDashboardView;
+    @FXML private VBox                       membershipGrowthChart;
+    @FXML private VBox                       membershipUtilizationPane;
+    @FXML private LineChart<String, Number>  membershipChart;
+    @FXML private TableView<Session>         trainerScheduleTable;
+    @FXML private TableColumn<Session, String> colScheduleClientName;
+    @FXML private TableColumn<Session, String> colScheduleTime;
+    @FXML private TableColumn<Session, String> colScheduleStatus;
     @FXML private ProgressIndicator         utilizationIndicator;
     @FXML private Label                     utilizationLabel;
     @FXML private Label                     activeCountLabel;
@@ -87,28 +107,55 @@ public class DashboardController implements Initializable {
         populateTrainerInfo();
         applyRoleBasedUI();
         populateSummaryCards();
-        populateMembershipChart();
-        populateUtilizationIndicator();
-        populateRecentPayments();
+        configureTrainerScheduleTable();
+        if (SessionManager.getInstance().getRole() == TrainerRole.ADMIN) {
+            populateMembershipChart();
+            populateUtilizationIndicator();
+            populateRecentPayments();
+        } else {
+            populateTrainerSchedule();
+        }
     }
 
     // Data population
 
     /**
-     * Shows or hides sidebar nav items based on the logged-in trainer's role.
+     * Shows or hides UI elements based on the logged-in trainer's role.
+     * ADMIN: adminDashboardView visible; trainerDashboardView, trainer cards hidden.
+     * TRAINER: trainerDashboardView, trainer cards visible; adminDashboardView, admin cards hidden.
      */
     private void applyRoleBasedUI() {
-        boolean isAdmin = SessionManager.getInstance().isAdmin();
+        boolean isAdmin = SessionManager.getInstance().getRole() == TrainerRole.ADMIN;
+        boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
 
-        // Memberships, Payments and Reports are admin-only
         setNavVisible(navMemberships, isAdmin);
         setNavVisible(navPayments,    isAdmin);
-        setNavVisible(navReports,     isAdmin);
+        setNavVisible(navReports,     true);
 
-        // Clients, Workouts, Sessions visible to all roles
-        setNavVisible(navClients,  true);
-        setNavVisible(navWorkouts, true);
-        setNavVisible(navSessions, true);
+        if (adminDashboardView != null) {
+            adminDashboardView.setVisible(isAdmin);
+            adminDashboardView.setManaged(isAdmin);
+        }
+        if (trainerDashboardView != null) {
+            trainerDashboardView.setVisible(isTrainer);
+            trainerDashboardView.setManaged(isTrainer);
+        }
+        if (revenueCard != null) {
+            revenueCard.setVisible(isAdmin);
+            revenueCard.setManaged(isAdmin);
+        }
+        if (activeMembershipsCard != null) {
+            activeMembershipsCard.setVisible(isAdmin);
+            activeMembershipsCard.setManaged(isAdmin);
+        }
+        if (pendingSessionsCard != null) {
+            pendingSessionsCard.setVisible(isTrainer);
+            pendingSessionsCard.setManaged(isTrainer);
+        }
+        if (workoutsThisWeekCard != null) {
+            workoutsThisWeekCard.setVisible(isTrainer);
+            workoutsThisWeekCard.setManaged(isTrainer);
+        }
     }
 
     // Shows or hides a sidebar HBox and removes it from layout when hidden.
@@ -135,6 +182,9 @@ public class DashboardController implements Initializable {
     }
 
     private void populateSummaryCards() {
+        Trainer trainer = SessionManager.getInstance().getCurrentTrainer();
+        boolean isTrainer = trainer != null && SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
+
         // Total members
         int total = dashboardService.getTotalClients();
         totalMembersLabel.setText(String.valueOf(total));
@@ -142,7 +192,7 @@ public class DashboardController implements Initializable {
         int newThisMonth = dashboardService.getNewClientsThisMonth();
         totalMembersTrendLabel.setText("+" + newThisMonth + " this month");
 
-        // Active memberships
+        // Active memberships (Admin only)
         int active = dashboardService.getActiveMembershipCount();
         activeMembershipsLabel.setText(String.valueOf(active));
 
@@ -156,7 +206,7 @@ public class DashboardController implements Initializable {
         int completedToday = dashboardService.getSessionsCompletedTodayCount();
         sessionsCompletedLabel.setText(completedToday + " completed");
 
-        // Revenue
+        // Revenue (Admin only)
         BigDecimal revenue  = dashboardService.getMonthlyRevenue();
         BigDecimal prevRev  = dashboardService.getPreviousMonthRevenue();
         revenueLabel.setText("Rs " + formatRevenue(revenue));
@@ -166,6 +216,16 @@ public class DashboardController implements Initializable {
         boolean positive = !trend.startsWith("-");
         revenueTrendLabel.getStyleClass().removeAll("card-trend-up", "card-trend-down");
         revenueTrendLabel.getStyleClass().add(positive ? "card-trend-up" : "card-trend-down");
+
+        // Trainer cards
+        if (isTrainer && trainer != null && pendingSessionsLabel != null) {
+            int pending = dashboardService.getPendingSessionsCountForTrainer(trainer.getTrainerId());
+            pendingSessionsLabel.setText(String.valueOf(pending));
+        }
+        if (isTrainer && trainer != null && workoutsThisWeekLabel != null) {
+            int workouts = dashboardService.getWorkoutsThisWeekForTrainer(trainer.getTrainerId());
+            workoutsThisWeekLabel.setText(String.valueOf(workouts));
+        }
     }
 
     /**
@@ -190,6 +250,43 @@ public class DashboardController implements Initializable {
         // Apply neon line colour after data is committed to the scene
         membershipChart.applyCss();
         membershipChart.layout();
+    }
+
+    private void configureTrainerScheduleTable() {
+        if (trainerScheduleTable == null || colScheduleClientName == null) return;
+
+        colScheduleClientName.setCellValueFactory(data -> {
+            int clientId = data.getValue().getClientId();
+            try {
+                var dao = new com.trainerclienthub.DAO.ClientDAO();
+                return dao.findById(clientId)
+                        .map(c -> new SimpleStringProperty(c.getName()))
+                        .orElse(new SimpleStringProperty("Client #" + clientId));
+            } catch (Exception e) {
+                return new SimpleStringProperty("—");
+            }
+        });
+        colScheduleTime.setCellValueFactory(data -> {
+            LocalTime t = data.getValue().getSessionTime();
+            return new SimpleStringProperty(t != null ? t.format(DateTimeFormatter.ofPattern("HH:mm")) : "—");
+        });
+        colScheduleStatus.setCellValueFactory(data -> {
+            var s = data.getValue().getStatus();
+            return new SimpleStringProperty(s != null ? s.name() : "—");
+        });
+    }
+
+    private void populateTrainerSchedule() {
+        if (trainerScheduleTable == null) return;
+
+        Trainer trainer = SessionManager.getInstance().getCurrentTrainer();
+        if (trainer == null || SessionManager.getInstance().getRole() != TrainerRole.TRAINER) {
+            trainerScheduleTable.setItems(FXCollections.observableArrayList());
+            return;
+        }
+
+        List<Session> todaySessions = dashboardService.getTodaySessionsForTrainer(trainer.getTrainerId());
+        trainerScheduleTable.setItems(FXCollections.observableArrayList(todaySessions));
     }
 
     /**
@@ -234,7 +331,7 @@ public class DashboardController implements Initializable {
     }
 
     @FXML private void handleNavPayments(MouseEvent event) {
-        navigateTo("PaymentManagementView.fxml", "TCH — Payments");
+        navigateTo("Payments.fxml", "TCH — Payments");
     }
 
     @FXML private void handleNavReports(MouseEvent event) {
