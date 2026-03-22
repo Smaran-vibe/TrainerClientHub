@@ -2,6 +2,7 @@ package com.trainerclienthub.controller;
 
 import com.trainerclienthub.model.Client;
 import com.trainerclienthub.model.Membership;
+import com.trainerclienthub.model.TrainerRole;
 import com.trainerclienthub.model.MembershipPlan;
 import com.trainerclienthub.model.MembershipStatus;
 import com.trainerclienthub.model.PaymentMethod;
@@ -14,15 +15,25 @@ import com.trainerclienthub.util.ViewLoader;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
+import java.io.IOException;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
@@ -30,6 +41,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Function;
 
 /**
  * Controller for {@code MembershipManagementView.fxml}.
@@ -39,8 +51,10 @@ import java.util.ResourceBundle;
  */
 public class MembershipController implements Initializable {
 
-    // ── FXML — top bar ────────────────────────────────────────────────────────
+    // ── FXML — top bar + sidebar ───────────────────────────────────────────────
     @FXML private Label avatarLabel;
+    @FXML private HBox navMemberships;
+    @FXML private HBox navPayments;
 
     // ── FXML — Memberships tab ────────────────────────────────────────────────
     @FXML private TabPane membershipTabs;
@@ -93,6 +107,7 @@ public class MembershipController implements Initializable {
     private final PaymentService    paymentService    = new PaymentService();
 
     private final ObservableList<Membership>    memberships = FXCollections.observableArrayList();
+    private FilteredList<Membership>             filteredMemberships;
     private final ObservableList<MembershipPlan> plans      = FXCollections.observableArrayList();
 
     // ── Initialise ────────────────────────────────────────────────────────────
@@ -100,18 +115,27 @@ public class MembershipController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         populateAvatarLabel();
+        applyRoleBasedUI();
         configureMembershipTable();
         configurePlanTable();
         loadMemberships();
+        filteredMemberships = new FilteredList<>(memberships);
+        SortedList<Membership> sortedMemberships = new SortedList<>(filteredMemberships);
+        membershipTable.setItems(sortedMemberships);
+        sortedMemberships.comparatorProperty().bind(membershipTable.comparatorProperty());
         loadPlans();
+        statusFilter.setItems(FXCollections.observableArrayList(
+                MembershipStatus.ACTIVE.name(),
+                MembershipStatus.EXPIRED.name(),
+                MembershipStatus.CANCELLED.name()));
+        statusFilter.setValue(MembershipStatus.ACTIVE.name());
         wireSearchAndFilter();
-        hideFormPanel();
-        hideFormError();
-        // Populate payment method options
-        if (fPaymentMethod != null) {
-            fPaymentMethod.getItems().setAll("CASH", "CARD", "ONLINE", "BANK_TRANSFER");
-            fPaymentMethod.setValue("CASH");
-        }
+    }
+
+    private void applyRoleBasedUI() {
+        boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
+        if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
+        if (navPayments != null)    { navPayments.setVisible(!isTrainer);    navPayments.setManaged(!isTrainer); }
     }
 
     // ── Table configuration ───────────────────────────────────────────────────
@@ -163,7 +187,6 @@ public class MembershipController implements Initializable {
             return new javafx.beans.property.SimpleLongProperty(Math.max(0, days)).asObject();
         });
 
-        membershipTable.setItems(memberships);
     }
 
     private void configurePlanTable() {
@@ -179,6 +202,9 @@ public class MembershipController implements Initializable {
 
     private void loadMemberships() {
         memberships.setAll(membershipService.findAll());
+        if (filteredMemberships != null) {
+            applyFilter();
+        }
     }
 
     private void loadPlans() {
@@ -187,21 +213,28 @@ public class MembershipController implements Initializable {
 
     private void wireSearchAndFilter() {
         membershipSearchField.textProperty().addListener((obs, o, keyword) -> applyFilter());
-        statusFilter.setOnAction(e -> applyFilter());
+        statusFilter.valueProperty().addListener((obs, oldVal, newVal) -> applyFilter());
     }
 
     private void applyFilter() {
+        if (filteredMemberships == null) return;
+
         String keyword = membershipSearchField.getText().trim().toLowerCase();
         String status  = statusFilter.getValue();
-        List<Membership> all = membershipService.findAll();
-        memberships.setAll(all.stream()
-                .filter(m -> {
-                    if (keyword.isEmpty()) return true;
-                    Optional<Client> c = clientService.findById(m.getClientId());
-                    return c.map(cl -> cl.getName().toLowerCase().contains(keyword)).orElse(false);
-                })
-                .filter(m -> status == null || "All".equals(status) || m.getStatus().name().equals(status))
-                .toList());
+
+        filteredMemberships.setPredicate(membership -> {
+            boolean keywordMatches = keyword.isEmpty() || matchesClientName(membership, keyword);
+
+            boolean statusMatches = status == null || status.isBlank()
+                    || membership.getStatus().name().equalsIgnoreCase(status);
+
+            return keywordMatches && statusMatches;
+        });
+    }
+
+    private boolean matchesClientName(Membership membership, String keyword) {
+        Optional<Client> client = clientService.findById(membership.getClientId());
+        return client.map(c -> c.getName().toLowerCase().contains(keyword)).orElse(false);
     }
 
     // ── Membership tab handlers ───────────────────────────────────────────────
@@ -281,8 +314,22 @@ public class MembershipController implements Initializable {
 
     // ── Plan tab handlers ─────────────────────────────────────────────────────
 
-    @FXML private void handleAddPlan(ActionEvent event) { showAlert(Alert.AlertType.INFORMATION, "Plans", "Plan creation form — wire to a separate dialog."); }
-    @FXML private void handleEditPlan(ActionEvent event) { showAlert(Alert.AlertType.INFORMATION, "Plans", "Plan edit form — wire to a separate dialog."); }
+    @FXML
+    private void handleAddPlan(ActionEvent event) {
+        openPlanDialog(null, "Plan Created", planName -> "Membership plan \"" + planName + "\" created.");
+    }
+
+    @FXML
+    private void handleEditPlan(ActionEvent event) {
+        MembershipPlan selected = planTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert(Alert.AlertType.WARNING, "No Selection", "Select a plan to edit.");
+            return;
+        }
+        openPlanDialog(selected, "Plan Updated",
+                planName -> "Membership plan \"" + planName + "\" updated successfully.");
+    }
+    // replaced by modal implementation above
 
     @FXML
     private void handleDeletePlan(ActionEvent event) {
@@ -292,6 +339,35 @@ public class MembershipController implements Initializable {
         if (confirm.isPresent() && confirm.get() == ButtonType.OK) {
             try { membershipService.deletePlan(selected.getPlanId()); loadPlans(); }
             catch (Exception ex) { showAlert(Alert.AlertType.ERROR, "Failed", ex.getMessage()); }
+        }
+    }
+
+    private void openPlanDialog(MembershipPlan plan, String dialogTitle, Function<String, String> messageFactory) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/trainerclienthub/NewPlanDialog.fxml"));
+            Parent root = loader.load();
+            NewPlanDialogController dialogController = loader.getController();
+            dialogController.setMembershipService(membershipService);
+            Stage dialogStage = new Stage(StageStyle.UNDECORATED);
+            dialogStage.initOwner(membershipTabs.getScene().getWindow());
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogController.setStage(dialogStage);
+            if (plan != null) {
+                dialogController.setExistingPlan(plan);
+            }
+            dialogController.setOnPlanCreated(savedPlan -> {
+                loadPlans();
+                loadFormDropdowns();
+                showAlert(Alert.AlertType.INFORMATION, dialogTitle, messageFactory.apply(savedPlan.getPlanName()));
+            });
+
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add("/com/trainerclienthub/css/neon-theme.css");
+            dialogStage.setScene(scene);
+            dialogStage.setTitle(dialogTitle);
+            dialogStage.showAndWait();
+        } catch (IOException ex) {
+            showAlert(Alert.AlertType.ERROR, "Dialog Failed", "Unable to open the Plan form.");
         }
     }
 
@@ -347,8 +423,7 @@ public class MembershipController implements Initializable {
             Membership membership = membershipService.assignMembership(
                     client.getClientId(), plan.getPlanId(), start, end);
 
-            // 2. Record the payment — this is what was missing, causing revenue = 0
-            //    Use the plan price. Only record if price > 0 (free plans skip payment).
+
             if (plan.getPrice() != null
                     && plan.getPrice().compareTo(java.math.BigDecimal.ZERO) > 0) {
                 paymentService.recordPayment(
@@ -411,6 +486,7 @@ public class MembershipController implements Initializable {
     @FXML private void handleNavClients(MouseEvent e)    { navigate("ClientManagementView.fxml",    "TCH — Clients"); }
     @FXML private void handleNavWorkouts(MouseEvent e)   { navigate("WorkoutTrackingView.fxml",     "TCH — Workouts"); }
     @FXML private void handleNavSessions(MouseEvent e)   { navigate("SessionManagementView.fxml",   "TCH — Sessions"); }
+    @FXML private void handleNavPayments(MouseEvent e)   { navigate("Payments.fxml",                "TCH — Payments"); }
     @FXML private void handleNavReports(MouseEvent e)    { navigate("ReportsView.fxml",             "TCH — Reports"); }
 
     @FXML private void handleLogout(MouseEvent e) { SessionManager.getInstance().logout(); navigate("LoginView.fxml", "TCH — Login"); }
