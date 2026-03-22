@@ -1,6 +1,7 @@
 package com.trainerclienthub.controller;
 
 import com.trainerclienthub.model.Client;
+import com.trainerclienthub.model.TrainerRole;
 import com.trainerclienthub.service.ReportService;
 import com.trainerclienthub.util.SessionManager;
 import com.trainerclienthub.util.ViewLoader;
@@ -9,13 +10,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.PieChart;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -26,6 +24,7 @@ import javafx.stage.Stage;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -33,15 +32,18 @@ import java.util.ResourceBundle;
 
 public class ReportController implements Initializable {
 
-    //  FXML — top bar
+    //  FXML — top bar + sidebar
 
     @FXML private Label      avatarLabel;
+    @FXML private HBox       navMemberships;
+    @FXML private HBox       navPayments;
     @FXML private DatePicker fromDate;
     @FXML private DatePicker toDate;
     @FXML private Button     generateBtn;
 
     //  FXML — stat cards
 
+    @FXML private VBox   totalRevenueCard;
     @FXML private Label totalRevenueStat;
     @FXML private Label newMembersStat;
     @FXML private Label sessionsCompletedStat;
@@ -58,12 +60,15 @@ public class ReportController implements Initializable {
 
     //  FXML Chart 3: Most Active Clients (BarChart)
 
-    @FXML private BarChart<String, Number>   activeClientsChart;
+    @FXML private BarChart<String, Number> activeClientsChart;
 
-    //  FXML legacy charts kept from original FXML
+    //  FXML legacy charts + gym-wide sections (hidden for TRAINER)
 
+    @FXML private VBox                       gymVolumeChartSection;
+    @FXML private VBox                       membershipDistributionSection;
+    @FXML private VBox                       revenueTrendChartSection;
     @FXML private PieChart                   membershipPieChart;
-    @FXML private BarChart<String, Number>   revenueTrendChart;
+    @FXML private LineChart<String, Number>  revenueTrendChart;
 
     //  Service
 
@@ -73,18 +78,29 @@ public class ReportController implements Initializable {
 
     /** Number of past weeks shown on the weekly charts. */
     private static final int WEEKS          = 8;
-    /** Maximum clients displayed in the Most Active chart. */
-    private static final int TOP_N_CLIENTS  = 8;
+    /** Top entries shown in the Most Active leaderboard. */
+    private static final int LEADERBOARD_SIZE = 3;
 
     //  Initialise
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         populateAvatarLabel();
+        applyRoleBasedUI();
         setDefaultDateRange();
         configureChartAxes();
         loadClientFilterComboBox();
         loadAllCharts();
+    }
+
+    private void applyRoleBasedUI() {
+        boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
+        if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
+        if (navPayments != null)    { navPayments.setVisible(!isTrainer);    navPayments.setManaged(!isTrainer); }
+        if (totalRevenueCard != null)           { totalRevenueCard.setVisible(!isTrainer);           totalRevenueCard.setManaged(!isTrainer); }
+        if (gymVolumeChartSection != null)       { gymVolumeChartSection.setVisible(!isTrainer);       gymVolumeChartSection.setManaged(!isTrainer); }
+        if (revenueTrendChartSection != null)    { revenueTrendChartSection.setVisible(!isTrainer);    revenueTrendChartSection.setManaged(!isTrainer); }
+        if (membershipDistributionSection != null) { membershipDistributionSection.setVisible(!isTrainer); membershipDistributionSection.setManaged(!isTrainer); }
     }
 
     //  Handlers
@@ -121,6 +137,7 @@ public class ReportController implements Initializable {
     @FXML private void handleNavWorkouts(MouseEvent e)    { navigateTo("WorkoutTrackingView.fxml",    "TCH — Workouts"); }
     @FXML private void handleNavMemberships(MouseEvent e) { navigateTo("MembershipManagementView.fxml","TCH — Memberships"); }
     @FXML private void handleNavSessions(MouseEvent e)    { navigateTo("SessionManagementView.fxml",  "TCH — Sessions"); }
+    @FXML private void handleNavPayments(MouseEvent e)    { navigateTo("Payments.fxml",                "TCH — Payments"); }
 
     @FXML
     private void handleLogout(MouseEvent e) {
@@ -135,16 +152,29 @@ public class ReportController implements Initializable {
     private void loadAllCharts() {
         LocalDate from = fromDate.getValue();
         LocalDate to   = toDate.getValue();
+        Integer trainerId = getTrainerIdForDataScope();
 
-        populateStatCards(from, to);
-        loadClientWorkoutProgressChart();
-        loadGymVolumeChart(from, to);
-        loadMostActiveClientsChart(from, to);
+        populateStatCards(from, to, trainerId);
+        loadClientWorkoutProgressChart(trainerId);
+        loadGymVolumeChart(from, to, trainerId);
+        loadMostActiveClientsChart(from, to, trainerId);
+        loadRevenueTrendChart(from, to);
+    }
+
+    /** Returns trainer ID when TRAINER role (for data isolation), null when ADMIN. */
+    private Integer getTrainerIdForDataScope() {
+        if (SessionManager.getInstance().getRole() != TrainerRole.TRAINER) return null;
+        var t = SessionManager.getInstance().getCurrentTrainer();
+        return t != null ? t.getTrainerId() : null;
     }
 
     //  Chart 1: Client Workout Progress (LineChart)
 
     private void loadClientWorkoutProgressChart() {
+        loadClientWorkoutProgressChart(getTrainerIdForDataScope());
+    }
+
+    private void loadClientWorkoutProgressChart(Integer trainerId) {
         workoutProgressChart.getData().clear();
 
         Client selected = workoutClientFilter.getValue();
@@ -164,7 +194,7 @@ public class ReportController implements Initializable {
         } else {
             series.setName(selected.getName());
             Map<String, BigDecimal> weeklyVolume = reportService.getClientWorkoutProgress(
-                    selected.getClientId(), WEEKS, from, to);
+                    selected.getClientId(), WEEKS, from, to, trainerId);
 
             weeklyVolume.forEach((weekLabel, volume) ->
                     series.getData().add(
@@ -177,13 +207,13 @@ public class ReportController implements Initializable {
 
     //  Chart 2: Gym Workout Volume (BarChart)
 
-    private void loadGymVolumeChart(LocalDate from, LocalDate to) {
+    private void loadGymVolumeChart(LocalDate from, LocalDate to, Integer trainerId) {
         gymVolumeChart.getData().clear();
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Total Volume (kg)");
 
-        Map<String, BigDecimal> gymVolume = reportService.getGymWorkoutVolume(WEEKS, from, to);
+        Map<String, BigDecimal> gymVolume = reportService.getGymWorkoutVolume(WEEKS, from, to, trainerId);
 
         gymVolume.forEach((weekLabel, volume) ->
                 series.getData().add(
@@ -195,42 +225,71 @@ public class ReportController implements Initializable {
 
     //  Chart 3: Most Active Clients (BarChart)
 
-    private void loadMostActiveClientsChart(LocalDate from, LocalDate to) {
+    private void loadMostActiveClientsChart(LocalDate from, LocalDate to, Integer trainerId) {
         activeClientsChart.getData().clear();
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Completed Sessions");
 
-        Map<String, Integer> topClients = reportService.getMostActiveClients(from, to, TOP_N_CLIENTS);
+        Map<String, Integer> topClients = reportService.getMostActiveClients(from, to, LEADERBOARD_SIZE, trainerId);
+        ObservableList<String> categories = FXCollections.observableArrayList();
 
         if (topClients.isEmpty()) {
-            // Placeholder so chart is not blank
             series.getData().add(new XYChart.Data<>("No data", 0));
+            categories.add("No data");
         } else {
-            topClients.forEach((name, count) ->
-                    series.getData().add(new XYChart.Data<>(name, count)));
+            topClients.forEach((name, count) -> {
+                series.getData().add(new XYChart.Data<>(name, count));
+                categories.add(name);
+            });
         }
+
+        CategoryAxis actX = (CategoryAxis) activeClientsChart.getXAxis();
+        actX.setCategories(categories);
 
         activeClientsChart.getData().add(series);
         applyNeonBarStyle(activeClientsChart);
     }
 
+    private void loadRevenueTrendChart(LocalDate from, LocalDate to) {
+        revenueTrendChart.getData().clear();
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Revenue (NPR)");
+
+        Map<YearMonth, BigDecimal> trend = reportService.getMonthlyRevenueTrend(from, to);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM yyyy");
+
+        trend.forEach((month, amount) -> {
+            BigDecimal value = amount != null ? amount : BigDecimal.ZERO;
+            series.getData().add(new XYChart.Data<>(month.format(formatter), value));
+        });
+
+        if (trend.isEmpty()) {
+            series.getData().add(new XYChart.Data<>("No data", 0));
+        }
+
+        revenueTrendChart.getData().add(series);
+        applyNeonLineStyle(revenueTrendChart);
+    }
+
     //  Stat cards
-    private void populateStatCards(LocalDate from, LocalDate to) {
-        // Revenue
-        BigDecimal revenue = reportService.getTotalRevenue(from, to);
-        totalRevenueStat.setText("Rs " + String.format("%,.0f", revenue));
+    private void populateStatCards(LocalDate from, LocalDate to, Integer trainerId) {
+        // Revenue (only shown for ADMIN; card hidden for TRAINER)
+        if (trainerId == null && totalRevenueStat != null) {
+            BigDecimal revenue = reportService.getTotalRevenue(from, to);
+            totalRevenueStat.setText("Rs " + String.format("%,.0f", revenue));
+        }
 
         // New members
-        int newMembers = reportService.getNewMembersCount(from, to);
+        int newMembers = reportService.getNewMembersCount(from, to, trainerId);
         newMembersStat.setText(String.valueOf(newMembers));
 
         // Completed sessions
-        int completed = reportService.getCompletedSessionsCount(from, to);
+        int completed = reportService.getCompletedSessionsCount(from, to, trainerId);
         sessionsCompletedStat.setText(String.valueOf(completed));
 
         // Avg workouts per member
-        String avg = reportService.getAvgWorkoutsPerMember(from, to);
+        String avg = reportService.getAvgWorkoutsPerMember(from, to, trainerId);
         avgWorkoutsStat.setText(avg);
     }
 
@@ -286,9 +345,10 @@ public class ReportController implements Initializable {
     /**
      * Loads all clients from the service into the client filter ComboBox.
      * Displays client names and re-triggers the LineChart on selection.
+     * For TRAINER role, only shows that trainer's clients.
      */
     private void loadClientFilterComboBox() {
-        List<Client> clients = reportService.getAllClients();
+        List<Client> clients = reportService.getAllClients(getTrainerIdForDataScope());
         ObservableList<Client> items = FXCollections.observableArrayList(clients);
         workoutClientFilter.setItems(items);
 
