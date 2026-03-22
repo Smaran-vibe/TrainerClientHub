@@ -6,6 +6,8 @@ import com.trainerclienthub.model.Membership;
 import com.trainerclienthub.model.MembershipPlan;
 import com.trainerclienthub.model.MembershipStatus;
 import com.trainerclienthub.model.PlanType;
+import com.trainerclienthub.model.TrainerRole;
+import com.trainerclienthub.util.SessionManager;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -39,6 +41,16 @@ public class MembershipDAO {
     private static final String SELECT_ALL          = "SELECT * FROM membership ORDER BY created_at DESC";
     private static final String SELECT_EXPIRING_BEFORE =
             "SELECT * FROM membership WHERE status = 'ACTIVE' AND end_date <= ?";
+
+    private static final String SELECT_EXPIRING_BEFORE_BY_TRAINER =
+            "SELECT m.* FROM membership m JOIN client c ON m.client_id = c.client_id " +
+            "WHERE m.status = 'ACTIVE' AND m.end_date <= ? AND c.trainer_id = ?";
+
+    private static final String COUNT_ACTIVE = "SELECT COUNT(*) FROM membership WHERE status = 'ACTIVE'";
+
+    private static final String COUNT_ACTIVE_BY_TRAINER =
+            "SELECT COUNT(*) FROM membership m JOIN client c ON m.client_id = c.client_id " +
+            "WHERE m.status = 'ACTIVE' AND c.trainer_id = ?";
     private static final String UPDATE =
             "UPDATE membership SET plan_id = ?, start_date = ?, end_date = ?, status = ? WHERE membership_id = ?";
     private static final String UPDATE_STATUS       = "UPDATE membership SET status = ? WHERE membership_id = ?";
@@ -188,6 +200,11 @@ public class MembershipDAO {
     }
 
     public List<Membership> findAll() {
+        var role = SessionManager.getInstance().getRole();
+        if (role == TrainerRole.TRAINER) {
+            var trainer = SessionManager.getInstance().getCurrentTrainer();
+            return trainer != null ? findAllByTrainer(trainer.getTrainerId()) : new ArrayList<>();
+        }
         List<Membership> list = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ALL);
@@ -200,12 +217,71 @@ public class MembershipDAO {
         return list;
     }
 
+    private List<Membership> findAllByTrainer(int trainerId) {
+        String sql = "SELECT m.* FROM membership m JOIN client c ON m.client_id = c.client_id " +
+                "WHERE c.trainer_id = ? ORDER BY m.created_at DESC";
+        List<Membership> list = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, trainerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(map(rs));
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to fetch memberships for trainer id: " + trainerId, e);
+        }
+        return list;
+    }
+
+    public int countActiveMemberships() {
+        var role = SessionManager.getInstance().getRole();
+        if (role == TrainerRole.TRAINER) {
+            var trainer = SessionManager.getInstance().getCurrentTrainer();
+            return trainer != null ? countActiveMembershipsByTrainer(trainer.getTrainerId()) : 0;
+        }
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(COUNT_ACTIVE);
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : 0;
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to count active memberships.", e);
+        }
+    }
+
+    private int countActiveMembershipsByTrainer(int trainerId) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(COUNT_ACTIVE_BY_TRAINER)) {
+            ps.setInt(1, trainerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to count active memberships for trainer id: " + trainerId, e);
+        }
+    }
+
     /** Returns all ACTIVE memberships whose end_date is on or before the given date string (yyyy-MM-dd). */
     public List<Membership> findExpiringBefore(Date date) {
+        var role = SessionManager.getInstance().getRole();
+        if (role == TrainerRole.TRAINER) {
+            var trainer = SessionManager.getInstance().getCurrentTrainer();
+            if (trainer == null) return new ArrayList<>();
+            List<Membership> list = new ArrayList<>();
+            try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                 PreparedStatement ps = conn.prepareStatement(SELECT_EXPIRING_BEFORE_BY_TRAINER)) {
+                ps.setDate(1, date);
+                ps.setInt(2, trainer.getTrainerId());
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) list.add(map(rs));
+                }
+            } catch (SQLException e) {
+                throw new DatabaseException("Failed to fetch expiring memberships for trainer.", e);
+            }
+            return list;
+        }
         List<Membership> list = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_EXPIRING_BEFORE)) {
-
             ps.setDate(1, date);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) list.add(map(rs));

@@ -4,10 +4,15 @@ import com.trainerclienthub.db.DatabaseConnection;
 import com.trainerclienthub.db.DatabaseException;
 import com.trainerclienthub.model.Session;
 import com.trainerclienthub.model.SessionStatus;
+import com.trainerclienthub.model.TrainerRole;
+import com.trainerclienthub.util.SessionManager;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class SessionDAO {
@@ -17,27 +22,37 @@ public class SessionDAO {
             "INSERT INTO session (client_id, trainer_id, session_date, session_time, status, notes) " +
             "VALUES (?, ?, ?, ?, ?, ?)";
 
+private static final String SESSION_SELECT_BASE =
+        "SELECT s.*, t.name AS trainer_name " +
+        "FROM session s " +
+        "JOIN trainer t ON s.trainer_id = t.trainer_id ";
+
     private static final String SELECT_BY_ID =
-            "SELECT * FROM session WHERE session_id = ?";
+            SESSION_SELECT_BASE + "WHERE s.session_id = ?";
 
     private static final String SELECT_BY_CLIENT =
-            "SELECT * FROM session WHERE client_id = ? ORDER BY session_date DESC, session_time DESC";
+            SESSION_SELECT_BASE + "WHERE s.client_id = ? ORDER BY s.session_date DESC, s.session_time DESC";
 
     private static final String SELECT_BY_TRAINER =
-            "SELECT * FROM session WHERE trainer_id = ? ORDER BY session_date DESC, session_time DESC";
+            SESSION_SELECT_BASE + "WHERE s.trainer_id = ? ORDER BY s.session_date DESC, s.session_time DESC";
 
     private static final String SELECT_BY_DATE =
-            "SELECT * FROM session WHERE session_date = ? ORDER BY session_time";
+            SESSION_SELECT_BASE + "WHERE s.session_date = ? ORDER BY s.session_time";
 
     private static final String SELECT_BY_CLIENT_AND_STATUS =
-            "SELECT * FROM session WHERE client_id = ? AND status = ? ORDER BY session_date DESC";
+            SESSION_SELECT_BASE + "WHERE s.client_id = ? AND s.status = ? ORDER BY s.session_date DESC";
 
     private static final String SELECT_UPCOMING_BY_CLIENT =
-            "SELECT * FROM session WHERE client_id = ? AND status = 'SCHEDULED' AND session_date >= CURDATE() " +
-            "ORDER BY session_date, session_time";
+            SESSION_SELECT_BASE + "WHERE s.client_id = ? AND s.status = 'SCHEDULED' AND s.session_date >= CURDATE() " +
+            "ORDER BY s.session_date, s.session_time";
 
     private static final String SELECT_ALL =
-            "SELECT * FROM session ORDER BY session_date DESC, session_time DESC";
+            SESSION_SELECT_BASE + "ORDER BY s.session_date DESC, s.session_time DESC";
+
+    private static final String SELECT_ALL_BY_TRAINER_CLIENTS =
+            SESSION_SELECT_BASE +
+            "JOIN client c ON s.client_id = c.client_id " +
+            "WHERE c.trainer_id = ? ORDER BY s.session_date DESC, s.session_time DESC";
 
     private static final String UPDATE =
             "UPDATE session SET client_id = ?, trainer_id = ?, session_date = ?, session_time = ?, " +
@@ -48,6 +63,29 @@ public class SessionDAO {
 
     private static final String DELETE =
             "DELETE FROM session WHERE session_id = ?";
+
+    private static final String CHECK_DUPLICATE_TIME_SLOT =
+            "SELECT COUNT(1) FROM session " +
+            "WHERE client_id = ? AND trainer_id = ? AND session_date = ? AND session_time = ?";
+
+
+    private static final String SELECT_MOST_ACTIVE_CLIENTS =
+            "SELECT c.name AS client_name, COUNT(*) AS completed_sessions " +
+            "FROM session s " +
+            "JOIN client c ON s.client_id = c.client_id " +
+            "WHERE s.status = 'COMPLETED' AND s.session_date BETWEEN ? AND ? " +
+            "GROUP BY c.client_id, c.name " +
+            "ORDER BY completed_sessions DESC, c.name ASC " +
+            "LIMIT ?";
+
+    private static final String SELECT_MOST_ACTIVE_CLIENTS_BY_TRAINER =
+            "SELECT c.name AS client_name, COUNT(*) AS completed_sessions " +
+            "FROM session s " +
+            "JOIN client c ON s.client_id = c.client_id " +
+            "WHERE s.status = 'COMPLETED' AND s.session_date BETWEEN ? AND ? AND s.trainer_id = ? " +
+            "GROUP BY c.client_id, c.name " +
+            "ORDER BY completed_sessions DESC, c.name ASC " +
+            "LIMIT ?";
 
 
     public void insert(Session session) {
@@ -95,6 +133,43 @@ public class SessionDAO {
             }
         } catch (SQLException e) {
             throw new DatabaseException("Failed to fetch sessions for client id: " + clientId, e);
+        }
+        return list;
+    }
+
+    public List<Map.Entry<String, Integer>> findMostActiveClients(LocalDate from, LocalDate to, int limit) {
+        return findMostActiveClients(from, to, limit, null);
+    }
+
+    /**
+     * Returns most active clients by completed session count.
+     * @param trainerId if non-null, restricts to sessions for that trainer only (TRAINER role).
+     */
+    public List<Map.Entry<String, Integer>> findMostActiveClients(LocalDate from, LocalDate to, int limit, Integer trainerId) {
+        List<Map.Entry<String, Integer>> list = new ArrayList<>();
+        boolean filterByTrainer = trainerId != null;
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(filterByTrainer ? SELECT_MOST_ACTIVE_CLIENTS_BY_TRAINER : SELECT_MOST_ACTIVE_CLIENTS)) {
+
+            if (filterByTrainer) {
+                ps.setDate(1, Date.valueOf(from));
+                ps.setDate(2, Date.valueOf(to));
+                ps.setInt(3, trainerId);
+                ps.setInt(4, limit);
+            } else {
+                ps.setDate(1, Date.valueOf(from));
+                ps.setDate(2, Date.valueOf(to));
+                ps.setInt(3, limit);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(Map.entry(rs.getString("client_name"), rs.getInt("completed_sessions")));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to fetch most active clients.", e);
         }
         return list;
     }
@@ -162,6 +237,22 @@ public class SessionDAO {
     }
 
     public List<Session> findAll() {
+        var role = SessionManager.getInstance().getRole();
+        if (role == TrainerRole.TRAINER) {
+            var trainer = SessionManager.getInstance().getCurrentTrainer();
+            if (trainer == null) return new ArrayList<>();
+            List<Session> list = new ArrayList<>();
+            try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                 PreparedStatement ps = conn.prepareStatement(SELECT_ALL_BY_TRAINER_CLIENTS)) {
+                ps.setInt(1, trainer.getTrainerId());
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) list.add(map(rs));
+                }
+            } catch (SQLException e) {
+                throw new DatabaseException("Failed to fetch sessions for trainer.", e);
+            }
+            return list;
+        }
         List<Session> list = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ALL);
@@ -220,9 +311,27 @@ public class SessionDAO {
         }
     }
 
+    public boolean isTimeSlotBooked(int clientId, int trainerId,
+                                    LocalDate sessionDate, LocalTime sessionTime) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(CHECK_DUPLICATE_TIME_SLOT)) {
+
+            ps.setInt(1, clientId);
+            ps.setInt(2, trainerId);
+            ps.setDate(3, Date.valueOf(sessionDate));
+            ps.setTime(4, Time.valueOf(sessionTime));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to validate session time slot", e);
+        }
+    }
+
 
     private Session map(ResultSet rs) throws SQLException {
-        return new Session(
+        Session session = new Session(
                 rs.getInt("session_id"),
                 rs.getInt("client_id"),
                 rs.getInt("trainer_id"),
@@ -231,5 +340,7 @@ public class SessionDAO {
                 SessionStatus.valueOf(rs.getString("status").toUpperCase()),
                 rs.getString("notes")
         );
+        session.setTrainerName(rs.getString("trainer_name"));
+        return session;
     }
 }

@@ -15,20 +15,25 @@ public class WorkoutDAO {
     private static final String INSERT =
             "INSERT INTO workout (client_id, trainer_id, workout_date, total_volume, notes) VALUES (?, ?, ?, ?, ?)";
 
+private static final String WORKOUT_SELECT_BASE =
+        "SELECT w.*, t.name AS trainer_name " +
+        "FROM workout w " +
+        "JOIN trainer t ON w.trainer_id = t.trainer_id ";
+
     private static final String SELECT_BY_ID =
-            "SELECT * FROM workout WHERE workout_id = ?";
+            WORKOUT_SELECT_BASE + "WHERE w.workout_id = ?";
 
     private static final String SELECT_BY_CLIENT =
-            "SELECT * FROM workout WHERE client_id = ? ORDER BY workout_date DESC";
+            WORKOUT_SELECT_BASE + "WHERE w.client_id = ? ORDER BY w.workout_date DESC";
 
     private static final String SELECT_BY_CLIENT_AND_DATE_RANGE =
-            "SELECT * FROM workout WHERE client_id = ? AND workout_date BETWEEN ? AND ? ORDER BY workout_date DESC";
+            WORKOUT_SELECT_BASE + "WHERE w.client_id = ? AND w.workout_date BETWEEN ? AND ? ORDER BY w.workout_date DESC";
 
     private static final String SELECT_BY_TRAINER =
-            "SELECT * FROM workout WHERE trainer_id = ? ORDER BY workout_date DESC";
+            WORKOUT_SELECT_BASE + "WHERE w.trainer_id = ? ORDER BY w.workout_date DESC";
 
     private static final String SELECT_ALL =
-            "SELECT * FROM workout ORDER BY workout_date DESC";
+            WORKOUT_SELECT_BASE + "ORDER BY w.workout_date DESC";
 
     private static final String UPDATE =
             "UPDATE workout SET client_id = ?, trainer_id = ?, workout_date = ?, total_volume = ?, notes = ? " +
@@ -181,7 +186,7 @@ public class WorkoutDAO {
 
 
     private Workout map(ResultSet rs) throws SQLException {
-        return new Workout(
+        Workout workout = new Workout(
                 rs.getInt("workout_id"),
                 rs.getInt("client_id"),
                 rs.getInt("trainer_id"),
@@ -189,5 +194,7 @@ public class WorkoutDAO {
                 rs.getBigDecimal("total_volume"),
                 rs.getString("notes")
         );
+        workout.setTrainerName(rs.getString("trainer_name"));
+        return workout;
     }
 }

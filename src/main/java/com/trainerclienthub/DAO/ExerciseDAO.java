@@ -11,10 +11,6 @@ import java.util.Optional;
 
 /**
  * DAO for {@link Exercise} — handles all SQL operations on the {@code exercise} table.
- *
- * <p>Exercises are composition children of {@link com.trainerclienthub.model.Workout};
- * the DB enforces {@code ON DELETE CASCADE} so deleting a workout removes all its
- * exercises automatically.</p>
  */
 public class ExerciseDAO {
 

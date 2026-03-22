@@ -47,6 +47,12 @@ public class PaymentDAO {
     private static final String UPDATE_STATUS =
             "UPDATE payment SET payment_status = ? WHERE payment_id = ?";
 
+    private static final String SUM_COMPLETED_BY_DATE_RANGE =
+            "SELECT COALESCE(SUM(amount), 0) FROM payment WHERE payment_status = 'COMPLETED' AND payment_date BETWEEN ? AND ?";
+
+    private static final String SUM_COMPLETED_ALL =
+            "SELECT COALESCE(SUM(amount), 0) FROM payment WHERE payment_status = 'COMPLETED'";
+
     private static final String DELETE =
             "DELETE FROM payment WHERE payment_id = ?";
 
@@ -174,6 +180,48 @@ public class PaymentDAO {
 
         } catch (SQLException e) {
             throw new DatabaseException("Failed to update status for payment id: " + paymentId, e);
+        }
+    }
+
+    /**
+     * Updates the payment status by ID. Accepts status as string (e.g. "COMPLETED", "PENDING", "REFUNDED", "FAILED").
+     */
+    public void updatePaymentStatus(int paymentId, String newStatus) {
+        updateStatus(paymentId, PaymentStatus.valueOf(newStatus.toUpperCase().trim()));
+    }
+
+    /**
+     * Returns the sum of amounts for payments with status COMPLETED within the date range.
+     */
+    public java.math.BigDecimal sumCompletedAmountByDateRange(Date from, Date to) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(SUM_COMPLETED_BY_DATE_RANGE)) {
+
+            ps.setDate(1, from);
+            ps.setDate(2, to);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return java.math.BigDecimal.ZERO;
+                java.math.BigDecimal val = rs.getBigDecimal(1);
+                return val != null ? val : java.math.BigDecimal.ZERO;
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to sum completed revenue by date range.", e);
+        }
+    }
+
+    /**
+     * Returns the sum of amounts for all payments with status COMPLETED.
+     */
+    public java.math.BigDecimal sumCompletedAmount() {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(SUM_COMPLETED_ALL);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (!rs.next()) return java.math.BigDecimal.ZERO;
+            java.math.BigDecimal val = rs.getBigDecimal(1);
+            return val != null ? val : java.math.BigDecimal.ZERO;
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to sum completed revenue.", e);
         }
     }
 

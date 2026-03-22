@@ -4,6 +4,8 @@ import com.trainerclienthub.db.DatabaseConnection;
 import com.trainerclienthub.db.DatabaseException;
 import com.trainerclienthub.model.Client;
 import com.trainerclienthub.model.Gender;
+import com.trainerclienthub.model.TrainerRole;
+import com.trainerclienthub.util.SessionManager;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -104,6 +106,11 @@ public class ClientDAO {
     }
 
     public List<Client> findAll() {
+        var role = SessionManager.getInstance().getRole();
+        if (role == TrainerRole.TRAINER) {
+            var trainer = SessionManager.getInstance().getCurrentTrainer();
+            return trainer != null ? findByTrainer(trainer.getTrainerId()) : new ArrayList<>();
+        }
         List<Client> list = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ALL);
