@@ -2,6 +2,7 @@ package com.trainerclienthub.controller;
 
 import com.trainerclienthub.model.Client;
 import com.trainerclienthub.model.Gender;
+import com.trainerclienthub.model.TrainerRole;
 import com.trainerclienthub.service.ClientService;
 import com.trainerclienthub.util.SessionManager;
 import com.trainerclienthub.util.ViewLoader;
@@ -13,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
@@ -27,8 +29,10 @@ import java.util.function.UnaryOperator;
 
 public class ClientController implements Initializable {
 
-    //  FXML — top bar
+    //  FXML — top bar + sidebar
     @FXML private Label avatarLabel;
+    @FXML private HBox navMemberships;
+    @FXML private HBox navPayments;
 
     //  FXML — action bar
     @FXML private TextField searchField;
@@ -77,12 +81,19 @@ public class ClientController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         populateAvatarLabel();
+        applyRoleBasedUI();
         configureTableColumns();
         initFormControls();
         loadClients();
         wireSearchFilter();
         hideFormPanel();
         hideFormError();
+    }
+
+    private void applyRoleBasedUI() {
+        boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
+        if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
+        if (navPayments != null)    { navPayments.setVisible(!isTrainer);    navPayments.setManaged(!isTrainer); }
     }
 
     //  Form control setup
@@ -411,7 +422,7 @@ public class ClientController implements Initializable {
     @FXML private void handleNavWorkouts(MouseEvent e)    { navigate("WorkoutTrackingView.fxml",     "TCH — Workouts"); }
     @FXML private void handleNavMemberships(MouseEvent e) { navigate("MembershipManagementView.fxml","TCH — Memberships"); }
     @FXML private void handleNavSessions(MouseEvent e)    { navigate("SessionManagementView.fxml",   "TCH — Sessions"); }
-    @FXML private void handleNavPayments(MouseEvent e)   { navigate("PaymentManagementView.fxml", "TCH — Payments"); }
+    @FXML private void handleNavPayments(MouseEvent e)   { navigate("Payments.fxml", "TCH — Payments"); }
     @FXML private void handleNavReports(MouseEvent e)     { navigate("ReportsView.fxml",             "TCH — Reports"); }
 
     @FXML
