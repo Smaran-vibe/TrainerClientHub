@@ -4,6 +4,7 @@ import com.trainerclienthub.DAO.ClientDAO;
 import com.trainerclienthub.DAO.MembershipDAO;
 import com.trainerclienthub.DAO.PaymentDAO;
 import com.trainerclienthub.DAO.SessionDAO;
+import com.trainerclienthub.DAO.WorkoutDAO;
 import com.trainerclienthub.model.MembershipStatus;
 import com.trainerclienthub.model.SessionStatus;
 
@@ -19,12 +20,14 @@ public class DashboardService {
     private final MembershipDAO membershipDAO;
     private final SessionDAO    sessionDAO;
     private final PaymentDAO    paymentDAO;
+    private final WorkoutDAO    workoutDAO;
 
     public DashboardService() {
         this.clientDAO     = new ClientDAO();
         this.membershipDAO = new MembershipDAO();
         this.sessionDAO    = new SessionDAO();
         this.paymentDAO    = new PaymentDAO();
+        this.workoutDAO    = new WorkoutDAO();
     }
 
     public int getTotalClients() {
@@ -57,24 +60,18 @@ public class DashboardService {
         YearMonth current = YearMonth.now();
         Date from = Date.valueOf(current.atDay(1));
         Date to   = Date.valueOf(current.atEndOfMonth());
-        return paymentDAO.findByDateRange(from, to).stream()
-                .map(p -> p.getAmount())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return paymentDAO.sumCompletedAmountByDateRange(from, to);
     }
 
     public BigDecimal getPreviousMonthRevenue() {
         YearMonth prev = YearMonth.now().minusMonths(1);
         Date from = Date.valueOf(prev.atDay(1));
         Date to   = Date.valueOf(prev.atEndOfMonth());
-        return paymentDAO.findByDateRange(from, to).stream()
-                .map(p -> p.getAmount())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return paymentDAO.sumCompletedAmountByDateRange(from, to);
     }
 
     public BigDecimal getTotalRevenue() {
-        return paymentDAO.findAll().stream()
-                .map(p -> p.getAmount())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return paymentDAO.sumCompletedAmount();
     }
 
     public java.util.List<com.trainerclienthub.model.Payment> getRecentPayments(int limit) {
@@ -88,6 +85,31 @@ public class DashboardService {
         return (int) clientDAO.findAll().stream()
                 .filter(c -> c.getCreatedAt() != null &&
                         YearMonth.from(c.getCreatedAt()).equals(current))
+                .count();
+    }
+
+    public java.util.List<com.trainerclienthub.model.Session> getTodaySessionsForTrainer(int trainerId) {
+        LocalDate today = LocalDate.now();
+        return sessionDAO.findByTrainer(trainerId).stream()
+                .filter(s -> s.getSessionDate().equals(today))
+                .sorted(java.util.Comparator.comparing(com.trainerclienthub.model.Session::getSessionTime))
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    public int getPendingSessionsCountForTrainer(int trainerId) {
+        return (int) sessionDAO.findByTrainer(trainerId).stream()
+                .filter(s -> s.getStatus() == SessionStatus.SCHEDULED)
+                .filter(s -> !s.getSessionDate().isBefore(LocalDate.now()))
+                .count();
+    }
+
+    public int getWorkoutsThisWeekForTrainer(int trainerId) {
+        LocalDate weekStart = LocalDate.now().with(java.time.DayOfWeek.MONDAY);
+        LocalDate weekEnd   = weekStart.plusDays(6);
+        return (int) workoutDAO.findByTrainer(trainerId).stream()
+                .filter(w -> w.getWorkoutDate() != null &&
+                        !w.getWorkoutDate().isBefore(weekStart) &&
+                        !w.getWorkoutDate().isAfter(weekEnd))
                 .count();
     }
 
