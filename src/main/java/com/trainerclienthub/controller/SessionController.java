@@ -2,19 +2,24 @@ package com.trainerclienthub.controller;
 
 import com.trainerclienthub.model.Client;
 import com.trainerclienthub.model.Session;
+import com.trainerclienthub.model.TrainerRole;
 import com.trainerclienthub.model.SessionStatus;
+import com.trainerclienthub.model.Trainer;
 import com.trainerclienthub.service.ClientService;
 import com.trainerclienthub.service.SessionService;
+import com.trainerclienthub.service.TrainerService;
 import com.trainerclienthub.util.SessionManager;
 import com.trainerclienthub.util.ViewLoader;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -24,15 +29,17 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 public class SessionController implements Initializable {
 
-    //  FXML — top bar
+    //  FXML — top bar + sidebar
     @FXML private Label avatarLabel;
+    @FXML private HBox navMemberships;
+    @FXML private HBox navPayments;
 
     //  FXML — stat cards
     @FXML private Label scheduledTodayLabel;
@@ -73,21 +80,38 @@ public class SessionController implements Initializable {
     //  State
     private final SessionService sessionService = new SessionService();
     private final ClientService  clientService  = new ClientService();
+    private final TrainerService trainerService = new TrainerService();
 
     private final ObservableList<Session> allSessions = FXCollections.observableArrayList();
+    private FilteredList<Session> filteredSessions;
 
     // Initialise
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         populateAvatarLabel();
+        applyRoleBasedUI();
         configureTable();
         loadSessions();
+        filteredSessions = new FilteredList<>(allSessions);
+        sessionTable.setItems(filteredSessions);
         populateStatCards();
         wireFilters();
+        statusFilterCombo.setItems(FXCollections.observableArrayList(
+                "SCHEDULED",
+                "COMPLETED",
+                "CANCELLED"));
+        statusFilterCombo.setValue("SCHEDULED");
+        applyFilters();
         loadClientFormComboBox();
         hideFormPanel();
         hideFormError();
+    }
+
+    private void applyRoleBasedUI() {
+        boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
+        if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
+        if (navPayments != null)    { navPayments.setVisible(!isTrainer);    navPayments.setManaged(!isTrainer); }
     }
 
     //  Table
@@ -104,9 +128,7 @@ public class SessionController implements Initializable {
                     c.map(Client::getName).orElse("Unknown"));
         });
 
-        colSessionTrainer.setCellValueFactory(data ->
-                new javafx.beans.property.SimpleStringProperty(
-                        "Trainer #" + data.getValue().getTrainerId()));
+        colSessionTrainer.setCellValueFactory(new PropertyValueFactory<>("trainerName"));
 
         colSessionStatus.setCellValueFactory(data ->
                 new javafx.beans.property.SimpleStringProperty(
@@ -127,30 +149,32 @@ public class SessionController implements Initializable {
             }
         });
 
-        sessionTable.setItems(allSessions);
     }
 
     private void loadSessions() {
         allSessions.setAll(sessionService.findAll());
+        if (filteredSessions != null) {
+            applyFilters();
+        }
     }
 
     //  Stat cards
 
     private void populateStatCards() {
-        LocalDate today = LocalDate.now();
-        List<Session> todaySessions = sessionService.findByDate(today);
+        List<Session> sessions = new ArrayList<>(allSessions);
 
-        long scheduled = todaySessions.stream().filter(s -> s.getStatus() == SessionStatus.SCHEDULED).count();
-        long completed = todaySessions.stream().filter(s -> s.getStatus() == SessionStatus.COMPLETED).count();
-        long cancelled = todaySessions.stream().filter(s -> s.getStatus() == SessionStatus.CANCELLED).count();
+        long scheduled = sessions.stream().filter(s -> s.getStatus() == SessionStatus.SCHEDULED).count();
+        long completed = sessions.stream().filter(s -> s.getStatus() == SessionStatus.COMPLETED).count();
+        long cancelled = sessions.stream().filter(s -> s.getStatus() == SessionStatus.CANCELLED).count();
 
         scheduledTodayLabel.setText(String.valueOf(scheduled));
         completedTodayLabel.setText(String.valueOf(completed));
         cancelledTodayLabel.setText(String.valueOf(cancelled));
 
         // Weekly total: sessions from Monday of current week
+        LocalDate today = LocalDate.now();
         LocalDate monday = today.with(java.time.DayOfWeek.MONDAY);
-        long weekly = allSessions.stream()
+        long weekly = sessions.stream()
                 .filter(s -> !s.getSessionDate().isBefore(monday)
                         && !s.getSessionDate().isAfter(today))
                 .count();
@@ -170,21 +194,36 @@ public class SessionController implements Initializable {
     }
 
     private void applyFilters() {
+        if (filteredSessions == null) return;
+
         String keyword = sessionSearchField.getText().trim().toLowerCase();
         String status  = statusFilterCombo.getValue();
         LocalDate date = dateFilter.getValue();
 
-        List<Session> base = sessionService.findAll();
+        filteredSessions.setPredicate(session -> {
+            boolean statusMatches = status == null || status.isBlank()
+                    || session.getStatus().name().equals(status);
 
-        allSessions.setAll(base.stream()
-                .filter(s -> {
-                    if (keyword.isEmpty()) return true;
-                    Optional<Client> c = clientService.findById(s.getClientId());
-                    return c.map(cl -> cl.getName().toLowerCase().contains(keyword)).orElse(false);
-                })
-                .filter(s -> status == null || "All".equals(status) || s.getStatus().name().equals(status))
-                .filter(s -> date == null || s.getSessionDate().equals(date))
-                .collect(Collectors.toList()));
+            boolean dateMatches = date == null || session.getSessionDate().equals(date);
+            boolean searchMatches = keyword.isEmpty() || matchesClientOrTrainer(session, keyword);
+
+            return statusMatches && dateMatches && searchMatches;
+        });
+    }
+
+    private boolean matchesClientOrTrainer(Session session, String keyword) {
+        Optional<Client> clientOpt = clientService.findById(session.getClientId());
+        if (clientOpt.map(client -> client.getName().toLowerCase().contains(keyword)).orElse(false)) {
+            return true;
+        }
+
+        Optional<Trainer> trainerOpt = trainerService.findById(session.getTrainerId());
+        if (trainerOpt.map(trainer -> trainer.getName().toLowerCase().contains(keyword)).orElse(false)) {
+            return true;
+        }
+
+        String fallbackTrainer = ("trainer #" + session.getTrainerId()).toLowerCase();
+        return fallbackTrainer.contains(keyword);
     }
 
     //  Action handlers
@@ -339,6 +378,7 @@ public class SessionController implements Initializable {
     @FXML private void handleNavClients(MouseEvent e)     { navigate("ClientManagementView.fxml",    "TCH — Clients"); }
     @FXML private void handleNavWorkouts(MouseEvent e)    { navigate("WorkoutTrackingView.fxml",     "TCH — Workouts"); }
     @FXML private void handleNavMemberships(MouseEvent e) { navigate("MembershipManagementView.fxml","TCH — Memberships"); }
+    @FXML private void handleNavPayments(MouseEvent e)   { navigate("Payments.fxml",                  "TCH — Payments"); }
     @FXML private void handleNavReports(MouseEvent e)     { navigate("ReportsView.fxml",             "TCH — Reports"); }
 
     @FXML private void handleLogout(MouseEvent e) { SessionManager.getInstance().logout(); navigate("LoginView.fxml", "TCH — Login"); }
