@@ -2,26 +2,9 @@ package com.trainerclienthub.model;
 
 import java.time.LocalDateTime;
 
-/**
- * Represents a gym trainer account in the Trainer-Client Hub system.
- * Maps to the {@code trainer} database table.
- *
- * <p>A Trainer is the primary actor who manages clients, records workouts,
- * conducts sessions, and generates reports. Encapsulation is enforced by
- * keeping all fields private and exposing access only through validated
- * getters and setters.</p>
- *
- * <p>The {@link TrainerRole} field controls which screens and operations
- * are accessible after login:
- * <ul>
- *   <li>{@link TrainerRole#ADMIN}   — unrestricted access to all views</li>
- *   <li>{@link TrainerRole#TRAINER} — restricted to client, workout, session views</li>
- * </ul>
- * </p>
- */
 public class Trainer {
 
-    // ── Fields ──────────────────────────────────────────────────────────────
+    // Fields
 
     private int trainerId;
     private String name;
@@ -31,20 +14,12 @@ public class Trainer {
     private TrainerRole role;
     private LocalDateTime createdAt;
 
-    // ── Constructors ─────────────────────────────────────────────────────────
+    //  Constructors
 
-    /** Default constructor required by the DAO layer when mapping ResultSets. */
     public Trainer() {}
 
     /**
      * Full constructor used when creating a new trainer record.
-     * Role defaults to {@link TrainerRole#TRAINER} for self-registered accounts.
-     * Use {@link #Trainer(String, String, String, String, TrainerRole)} to set ADMIN.
-     *
-     * @param name         trainer's full name
-     * @param email        unique email address
-     * @param phone        contact phone number
-     * @param passwordHash BCrypt-hashed password (never store plaintext)
      */
     public Trainer(String name, String email, String phone, String passwordHash) {
         setName(name);
@@ -57,12 +32,6 @@ public class Trainer {
 
     /**
      * Constructor with explicit role — used by an admin creating another account.
-     *
-     * @param name         trainer's full name
-     * @param email        unique email address
-     * @param phone        contact phone number
-     * @param passwordHash BCrypt-hashed password
-     * @param role         {@link TrainerRole#ADMIN} or {@link TrainerRole#TRAINER}
      */
     public Trainer(String name, String email, String phone,
                    String passwordHash, TrainerRole role) {
@@ -90,7 +59,7 @@ public class Trainer {
         this.createdAt = createdAt;
     }
 
-    // ── Getters & Setters ────────────────────────────────────────────────────
+    //  Getters & Setters
 
     public int getTrainerId() {
         return trainerId;
@@ -126,23 +95,7 @@ public class Trainer {
         return phone;
     }
 
-    /**
-     * Validates and sets the trainer's phone number.
-     *
-     * <p>Accepted formats (Nepal numbers only):
-     * <ul>
-     *   <li>{@code +9771111111111} — E.164 with country code, 10-digit local number</li>
-     *   <li>{@code 9771111111111} — country code without plus, 10-digit local number</li>
-     *   <li>{@code 1111111111}    — bare 10-digit local number</li>
-     * </ul>
-     * The local number must start with 9 (mobile) or 1 (landline Kathmandu),
-     * 2–8 (other landlines), for a total of exactly 10 local digits after the
-     * optional {@code +977} / {@code 977} prefix.</p>
-     *
-     * @param phone Nepal phone number in any accepted format
-     * @throws IllegalArgumentException if the number is null, blank, or does not
-     *                                  match a valid Nepal phone number pattern
-     */
+
     public void setPhone(String phone) {
         if (phone == null || phone.isBlank()) {
             throw new IllegalArgumentException("Trainer phone must not be blank.");
@@ -180,20 +133,7 @@ public class Trainer {
         this.role = role;
     }
 
-    /**
-     * Convenience method — returns {@code true} if this trainer holds the
-     * {@link TrainerRole#ADMIN} role.
-     *
-     * <p>Use this in controllers to guard admin-only actions:</p>
-     * <pre>{@code
-     * if (!SessionManager.getInstance().getCurrentTrainer().isAdmin()) {
-     *     showAlert("Access denied — admin only.");
-     *     return;
-     * }
-     * }</pre>
-     *
-     * @return {@code true} if role is ADMIN
-     */
+
     public boolean isAdmin() {
         return role == TrainerRole.ADMIN;
     }
@@ -206,7 +146,7 @@ public class Trainer {
         this.createdAt = createdAt;
     }
 
-    // ── Object overrides ─────────────────────────────────────────────────────
+    //  Object overrides
 
     @Override
     public String toString() {
