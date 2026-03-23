@@ -3,19 +3,6 @@ package com.trainerclienthub.model;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-/**
- * Represents a scheduled training session (calendar event) in the system.
- * Maps to the {@code session} database table.
- *
- * <p>A Session is a <em>calendar booking</em> — it records when a client is
- * scheduled to train with a specific trainer. It is intentionally separate
- * from {@link Workout}, which records the actual performance data. A session
- * may be booked and then completed, cancelled, or result in a no-show,
- * regardless of whether a workout record exists.</p>
- *
- * <p>Completing a session should trigger a decrement of the client's
- * {@code sessionBalance}, which is handled by the service layer.</p>
- */
 public class Session {
 
     // ── Fields ──────────────────────────────────────────────────────────────
@@ -23,6 +10,7 @@ public class Session {
     private int sessionId;
     private int clientId;
     private int trainerId;
+    private String trainerName;
     private LocalDate sessionDate;
     private LocalTime sessionTime;
     private SessionStatus status;
@@ -35,12 +23,6 @@ public class Session {
 
     /**
      * Constructor used when booking a new session.
-     *
-     * @param clientId    FK referencing the client being trained
-     * @param trainerId   FK referencing the conducting trainer
-     * @param sessionDate date of the session
-     * @param sessionTime time of the session
-     * @param notes       optional trainer notes
      */
     public Session(int clientId, int trainerId,
                    LocalDate sessionDate, LocalTime sessionTime, String notes) {
@@ -54,14 +36,6 @@ public class Session {
 
     /**
      * Full constructor used when reconstructing a session from the database.
-     *
-     * @param sessionId   database primary key
-     * @param clientId    FK referencing the client
-     * @param trainerId   FK referencing the trainer
-     * @param sessionDate date of the session
-     * @param sessionTime time of the session
-     * @param status      current lifecycle status
-     * @param notes       optional trainer notes
      */
     public Session(int sessionId, int clientId, int trainerId,
                    LocalDate sessionDate, LocalTime sessionTime,
@@ -75,7 +49,7 @@ public class Session {
         this.notes = notes;
     }
 
-    // ── Getters & Setters ────────────────────────────────────────────────────
+    //  Getters & Setters
 
     public int getSessionId() {
         return sessionId;
@@ -105,6 +79,14 @@ public class Session {
             throw new IllegalArgumentException("Trainer ID must be a positive integer.");
         }
         this.trainerId = trainerId;
+    }
+
+    public String getTrainerName() {
+        return trainerName;
+    }
+
+    public void setTrainerName(String trainerName) {
+        this.trainerName = trainerName == null ? null : trainerName.trim();
     }
 
     public LocalDate getSessionDate() {
@@ -148,7 +130,7 @@ public class Session {
         this.notes = notes;
     }
 
-    // ── Convenience methods ───────────────────────────────────────────────────
+    //Convenience methods
 
     /** Returns {@code true} if this session is still in SCHEDULED state. */
     public boolean isScheduled() {
@@ -160,7 +142,7 @@ public class Session {
         return status == SessionStatus.COMPLETED;
     }
 
-    // ── Object overrides ─────────────────────────────────────────────────────
+    //Object overrides
 
     @Override
     public String toString() {
