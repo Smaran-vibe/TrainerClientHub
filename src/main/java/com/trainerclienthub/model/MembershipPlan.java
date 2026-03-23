@@ -2,67 +2,50 @@ package com.trainerclienthub.model;
 
 import java.math.BigDecimal;
 
-/**
- * Represents a reusable membership plan template in the Trainer-Client Hub system.
- * Maps to the {@code membership_plan} database table.
- *
- * <p>A MembershipPlan defines the structure of a subscription offering (e.g.
- * "Monthly Basic", "Annual Premium"). Individual client subscriptions are
- * represented by {@link Membership}, which references this class via FK.</p>
- *
- * <p>This separation follows 3NF: plan attributes live here once and are
- * referenced — never duplicated — across all memberships that use this plan.</p>
- */
 public class MembershipPlan {
 
-    // ── Fields ──────────────────────────────────────────────────────────────
+    //  Fields
 
     private int planId;
     private String planName;
     private PlanType planType;
     private int durationDays;
     private BigDecimal price;
+    private int sessionsIncluded;
 
-    // ── Constructors ─────────────────────────────────────────────────────────
+    // ── Constructors
 
     /** Default constructor required by the DAO layer when mapping ResultSets. */
     public MembershipPlan() {}
 
     /**
      * Constructor used when creating a new membership plan.
-     *
-     * @param planName     unique human-readable plan name
-     * @param planType     duration category (Monthly, Quarterly, etc.)
-     * @param durationDays number of calendar days the plan covers (must be > 0)
-     * @param price        subscription price (must be >= 0)
      */
     public MembershipPlan(String planName, PlanType planType,
-                          int durationDays, BigDecimal price) {
+                          int durationDays, BigDecimal price,
+                          int sessionsIncluded) {
         setPlanName(planName);
         setPlanType(planType);
         setDurationDays(durationDays);
         setPrice(price);
+        setSessionsIncluded(sessionsIncluded);
     }
 
     /**
      * Full constructor used when reconstructing a plan from the database.
-     *
-     * @param planId       database primary key
-     * @param planName     unique human-readable plan name
-     * @param planType     duration category
-     * @param durationDays number of calendar days the plan covers
-     * @param price        subscription price
      */
     public MembershipPlan(int planId, String planName, PlanType planType,
-                          int durationDays, BigDecimal price) {
+                          int durationDays, BigDecimal price,
+                          int sessionsIncluded) {
         this.planId = planId;
         setPlanName(planName);
         setPlanType(planType);
         setDurationDays(durationDays);
         setPrice(price);
+        setSessionsIncluded(sessionsIncluded);
     }
 
-    // ── Getters & Setters ────────────────────────────────────────────────────
+    // Getters & Setters
 
     public int getPlanId() {
         return planId;
@@ -116,6 +99,17 @@ public class MembershipPlan {
         this.price = price;
     }
 
+    public int getSessionsIncluded() {
+        return sessionsIncluded;
+    }
+
+    public void setSessionsIncluded(int sessionsIncluded) {
+        if (sessionsIncluded < 0) {
+            throw new IllegalArgumentException("Sessions included cannot be negative.");
+        }
+        this.sessionsIncluded = sessionsIncluded;
+    }
+
     // ── Object overrides ─────────────────────────────────────────────────────
 
     @Override
@@ -126,6 +120,7 @@ public class MembershipPlan {
                 ", planType=" + planType +
                 ", durationDays=" + durationDays +
                 ", price=" + price +
+                ", sessionsIncluded=" + sessionsIncluded +
                 '}';
     }
 
