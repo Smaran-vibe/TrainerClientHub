@@ -6,26 +6,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Represents a single workout session header in the Trainer-Client Hub system.
- * Maps to the {@code workout} database table.
- *
- * <p>A Workout is the parent record for one training session. It holds summary
- * data (date, total volume, notes) and owns a list of {@link Exercise} objects
- * that represent the individual exercises performed. This composition relationship
- * means Exercises cannot exist without their parent Workout.</p>
- *
- * <p>{@code totalVolume} is the aggregate of all child exercise volumes
- * (sets × reps × weight). It is kept in sync via {@link #recalculateTotalVolume()}
- * whenever the exercise list is modified.</p>
- */
+
+
 public class Workout {
 
-    // ── Fields ──────────────────────────────────────────────────────────────
+    //Fields
 
     private int workoutId;
     private int clientId;
     private int trainerId;
+    private String trainerName;
     private LocalDate workoutDate;
     private BigDecimal totalVolume;
     private String notes;
@@ -33,7 +23,7 @@ public class Workout {
     /** Child exercises — owned by this workout (composition). */
     private List<Exercise> exercises;
 
-    // ── Constructors ─────────────────────────────────────────────────────────
+    //  Constructors
 
     /** Default constructor required by the DAO layer when mapping ResultSets. */
     public Workout() {
@@ -43,11 +33,6 @@ public class Workout {
 
     /**
      * Constructor used when logging a new workout.
-     *
-     * @param clientId    FK referencing the client performing the workout
-     * @param trainerId   FK referencing the supervising trainer
-     * @param workoutDate date the workout took place
-     * @param notes       optional trainer notes
      */
     public Workout(int clientId, int trainerId, LocalDate workoutDate, String notes) {
         setClientId(clientId);
@@ -58,17 +43,6 @@ public class Workout {
         this.exercises   = new ArrayList<>();
     }
 
-    /**
-     * Full constructor used when reconstructing a workout from the database
-     * (without child exercises — those are loaded separately by the DAO).
-     *
-     * @param workoutId   database primary key
-     * @param clientId    FK referencing the client
-     * @param trainerId   FK referencing the trainer
-     * @param workoutDate date of the workout
-     * @param totalVolume pre-computed total volume
-     * @param notes       optional trainer notes
-     */
     public Workout(int workoutId, int clientId, int trainerId,
                    LocalDate workoutDate, BigDecimal totalVolume, String notes) {
         this.workoutId  = workoutId;
@@ -80,12 +54,10 @@ public class Workout {
         this.exercises   = new ArrayList<>();
     }
 
-    // ── Exercise management ───────────────────────────────────────────────────
+    // Exercise management
 
     /**
      * Adds an exercise to this workout and recalculates the total volume.
-     *
-     * @param exercise the exercise to add (must not be null)
      */
     public void addExercise(Exercise exercise) {
         if (exercise == null) {
@@ -97,8 +69,7 @@ public class Workout {
 
     /**
      * Removes an exercise from this workout and recalculates the total volume.
-     *
-     * @param exercise the exercise to remove
+
      */
     public void removeExercise(Exercise exercise) {
         exercises.remove(exercise);
@@ -107,7 +78,6 @@ public class Workout {
 
     /**
      * Recalculates {@code totalVolume} as the sum of all child exercise volumes.
-     * Should be called whenever the exercise list changes.
      */
     public void recalculateTotalVolume() {
         this.totalVolume = exercises.stream()
@@ -115,7 +85,7 @@ public class Workout {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    // ── Getters & Setters ────────────────────────────────────────────────────
+    // Getters & Setters
 
     public int getWorkoutId() {
         return workoutId;
@@ -147,18 +117,20 @@ public class Workout {
         this.trainerId = trainerId;
     }
 
+    public String getTrainerName() {
+        return trainerName;
+    }
+
+    public void setTrainerName(String trainerName) {
+        this.trainerName = trainerName == null ? null : trainerName.trim();
+    }
+
     public LocalDate getWorkoutDate() {
         return workoutDate;
     }
 
     /**
      * Sets the date of this workout session.
-     *
-     * <p>The workout date must not be in the future — a workout can only be
-     * recorded for a session that has already taken place.</p>
-     *
-     * @param workoutDate the date the workout occurred (must be today or earlier)
-     * @throws IllegalArgumentException if the date is null or in the future
      */
     public void setWorkoutDate(LocalDate workoutDate) {
         if (workoutDate == null) {
@@ -190,8 +162,6 @@ public class Workout {
 
     /**
      * Returns an unmodifiable view of the exercise list.
-     * Use {@link #addExercise(Exercise)} and {@link #removeExercise(Exercise)}
-     * to modify the list so that total volume stays in sync.
      */
     public List<Exercise> getExercises() {
         return Collections.unmodifiableList(exercises);
