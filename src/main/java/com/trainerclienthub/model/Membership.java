@@ -3,18 +3,9 @@ package com.trainerclienthub.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * Represents a specific client's subscription to a membership plan.
- * Maps to the {@code membership} database table.
- *
- * <p>A Membership is the instance that binds a {@link Client} to a
- * {@link MembershipPlan} for a defined date range. Historical memberships
- * are retained (status = EXPIRED or CANCELLED) rather than deleted,
- * enabling full audit history and reporting.</p>
- */
 public class Membership {
 
-    // ── Fields ──────────────────────────────────────────────────────────────
+    // Fields
 
     private int membershipId;
     private int clientId;
@@ -24,18 +15,11 @@ public class Membership {
     private MembershipStatus status;
     private LocalDateTime createdAt;
 
-    // ── Constructors ─────────────────────────────────────────────────────────
-
-    /** Default constructor required by the DAO layer when mapping ResultSets. */
+    // Constructors
     public Membership() {}
 
     /**
      * Constructor used when creating a new membership for a client.
-     *
-     * @param clientId  FK referencing the client holding this membership
-     * @param planId    FK referencing the chosen membership plan
-     * @param startDate date the membership becomes active
-     * @param endDate   date the membership expires (must be after startDate)
      */
     public Membership(int clientId, int planId, LocalDate startDate, LocalDate endDate) {
         setClientId(clientId);
@@ -48,14 +32,6 @@ public class Membership {
 
     /**
      * Full constructor used when reconstructing a membership from the database.
-     *
-     * @param membershipId database primary key
-     * @param clientId     FK referencing the client
-     * @param planId       FK referencing the membership plan
-     * @param startDate    membership activation date
-     * @param endDate      membership expiry date
-     * @param status       current lifecycle status
-     * @param createdAt    record creation timestamp
      */
     public Membership(int membershipId, int clientId, int planId, LocalDate startDate,
                       LocalDate endDate, MembershipStatus status, LocalDateTime createdAt) {
@@ -68,7 +44,7 @@ public class Membership {
         this.createdAt = createdAt;
     }
 
-    // ── Getters & Setters ────────────────────────────────────────────────────
+    //Getters & Setters
 
     public int getMembershipId() {
         return membershipId;
@@ -144,7 +120,7 @@ public class Membership {
         this.createdAt = createdAt;
     }
 
-    // ── Convenience methods ───────────────────────────────────────────────────
+    // Convenience methods
 
     /**
      * Returns {@code true} if this membership is currently active and has not
@@ -155,15 +131,12 @@ public class Membership {
                 && !LocalDate.now().isAfter(endDate);
     }
 
-    /**
-     * Returns {@code true} if the membership end date is in the past
-     * regardless of the recorded status field.
-     */
+
     public boolean isPastExpiry() {
         return LocalDate.now().isAfter(endDate);
     }
 
-    // ── Object overrides ─────────────────────────────────────────────────────
+    //  Object overrides
 
     @Override
     public String toString() {
