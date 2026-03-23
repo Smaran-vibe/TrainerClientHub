@@ -2,21 +2,9 @@ package com.trainerclienthub.model;
 
 import java.time.LocalDateTime;
 
-/**
- * Represents a generated system report in the Trainer-Client Hub system.
- * Maps to the {@code report} database table.
- *
- * <p>A Report is created by an admin trainer and stores the metadata and
- * full text content of the generated output. Persisting report content
- * allows past reports to be replayed without re-running queries, and
- * provides an audit trail of what was reviewed and when.</p>
- *
- * <p>The {@code generatedBy} field references the {@link Trainer} who
- * produced the report, supporting accountability tracking.</p>
- */
 public class Report {
 
-    // ── Fields ──────────────────────────────────────────────────────────────
+    //  Fields
 
     private int reportId;
     private int generatedBy;
@@ -24,17 +12,13 @@ public class Report {
     private LocalDateTime generatedDate;
     private String content;
 
-    // ── Constructors ─────────────────────────────────────────────────────────
+    // Constructors
 
     /** Default constructor required by the DAO layer when mapping ResultSets. */
     public Report() {}
 
     /**
      * Constructor used when generating a new report.
-     *
-     * @param generatedBy FK referencing the trainer (admin) who ran the report
-     * @param reportType  category of the report
-     * @param content     full text/formatted content of the report
      */
     public Report(int generatedBy, ReportType reportType, String content) {
         setGeneratedBy(generatedBy);
@@ -43,15 +27,6 @@ public class Report {
         this.generatedDate = LocalDateTime.now();
     }
 
-    /**
-     * Full constructor used when reconstructing a report from the database.
-     *
-     * @param reportId      database primary key
-     * @param generatedBy   FK referencing the trainer who ran the report
-     * @param reportType    category of the report
-     * @param generatedDate timestamp when the report was generated
-     * @param content       full report content
-     */
     public Report(int reportId, int generatedBy, ReportType reportType,
                   LocalDateTime generatedDate, String content) {
         this.reportId = reportId;
@@ -61,7 +36,7 @@ public class Report {
         setContent(content);
     }
 
-    // ── Getters & Setters ────────────────────────────────────────────────────
+    // Getters & Setters
 
     public int getReportId() {
         return reportId;
@@ -115,7 +90,7 @@ public class Report {
         this.content = content;
     }
 
-    // ── Object overrides ─────────────────────────────────────────────────────
+    // Object overrides
 
     @Override
     public String toString() {
