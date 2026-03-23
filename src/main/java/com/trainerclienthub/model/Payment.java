@@ -3,41 +3,27 @@ package com.trainerclienthub.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-/**
- * Represents a financial transaction linked to a client's membership.
- * Maps to the {@code payment} database table.
- *
- * <p>A Payment records a single monetary transaction that a client makes
- * in relation to a specific {@link Membership}. Both the {@code clientId}
- * and {@code membershipId} FKs are stored to allow querying by either
- * dimension independently (e.g. all payments by a client, or all payments
- * for a specific membership renewal).</p>
- */
 public class Payment {
 
-    // ── Fields ──────────────────────────────────────────────────────────────
+    // Fields
 
     private int paymentId;
     private int clientId;
+    private String clientName;
     private int membershipId;
     private BigDecimal amount;
     private LocalDate paymentDate;
     private PaymentMethod paymentMethod;
     private PaymentStatus paymentStatus;
 
-    // ── Constructors ─────────────────────────────────────────────────────────
+    //Constructors
 
-    /** Default constructor required by the DAO layer when mapping ResultSets. */
+
     public Payment() {}
 
     /**
      * Constructor used when recording a new payment.
-     *
-     * @param clientId      FK referencing the paying client
-     * @param membershipId  FK referencing the membership being paid for
-     * @param amount        transaction amount (must be > 0)
-     * @param paymentDate   date the payment was made
-     * @param paymentMethod how the payment was made
+     * Default status is PENDING so dashboard revenue reflects actual paid amounts until marked COMPLETED.
      */
     public Payment(int clientId, int membershipId, BigDecimal amount,
                    LocalDate paymentDate, PaymentMethod paymentMethod) {
@@ -46,19 +32,11 @@ public class Payment {
         setAmount(amount);
         setPaymentDate(paymentDate);
         setPaymentMethod(paymentMethod);
-        this.paymentStatus = PaymentStatus.COMPLETED;
+        this.paymentStatus = PaymentStatus.PENDING;
     }
 
     /**
      * Full constructor used when reconstructing a payment from the database.
-     *
-     * @param paymentId     database primary key
-     * @param clientId      FK referencing the client
-     * @param membershipId  FK referencing the membership
-     * @param amount        transaction amount
-     * @param paymentDate   date of the transaction
-     * @param paymentMethod payment method used
-     * @param paymentStatus current status of the transaction
      */
     public Payment(int paymentId, int clientId, int membershipId, BigDecimal amount,
                    LocalDate paymentDate, PaymentMethod paymentMethod, PaymentStatus paymentStatus) {
@@ -71,7 +49,7 @@ public class Payment {
         setPaymentStatus(paymentStatus);
     }
 
-    // ── Getters & Setters ────────────────────────────────────────────────────
+    // Getters & Setters
 
     public int getPaymentId() {
         return paymentId;
@@ -90,6 +68,14 @@ public class Payment {
             throw new IllegalArgumentException("Client ID must be a positive integer.");
         }
         this.clientId = clientId;
+    }
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName == null ? null : clientName.trim();
     }
 
     public int getMembershipId() {
@@ -147,13 +133,14 @@ public class Payment {
         this.paymentStatus = paymentStatus;
     }
 
-    // ── Object overrides ─────────────────────────────────────────────────────
+    // Object overrides
 
     @Override
     public String toString() {
         return "Payment{" +
                 "paymentId=" + paymentId +
                 ", clientId=" + clientId +
+                ", clientName='" + clientName + '\'' +
                 ", membershipId=" + membershipId +
                 ", amount=" + amount +
                 ", paymentDate=" + paymentDate +
