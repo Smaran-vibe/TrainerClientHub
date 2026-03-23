@@ -3,25 +3,16 @@ package com.trainerclienthub.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * Represents a gym member (client) in the Trainer-Client Hub system.
- * Maps to the {@code client} database table.
- *
- * <p>A Client is associated with exactly one {@link Trainer} who manages their
- * workouts and sessions. The {@code sessionBalance} tracks how many prepaid
- * training sessions the client has remaining.</p>
- */
 public class Client {
 
-    // ── Constants ────────────────────────────────────────────────────────────
+    // Constants
 
     private static final int MIN_AGE = 10;
     private static final int MAX_AGE = 100;
     private static final BigDecimal MIN_WEIGHT = new BigDecimal("20.00");
     private static final BigDecimal MAX_WEIGHT = new BigDecimal("300.00");
 
-    // ── Fields ──────────────────────────────────────────────────────────────
-
+    // Fields
     private int clientId;
     private String name;
     private int age;
@@ -33,23 +24,11 @@ public class Client {
     private int trainerId;
     private LocalDateTime createdAt;
 
-    // ── Constructors ─────────────────────────────────────────────────────────
+    //  Constructors
 
     /** Default constructor required by the DAO layer when mapping ResultSets. */
     public Client() {}
 
-    /**
-     * Constructor used when registering a new client.
-     *
-     * @param name           client's full name
-     * @param age            client's age (10–100)
-     * @param gender         client's gender
-     * @param phone          contact phone number
-     * @param email          unique email address
-     * @param weightKg       body weight in kilograms (20–300 kg)
-     * @param sessionBalance initial number of prepaid sessions
-     * @param trainerId      FK referencing the managing trainer
-     */
     public Client(String name, int age, Gender gender, String phone,
                   String email, int sessionBalance, BigDecimal weightKg, int trainerId) {
         setName(name);
@@ -63,20 +42,6 @@ public class Client {
         this.createdAt = LocalDateTime.now();
     }
 
-    /**
-     * Full constructor used when reconstructing a client from the database.
-     *
-     * @param clientId       database primary key
-     * @param name           client's full name
-     * @param age            client's age
-     * @param gender         client's gender
-     * @param phone          contact phone number
-     * @param email          unique email address
-     * @param sessionBalance remaining prepaid sessions
-     * @param weightKg       body weight in kilograms
-     * @param trainerId      FK referencing the managing trainer
-     * @param createdAt      record creation timestamp
-     */
     public Client(int clientId, String name, int age, Gender gender, String phone,
                   String email, int sessionBalance, BigDecimal weightKg, int trainerId, LocalDateTime createdAt) {
         this.clientId = clientId;
@@ -91,8 +56,7 @@ public class Client {
         this.createdAt = createdAt;
     }
 
-    // ── Getters & Setters ────────────────────────────────────────────────────
-
+    // Getters & Setters
     public int getClientId() {
         return clientId;
     }
@@ -141,18 +105,6 @@ public class Client {
 
     /**
      * Validates and sets the client's phone number.
-     *
-     * <p>Accepted formats (Nepal numbers only):
-     * <ul>
-     *   <li>{@code +9771111111111} — E.164 with country code, 10-digit local number</li>
-     *   <li>{@code 9771111111111} — country code without plus, 10-digit local number</li>
-     *   <li>{@code 1111111111}    — bare 10-digit local number</li>
-     * </ul>
-     * The local portion must be exactly 10 digits; no more, no less.</p>
-     *
-     * @param phone Nepal phone number in any accepted format
-     * @throws IllegalArgumentException if the number is null, blank, or does not
-     *                                  match a valid Nepal phone number pattern
      */
     public void setPhone(String phone) {
         if (phone == null || phone.isBlank()) {
@@ -193,8 +145,6 @@ public class Client {
 
     /**
      * Convenience method to decrement the session balance by one.
-     *
-     * @throws IllegalStateException if session balance is already zero
      */
     public void decrementSessionBalance() {
         if (sessionBalance == 0) {
@@ -209,9 +159,6 @@ public class Client {
 
     /**
      * Validates and sets the client's body weight.
-     *
-     * @param weightKg weight in kilograms (must be between 20.00 and 300.00)
-     * @throws IllegalArgumentException if weight is null or outside the valid range
      */
     public void setWeightKg(BigDecimal weightKg) {
         if (weightKg == null) {
@@ -243,7 +190,7 @@ public class Client {
         this.createdAt = createdAt;
     }
 
-    // ── Object overrides ─────────────────────────────────────────────────────
+    //  Object overrides
 
     @Override
     public String toString() {
