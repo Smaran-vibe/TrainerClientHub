@@ -109,7 +109,7 @@ public class ClientController implements Initializable {
         fGender.getItems().setAll("Male", "Female", "Other");
 
         // Age TextFormatter — accepts only digit characters, maximum 3 characters
-        // (100 is the maximum allowed age). Any non-digit keystroke is silently
+
         UnaryOperator<TextFormatter.Change> ageFilter = change -> {
             String newText = change.getControlNewText();
 
