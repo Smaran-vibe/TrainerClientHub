@@ -33,6 +33,7 @@ public class ClientController implements Initializable {
     @FXML private Label avatarLabel;
     @FXML private HBox navMemberships;
     @FXML private HBox navPayments;
+    @FXML private HBox navTrainers;
 
     //  FXML — action bar
     @FXML private TextField searchField;
@@ -94,6 +95,7 @@ public class ClientController implements Initializable {
         boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
         if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
         if (navPayments != null)    { navPayments.setVisible(!isTrainer);    navPayments.setManaged(!isTrainer); }
+        if (navTrainers != null)    { navTrainers.setVisible(!isTrainer);    navTrainers.setManaged(!isTrainer); }
     }
 
     //  Form control setup
@@ -423,6 +425,7 @@ public class ClientController implements Initializable {
     @FXML private void handleNavMemberships(MouseEvent e) { navigate("MembershipManagementView.fxml","TCH — Memberships"); }
     @FXML private void handleNavSessions(MouseEvent e)    { navigate("SessionManagementView.fxml",   "TCH — Sessions"); }
     @FXML private void handleNavPayments(MouseEvent e)   { navigate("Payments.fxml", "TCH — Payments"); }
+    @FXML private void handleNavTrainers(MouseEvent e)   { navigate("Trainers.fxml",                "TCH — Trainers"); }
     @FXML private void handleNavReports(MouseEvent e)     { navigate("ReportsView.fxml",             "TCH — Reports"); }
 
     @FXML
