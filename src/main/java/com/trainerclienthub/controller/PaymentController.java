@@ -44,6 +44,7 @@ public class PaymentController implements Initializable {
     @FXML private Label avatarLabel;
     @FXML private HBox navMemberships;
     @FXML private HBox navPayments;
+    @FXML private HBox navTrainers;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> statusFilterCombo;
     @FXML private TableView<Payment> paymentTable;
@@ -74,6 +75,7 @@ public class PaymentController implements Initializable {
         boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
         if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
         if (navPayments != null)    { navPayments.setVisible(!isTrainer);    navPayments.setManaged(!isTrainer); }
+        if (navTrainers != null)    { navTrainers.setVisible(!isTrainer);    navTrainers.setManaged(!isTrainer); }
     }
 
     private void setupSearchAndFilter() {
@@ -246,6 +248,10 @@ public class PaymentController implements Initializable {
 
     @FXML private void handleNavPayments(MouseEvent event) {
         navigate("Payments.fxml", "TCH — Payments");
+    }
+
+    @FXML private void handleNavTrainers(MouseEvent event) {
+        navigate("Trainers.fxml", "TCH â€” Trainers");
     }
 
     @FXML private void handleNavReports(MouseEvent event) {
