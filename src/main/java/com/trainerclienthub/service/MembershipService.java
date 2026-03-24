@@ -14,9 +14,11 @@ public class MembershipService {
     // Enforces membership business rules and DAO operations.
 
     private final MembershipDAO membershipDAO;
+    private final ClientService clientService;
 
     public MembershipService() {
         this.membershipDAO = new MembershipDAO();
+        this.clientService = new ClientService();
     }
 
 
@@ -29,6 +31,7 @@ public class MembershipService {
         if (plan.getPrice() == null || plan.getPrice().signum() < 0) {
             throw new IllegalArgumentException("Plan price must be zero or greater.");
         }
+        ValidationUtil.requirePositiveInt(plan.getSessionsIncluded(), "Sessions included");
         membershipDAO.insertPlan(plan);
         return plan;
     }
@@ -70,8 +73,16 @@ public class MembershipService {
                     + "). Cancel it before assigning a new one.");
         }
 
+        MembershipPlan plan = membershipDAO.findPlanById(planId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Membership plan not found with ID: " + planId));
+        if (plan.getSessionsIncluded() <= 0) {
+            throw new IllegalStateException("Selected membership plan must include at least one session.");
+        }
+
         Membership membership = new Membership(clientId, planId, startDate, endDate);
         membershipDAO.insert(membership);
+        clientService.addSessions(clientId, plan.getSessionsIncluded());
         return membership;
     }
 
