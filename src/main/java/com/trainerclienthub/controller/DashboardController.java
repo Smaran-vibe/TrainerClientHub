@@ -51,6 +51,7 @@ public class DashboardController implements Initializable {
     @FXML private HBox navMemberships;
     @FXML private HBox navSessions;
     @FXML private HBox navPayments;
+    @FXML private HBox navTrainers;
     @FXML private HBox navReports;
 
     //  FXML injections — summary cards
@@ -130,6 +131,7 @@ public class DashboardController implements Initializable {
 
         setNavVisible(navMemberships, isAdmin);
         setNavVisible(navPayments,    isAdmin);
+        setNavVisible(navTrainers,    isAdmin);
         setNavVisible(navReports,     true);
 
         if (adminDashboardView != null) {
@@ -332,6 +334,10 @@ public class DashboardController implements Initializable {
 
     @FXML private void handleNavPayments(MouseEvent event) {
         navigateTo("Payments.fxml", "TCH — Payments");
+    }
+
+    @FXML private void handleNavTrainers(MouseEvent event) {
+        navigateTo("Trainers.fxml", "TCH — Trainers");
     }
 
     @FXML private void handleNavReports(MouseEvent event) {
