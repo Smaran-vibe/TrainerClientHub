@@ -40,6 +40,7 @@ public class SessionController implements Initializable {
     @FXML private Label avatarLabel;
     @FXML private HBox navMemberships;
     @FXML private HBox navPayments;
+    @FXML private HBox navTrainers;
 
     //  FXML — stat cards
     @FXML private Label scheduledTodayLabel;
@@ -112,6 +113,7 @@ public class SessionController implements Initializable {
         boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
         if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
         if (navPayments != null)    { navPayments.setVisible(!isTrainer);    navPayments.setManaged(!isTrainer); }
+        if (navTrainers != null)    { navTrainers.setVisible(!isTrainer);    navTrainers.setManaged(!isTrainer); }
     }
 
     //  Table
@@ -379,6 +381,7 @@ public class SessionController implements Initializable {
     @FXML private void handleNavWorkouts(MouseEvent e)    { navigate("WorkoutTrackingView.fxml",     "TCH — Workouts"); }
     @FXML private void handleNavMemberships(MouseEvent e) { navigate("MembershipManagementView.fxml","TCH — Memberships"); }
     @FXML private void handleNavPayments(MouseEvent e)   { navigate("Payments.fxml",                  "TCH — Payments"); }
+    @FXML private void handleNavTrainers(MouseEvent e)   { navigate("Trainers.fxml",                  "TCH — Trainers"); }
     @FXML private void handleNavReports(MouseEvent e)     { navigate("ReportsView.fxml",             "TCH — Reports"); }
 
     @FXML private void handleLogout(MouseEvent e) { SessionManager.getInstance().logout(); navigate("LoginView.fxml", "TCH — Login"); }
