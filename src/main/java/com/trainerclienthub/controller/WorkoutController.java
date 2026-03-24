@@ -39,19 +39,20 @@ import java.util.ResourceBundle;
  */
 public class WorkoutController implements Initializable {
 
-    // ── FXML — top bar + sidebar ───────────────────────────────────────────────
+    // FXML — top bar + sidebar
     @FXML private Label avatarLabel;
     @FXML private HBox navMemberships;
     @FXML private HBox navPayments;
+    @FXML private HBox navTrainers;
 
-    // ── FXML — client selector ────────────────────────────────────────────────
+    //  FXML — client selector
     @FXML private ComboBox<Client> clientSelector;
 
-    // ── FXML — action bar ─────────────────────────────────────────────────────
+    //FXML — action bar
     @FXML private Button addWorkoutBtn;
     @FXML private Button deleteWorkoutBtn;
 
-    // ── FXML — workout history table ──────────────────────────────────────────
+    //FXML — workout history table
     @FXML private TableView<Workout>               workoutTable;
     @FXML private TableColumn<Workout, Integer>    colWorkoutId;
     @FXML private TableColumn<Workout, LocalDate>  colWorkoutDate;
@@ -59,7 +60,7 @@ public class WorkoutController implements Initializable {
     @FXML private TableColumn<Workout, BigDecimal> colTotalVolume;
     @FXML private TableColumn<Workout, String>     colWorkoutNotes;
 
-    // ── FXML — exercise breakdown table ──────────────────────────────────────
+    // FXML — exercise breakdown table
     @FXML private Label                              exerciseSectionLabel;
     @FXML private Button                             addExerciseBtn;
     @FXML private Button                             deleteExerciseBtn;
@@ -70,7 +71,7 @@ public class WorkoutController implements Initializable {
     @FXML private TableColumn<Exercise, BigDecimal>  colWeight;
     @FXML private TableColumn<Exercise, BigDecimal>  colVolume;
 
-    // ── FXML — log workout slide-in form ──────────────────────────────────────
+    // FXML — log workout slide-in form
     @FXML private VBox workoutFormPanel;
     @FXML private Label     workoutFormTitle;
     @FXML private DatePicker fWorkoutDate;
@@ -85,7 +86,7 @@ public class WorkoutController implements Initializable {
     @FXML private Button     saveWorkoutBtn;
     @FXML private Button     cancelWorkoutBtn;
 
-    // ── State ─────────────────────────────────────────────────────────────────
+    // State
     private final WorkoutService workoutService = new WorkoutService();
     private final ClientService  clientService  = new ClientService();
 
@@ -96,7 +97,7 @@ public class WorkoutController implements Initializable {
     private final List<Exercise>           stagedExercises = new ArrayList<>();
     private final ObservableList<String>   stagedLabels    = FXCollections.observableArrayList();
 
-    // ── Initialise ────────────────────────────────────────────────────────────
+    // Initialise
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -114,9 +115,10 @@ public class WorkoutController implements Initializable {
         boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
         if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
         if (navPayments != null)    { navPayments.setVisible(!isTrainer);    navPayments.setManaged(!isTrainer); }
+        if (navTrainers != null)    { navTrainers.setVisible(!isTrainer);    navTrainers.setManaged(!isTrainer); }
     }
 
-    // ── Table configuration ───────────────────────────────────────────────────
+    // Table configuration
 
     private void configureWorkoutTable() {
         colWorkoutId.setCellValueFactory(new PropertyValueFactory<>("workoutId"));
@@ -154,7 +156,7 @@ public class WorkoutController implements Initializable {
         clientSelector.setItems(FXCollections.observableArrayList(clients));
     }
 
-    // ── Client selection ──────────────────────────────────────────────────────
+    //Client selection
 
     @FXML
     private void handleClientSelected(ActionEvent event) {
@@ -170,7 +172,7 @@ public class WorkoutController implements Initializable {
         exerciseSectionLabel.setText("Exercises — select a workout above");
     }
 
-    // ── Workout selection ─────────────────────────────────────────────────────
+    //Workout selection
 
     @FXML
     private void handleWorkoutSelected(MouseEvent event) {
@@ -181,7 +183,7 @@ public class WorkoutController implements Initializable {
         showExerciseActions();
     }
 
-    // ── Add / delete workout ──────────────────────────────────────────────────
+    //  Add / delete workout
 
     @FXML
     private void handleAddWorkout(ActionEvent event) {
@@ -213,7 +215,7 @@ public class WorkoutController implements Initializable {
         }
     }
 
-    // ── Exercise management (from table, post-save) ───────────────────────────
+    //  Exercise management (from table, post-save)
 
     @FXML private void handleAddExercise(ActionEvent event) { showFormPanel(); }
 
@@ -225,7 +227,7 @@ public class WorkoutController implements Initializable {
                 "Delete individual exercises by editing the workout.");
     }
 
-    // ── Form: inline exercise builder ─────────────────────────────────────────
+    // Form: inline exercise builder
 
     @FXML
     private void handleAddExerciseInline(ActionEvent event) {
@@ -343,6 +345,7 @@ public class WorkoutController implements Initializable {
     @FXML private void handleNavMemberships(MouseEvent e) { navigate("MembershipManagementView.fxml", "TCH — Memberships"); }
     @FXML private void handleNavSessions(MouseEvent e)    { navigate("SessionManagementView.fxml",    "TCH — Sessions"); }
     @FXML private void handleNavPayments(MouseEvent e)    { navigate("Payments.fxml",                  "TCH — Payments"); }
+    @FXML private void handleNavTrainers(MouseEvent e)    { navigate("Trainers.fxml",                  "TCH — Trainers"); }
     @FXML private void handleNavReports(MouseEvent e)     { navigate("ReportsView.fxml",              "TCH — Reports"); }
 
     @FXML private void handleLogout(MouseEvent e) {
