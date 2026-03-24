@@ -25,14 +25,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.IOException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -55,6 +54,7 @@ public class MembershipController implements Initializable {
     @FXML private Label avatarLabel;
     @FXML private HBox navMemberships;
     @FXML private HBox navPayments;
+    @FXML private HBox navTrainers;
 
     // ── FXML — Memberships tab ────────────────────────────────────────────────
     @FXML private TabPane membershipTabs;
@@ -136,6 +136,7 @@ public class MembershipController implements Initializable {
         boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
         if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
         if (navPayments != null)    { navPayments.setVisible(!isTrainer);    navPayments.setManaged(!isTrainer); }
+        if (navTrainers != null)    { navTrainers.setVisible(!isTrainer);    navTrainers.setManaged(!isTrainer); }
     }
 
     // ── Table configuration ───────────────────────────────────────────────────
@@ -487,6 +488,7 @@ public class MembershipController implements Initializable {
     @FXML private void handleNavWorkouts(MouseEvent e)   { navigate("WorkoutTrackingView.fxml",     "TCH — Workouts"); }
     @FXML private void handleNavSessions(MouseEvent e)   { navigate("SessionManagementView.fxml",   "TCH — Sessions"); }
     @FXML private void handleNavPayments(MouseEvent e)   { navigate("Payments.fxml",                "TCH — Payments"); }
+    @FXML private void handleNavTrainers(MouseEvent e)   { navigate("Trainers.fxml",                "TCH — Trainers"); }
     @FXML private void handleNavReports(MouseEvent e)    { navigate("ReportsView.fxml",             "TCH — Reports"); }
 
     @FXML private void handleLogout(MouseEvent e) { SessionManager.getInstance().logout(); navigate("LoginView.fxml", "TCH — Login"); }
