@@ -1,28 +1,37 @@
 package com.trainerclienthub.controller;
 
+import com.trainerclienthub.db.DatabaseConnection;
 import com.trainerclienthub.model.Client;
 import com.trainerclienthub.model.TrainerRole;
 import com.trainerclienthub.service.ReportService;
 import com.trainerclienthub.util.SessionManager;
 import com.trainerclienthub.util.ViewLoader;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -37,6 +46,7 @@ public class ReportController implements Initializable {
     @FXML private Label      avatarLabel;
     @FXML private HBox       navMemberships;
     @FXML private HBox       navPayments;
+    @FXML private HBox       navTrainers;
     @FXML private DatePicker fromDate;
     @FXML private DatePicker toDate;
     @FXML private Button     generateBtn;
@@ -97,6 +107,7 @@ public class ReportController implements Initializable {
         boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
         if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
         if (navPayments != null)    { navPayments.setVisible(!isTrainer);    navPayments.setManaged(!isTrainer); }
+        if (navTrainers != null)    { navTrainers.setVisible(!isTrainer);    navTrainers.setManaged(!isTrainer); }
         if (totalRevenueCard != null)           { totalRevenueCard.setVisible(!isTrainer);           totalRevenueCard.setManaged(!isTrainer); }
         if (gymVolumeChartSection != null)       { gymVolumeChartSection.setVisible(!isTrainer);       gymVolumeChartSection.setManaged(!isTrainer); }
         if (revenueTrendChartSection != null)    { revenueTrendChartSection.setVisible(!isTrainer);    revenueTrendChartSection.setManaged(!isTrainer); }
@@ -138,6 +149,7 @@ public class ReportController implements Initializable {
     @FXML private void handleNavMemberships(MouseEvent e) { navigateTo("MembershipManagementView.fxml","TCH — Memberships"); }
     @FXML private void handleNavSessions(MouseEvent e)    { navigateTo("SessionManagementView.fxml",  "TCH — Sessions"); }
     @FXML private void handleNavPayments(MouseEvent e)    { navigateTo("Payments.fxml",                "TCH — Payments"); }
+    @FXML private void handleNavTrainers(MouseEvent e)    { navigateTo("Trainers.fxml",                "TCH — Trainers"); }
 
     @FXML
     private void handleLogout(MouseEvent e) {
@@ -159,6 +171,7 @@ public class ReportController implements Initializable {
         loadGymVolumeChart(from, to, trainerId);
         loadMostActiveClientsChart(from, to, trainerId);
         loadRevenueTrendChart(from, to);
+        loadMembershipDistributionChart();
     }
 
     /** Returns trainer ID when TRAINER role (for data isolation), null when ADMIN. */
@@ -272,7 +285,95 @@ public class ReportController implements Initializable {
         applyNeonLineStyle(revenueTrendChart);
     }
 
+    private void loadMembershipDistributionChart() {
+        if (membershipPieChart == null) return;
+
+        Task<ObservableList<PieChart.Data>> pieTask = new Task<>() {
+            @Override
+            protected ObservableList<PieChart.Data> call() {
+                ObservableList<PieChart.Data> slices = FXCollections.observableArrayList();
+                String sql = """
+                        SELECT p.plan_name,
+                               COUNT(m.membership_id) AS plan_count
+                          FROM membership_plan p
+                          LEFT JOIN membership m ON p.plan_id = m.plan_id AND UPPER(m.status) = 'ACTIVE'
+                         GROUP BY p.plan_name
+                         ORDER BY plan_count DESC
+                        """;
+                try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                     PreparedStatement ps = conn.prepareStatement(sql);
+                     ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        slices.add(new PieChart.Data(
+                                rs.getString("plan_name"),
+                                rs.getInt("plan_count")));
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                return slices;
+            }
+        };
+
+        pieTask.setOnSucceeded(event -> Platform.runLater(() -> {
+            ObservableList<PieChart.Data> data = pieTask.getValue();
+            membershipPieChart.setData(data);
+            membershipPieChart.setStartAngle(90);
+
+            // This is what makes the Pie Chart physically bigger!
+            membershipPieChart.setLabelsVisible(false);
+            membershipPieChart.setLegendVisible(true);
+
+            String[] neon = {"#CCFF00", "#00E5FF", "#B300FF", "#FF5F00", "#00FFA5"};
+
+            // Force the UI to build so the legend dots actually exist before we color them
+            membershipPieChart.applyCss();
+            membershipPieChart.layout();
+
+            // 1. Color the slices and add tooltips
+            for (int i = 0; i < data.size(); i++) {
+                PieChart.Data slice = data.get(i);
+                String color = neon[i % neon.length];
+                Runnable decorate = () -> {
+                    Node node = slice.getNode();
+                    if (node != null) {
+                        node.setStyle("-fx-pie-color: " + color + ";");
+                        Tooltip.install(node, new Tooltip(slice.getName() + ": " + (int) slice.getPieValue()));
+                    }
+                };
+                if (slice.getNode() != null) {
+                    decorate.run();
+                } else {
+                    slice.nodeProperty().addListener((obs, oldNode, node) -> {
+                        if (node != null) {
+                            decorate.run();
+                        }
+                    });
+                }
+            }
+
+            // 2. Color the Legend Dots safely
+            int index = 0;
+            for (Node legendSymbol : membershipPieChart.lookupAll(".chart-legend-item-symbol")) {
+                if (index < data.size()) {
+                    legendSymbol.setStyle("-fx-background-color: " + neon[index % neon.length] + ", transparent;");
+                    index++;
+                }
+            }
+        }));
+
+        pieTask.setOnFailed(event -> {
+            if (pieTask.getException() != null) {
+                pieTask.getException().printStackTrace();
+            }
+        });
+
+
+        new Thread(pieTask, "membership-distribution-loader").start();
+    }
+
     //  Stat cards
+
     private void populateStatCards(LocalDate from, LocalDate to, Integer trainerId) {
         // Revenue (only shown for ADMIN; card hidden for TRAINER)
         if (trainerId == null && totalRevenueStat != null) {
@@ -380,8 +481,8 @@ public class ReportController implements Initializable {
 
         chart.lookupAll(".chart-line-symbol").forEach(node ->
                 node.setStyle("-fx-background-color: #CCFF00, #121212; " +
-                              "-fx-background-radius: 5px; " +
-                              "-fx-padding: 4px;"));
+                        "-fx-background-radius: 5px; " +
+                        "-fx-padding: 4px;"));
     }
 
     private void applyNeonBarStyle(BarChart<String, Number> chart) {
