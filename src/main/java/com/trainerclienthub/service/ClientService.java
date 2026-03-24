@@ -95,6 +95,11 @@ public class ClientService {
         clientDAO.updateSessionBalance(clientId, newBalance);
     }
 
+    public void addSessions(int clientId, int sessionsToAdd) {
+        ValidationUtil.requirePositiveInt(clientId, "Client ID");
+        ValidationUtil.requirePositiveInt(sessionsToAdd, "Sessions to add");
+        clientDAO.incrementSessionBalance(clientId, sessionsToAdd);
+    }
 
     public void deleteClient(int clientId) {
         ValidationUtil.requirePositiveInt(clientId, "Client ID");
