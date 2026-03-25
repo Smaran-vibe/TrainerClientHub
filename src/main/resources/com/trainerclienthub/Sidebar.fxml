@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.layout.Region?>
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.trainerclienthub.controller.SidebarController"
+      spacing="0"
+      styleClass="sidebar">
+
+    <VBox styleClass="sidebar-logo-box" spacing="4">
+        <Label styleClass="sidebar-logo-title" text="TCH"/>
+        <Label styleClass="sidebar-logo-sub" text="TRAINER CLIENT HUB"/>
+    </VBox>
+
+    <Region styleClass="sidebar-divider"/>
+
+    <Label styleClass="sidebar-section-label" text="MAIN MENU"/>
+
+    <HBox fx:id="navDashboard" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+          onMouseClicked="#handleNavDashboard">
+        <Label styleClass="nav-icon" text="⊞"/>
+        <Label text="Dashboard"/>
+    </HBox>
+    <HBox fx:id="navClients" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+          onMouseClicked="#handleNavClients">
+        <Label styleClass="nav-icon" text="👥"/>
+        <Label text="Clients"/>
+    </HBox>
+    <HBox fx:id="navWorkouts" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+          onMouseClicked="#handleNavWorkouts">
+        <Label styleClass="nav-icon" text="🏋"/>
+        <Label text="Workouts"/>
+    </HBox>
+    <HBox fx:id="navMemberships" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+          onMouseClicked="#handleNavMemberships">
+        <Label styleClass="nav-icon" text="🪪"/>
+        <Label text="Memberships"/>
+    </HBox>
+    <HBox fx:id="navSessions" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+          onMouseClicked="#handleNavSessions">
+        <Label styleClass="nav-icon" text="📅"/>
+        <Label text="Sessions"/>
+    </HBox>
+    <HBox fx:id="navPayments" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+          onMouseClicked="#handleNavPayments">
+        <Label styleClass="nav-icon" text="💳"/>
+        <Label text="Payments"/>
+    </HBox>
+    <Button fx:id="trainersButton" styleClass="nav-item" text="Trainers" onAction="#handleNavTrainers">
+        <graphic>
+            <Label styleClass="nav-icon" text="🧑‍🏫"/>
+        </graphic>
+    </Button>
+    <HBox fx:id="navReports" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+          onMouseClicked="#handleNavReports">
+        <Label styleClass="nav-icon" text="📊"/>
+        <Label text="Reports"/>
+    </HBox>
+
+    <Region VBox.vgrow="ALWAYS"/>
+
+    <Region styleClass="sidebar-divider"/>
+
+    <HBox styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleLogout">
+        <Label styleClass="nav-icon" text="⏻"/>
+        <Label text="Logout" style="-fx-text-fill:#AAAAAA;"/>
+    </HBox>
+
+</VBox>
