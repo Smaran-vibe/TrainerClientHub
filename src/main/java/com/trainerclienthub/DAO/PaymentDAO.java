@@ -47,6 +47,9 @@ public class PaymentDAO {
     private static final String UPDATE_STATUS =
             "UPDATE payment SET payment_status = ? WHERE payment_id = ?";
 
+    private static final String UPDATE_STATUS_AND_METHOD =
+            "UPDATE payment SET payment_status = ?, payment_method = ? WHERE payment_id = ?";
+
     private static final String SUM_COMPLETED_BY_DATE_RANGE =
             "SELECT COALESCE(SUM(amount), 0) FROM payment WHERE payment_status = 'COMPLETED' AND payment_date BETWEEN ? AND ?";
 
@@ -181,6 +184,24 @@ public class PaymentDAO {
         } catch (SQLException e) {
             throw new DatabaseException("Failed to update status for payment id: " + paymentId, e);
         }
+    }
+
+    public void updateStatusAndMethod(int paymentId, PaymentStatus status, PaymentMethod method) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(UPDATE_STATUS_AND_METHOD)) {
+
+            ps.setString(1, status.name());
+            ps.setString(2, method.name());
+            ps.setInt(3, paymentId);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Update Failed for ID " + paymentId + " | DB Error: " + e.getMessage(), e);
+        }
+    }
+
+    public void updatePaymentStatusAndMethod(int paymentId, String newStatus, PaymentMethod method) {
+        updateStatusAndMethod(paymentId, PaymentStatus.valueOf(newStatus.toUpperCase().trim()), method);
     }
 
     /**
