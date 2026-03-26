@@ -77,6 +77,17 @@ public class PaymentService {
         paymentDAO.updatePaymentStatus(paymentId, newStatus);
     }
 
+    public void updatePaymentStatusAndMethod(int paymentId, String newStatus, PaymentMethod method) {
+        ValidationUtil.requirePositiveInt(paymentId, "Payment ID");
+        if (newStatus == null || newStatus.isBlank()) {
+            throw new IllegalArgumentException("Payment status must not be null or blank.");
+        }
+        if (method == null) {
+            throw new IllegalArgumentException("Payment method must not be null.");
+        }
+        paymentDAO.updatePaymentStatusAndMethod(paymentId, newStatus, method);
+    }
+
     public void refundPayment(int paymentId) {
         ValidationUtil.requirePositiveInt(paymentId, "Payment ID");
 
