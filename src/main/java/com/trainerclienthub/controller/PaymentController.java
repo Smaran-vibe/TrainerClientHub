@@ -1,6 +1,7 @@
 package com.trainerclienthub.controller;
 
 import com.trainerclienthub.model.Payment;
+import com.trainerclienthub.model.PaymentMethod;
 import com.trainerclienthub.model.PaymentStatus;
 import com.trainerclienthub.model.TrainerRole;
 import com.trainerclienthub.service.PaymentService;
@@ -14,15 +15,19 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
@@ -183,33 +188,87 @@ public class PaymentController implements Initializable {
     }
 
     private void handleEditStatus(Payment payment) {
-        ChoiceDialog<String> dialog = new ChoiceDialog<>(
-                payment.getPaymentStatus() != null ? payment.getPaymentStatus().name() : "PENDING",
-                "COMPLETED", "PENDING", "REFUNDED", "FAILED"
-        );
-        dialog.setTitle("Edit Payment Status");
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Edit Payment");
         dialog.setHeaderText("Payment #" + payment.getPaymentId());
-        dialog.setContentText("Select new status:");
+
+        DialogPane pane = dialog.getDialogPane();
+        pane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        ComboBox<String> statusCombo = new ComboBox<>(
+                FXCollections.observableArrayList("COMPLETED", "PENDING", "REFUNDED", "FAILED")
+        );
+        statusCombo.setValue(payment.getPaymentStatus() != null ? payment.getPaymentStatus().name() : "PENDING");
+        statusCombo.getStyleClass().add("combo-box");
+
+        ComboBox<String> methodCombo = new ComboBox<>(
+                FXCollections.observableArrayList("CASH", "BANKTRANSFER", "ONLINE", "Card")
+        );
+        methodCombo.setValue(displayTextForMethod(payment.getPaymentMethod()));
+        methodCombo.getStyleClass().add("combo-box");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(12);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 20, 10, 20));
+        grid.add(new Label("Status"), 0, 0);
+        grid.add(statusCombo, 1, 0);
+        grid.add(new Label("Method"), 0, 1);
+        grid.add(methodCombo, 1, 1);
+
+        pane.setContent(grid);
 
         java.net.URL cssUrl = getClass().getResource("/com/trainerclienthub/css/neon-theme.css");
         if (cssUrl != null) {
-            dialog.getDialogPane().getStylesheets().add(cssUrl.toExternalForm());
+            pane.getStylesheets().add(cssUrl.toExternalForm());
         }
 
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(newStatus -> {
-            try {
-                paymentService.updatePaymentStatus(payment.getPaymentId(), newStatus);
-                payment.setPaymentStatus(PaymentStatus.valueOf(newStatus));
-                paymentTable.refresh();
-            } catch (Exception ex) {
-                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
-                alert.setTitle("Update Failed");
-                alert.setHeaderText("Could not update payment status");
-                alert.setContentText(ex.getMessage());
-                alert.showAndWait();
+        Optional<ButtonType> result = dialog.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            String newStatusLabel = statusCombo.getValue();
+            String selectedMethod = methodCombo.getValue();
+            if (newStatusLabel != null && selectedMethod != null) {
+                try {
+                    PaymentStatus newStatus = PaymentStatus.valueOf(newStatusLabel);
+                    PaymentMethod newMethod = parsePaymentMethod(selectedMethod);
+                    paymentService.updatePaymentStatusAndMethod(payment.getPaymentId(), newStatus.name(), newMethod);
+                    payment.setPaymentStatus(newStatus);
+                    payment.setPaymentMethod(newMethod);
+                    paymentTable.refresh();
+                } catch (Exception ex) {
+                    javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+                    alert.setTitle("Update Failed");
+                    alert.setHeaderText("Could not update payment");
+                    alert.setContentText(ex.getMessage());
+                    alert.showAndWait();
+                }
             }
-        });
+        }
+    }
+
+    private String displayTextForMethod(PaymentMethod method) {
+        if (method == null) {
+            return "CASH";
+        }
+        return switch (method) {
+            case CASH -> "CASH";
+            case BANKTRANSFER -> "BANKTRANSFER";
+            case ONLINE -> "ONLINE";
+            case CARD -> "Card";
+        };
+    }
+
+    private PaymentMethod parsePaymentMethod(String label) {
+        if (label == null) {
+            return PaymentMethod.CASH;
+        }
+        return switch (label) {
+            case "CASH" -> PaymentMethod.CASH;
+            case "BANKTRANSFER" -> PaymentMethod.BANKTRANSFER;
+            case "ONLINE" -> PaymentMethod.ONLINE;
+            case "Card" -> PaymentMethod.CARD;
+            default -> PaymentMethod.CASH;
+        };
     }
 
     private String formatAmount(BigDecimal amount) {
