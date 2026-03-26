@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.geometry.Insets?>
 <?import javafx.geometry.Pos?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -42,6 +44,9 @@
             <HBox fx:id="navPayments" styleClass="nav-item, nav-item-active" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavPayments">
                 <Label styleClass="nav-icon" text="💳"/><Label text="Payments"/>
             </HBox>
+            <HBox fx:id="navTrainers" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavTrainers">
+                <Label styleClass="nav-icon" text="🧑‍🏫"/><Label text="Trainers"/>
+            </HBox>
             <HBox fx:id="navReports" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavReports">
                 <Label styleClass="nav-icon" text="📊"/><Label text="Reports"/>
             </HBox>
@@ -70,7 +75,10 @@
         <VBox styleClass="content-area" spacing="16">
             <HBox alignment="CENTER_LEFT" spacing="10">
                 <Label styleClass="section-title" text="All Payments"/>
-
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="filter-bar">
+                <TextField fx:id="searchField" promptText="Search by Client Name..." prefWidth="260"/>
+                <ComboBox fx:id="statusFilterCombo" prefWidth="160" promptText="Filter by status"/>
             </HBox>
             <TableView fx:id="paymentTable" VBox.vgrow="ALWAYS" styleClass="table-view">
                 <columns>
@@ -80,6 +88,7 @@
                     <TableColumn fx:id="colPaymentDate" text="Date" prefWidth="140"/>
                     <TableColumn fx:id="colMethod" text="Method" prefWidth="110"/>
                     <TableColumn fx:id="colStatus" text="Status" prefWidth="110"/>
+                    <TableColumn fx:id="colAction" text="Action" prefWidth="100"/>
                 </columns>
                 <placeholder>
                     <Label text="No payments to show." style="-fx-text-fill:#888888; -fx-font-size:14px;"/>
