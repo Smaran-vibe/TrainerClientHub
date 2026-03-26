@@ -215,6 +215,8 @@ public class MembershipController implements Initializable {
     private void wireSearchAndFilter() {
         membershipSearchField.textProperty().addListener((obs, o, keyword) -> applyFilter());
         statusFilter.valueProperty().addListener((obs, oldVal, newVal) -> applyFilter());
+
+        applyFilter();
     }
 
     private void applyFilter() {
