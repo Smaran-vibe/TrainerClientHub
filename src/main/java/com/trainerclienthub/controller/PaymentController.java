@@ -202,7 +202,7 @@ public class PaymentController implements Initializable {
         statusCombo.getStyleClass().add("combo-box");
 
         ComboBox<String> methodCombo = new ComboBox<>(
-                FXCollections.observableArrayList("CASH", "BANKTRANSFER", "ONLINE", "Card")
+                FXCollections.observableArrayList("CASH", "BANK TRANSFER", "ONLINE", "Card")
         );
         methodCombo.setValue(displayTextForMethod(payment.getPaymentMethod()));
         methodCombo.getStyleClass().add("combo-box");
@@ -252,7 +252,7 @@ public class PaymentController implements Initializable {
         }
         return switch (method) {
             case CASH -> "CASH";
-            case BANKTRANSFER -> "BANKTRANSFER";
+            case BANKTRANSFER -> "BANK TRANSFER";
             case ONLINE -> "ONLINE";
             case CARD -> "Card";
         };
@@ -264,7 +264,7 @@ public class PaymentController implements Initializable {
         }
         return switch (label) {
             case "CASH" -> PaymentMethod.CASH;
-            case "BANKTRANSFER" -> PaymentMethod.BANKTRANSFER;
+            case "BANK TRANSFER" -> PaymentMethod.BANKTRANSFER;
             case "ONLINE" -> PaymentMethod.ONLINE;
             case "Card" -> PaymentMethod.CARD;
             default -> PaymentMethod.CASH;
@@ -310,7 +310,7 @@ public class PaymentController implements Initializable {
     }
 
     @FXML private void handleNavTrainers(MouseEvent event) {
-        navigate("Trainers.fxml", "TCH â€” Trainers");
+        navigate("Trainers.fxml", "TCH — Trainers");
     }
 
     @FXML private void handleNavReports(MouseEvent event) {
