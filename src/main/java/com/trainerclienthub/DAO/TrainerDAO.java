@@ -3,6 +3,8 @@ package com.trainerclienthub.DAO;
 import com.trainerclienthub.db.DatabaseConnection;
 import com.trainerclienthub.db.DatabaseException;
 import com.trainerclienthub.model.Trainer;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -30,6 +32,9 @@ public class TrainerDAO {
 
     private static final String SELECT_ALL =
             "SELECT * FROM trainer ORDER BY name";
+
+    private static final String SELECT_ONLY_TRAINERS =
+            "SELECT * FROM trainer WHERE role = 'TRAINER' ORDER BY name";
 
     private static final String UPDATE =
             "UPDATE trainer SET name = ?, email = ?, phone = ?, password_hash = ?, role = ? WHERE trainer_id = ?";
@@ -122,6 +127,21 @@ public class TrainerDAO {
             while (rs.next()) list.add(map(rs));
         } catch (SQLException e) {
             throw new DatabaseException("Failed to fetch all trainers.", e);
+        }
+        return list;
+    }
+
+    public ObservableList<Trainer> getAllTrainers() {
+        ObservableList<Trainer> list = FXCollections.observableArrayList();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(SELECT_ONLY_TRAINERS);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(map(rs));
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to fetch trainers with TRAINER role only.", e);
         }
         return list;
     }
