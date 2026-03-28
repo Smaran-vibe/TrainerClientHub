@@ -35,6 +35,12 @@
             <HBox styleClass="nav-item, nav-item-active" spacing="12" alignment="CENTER_LEFT">
                 <Label styleClass="nav-icon" text="📅"/><Label text="Sessions"/>
             </HBox>
+            <HBox fx:id="navPayments" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavPayments">
+                <Label styleClass="nav-icon" text="💳"/><Label text="Payments"/>
+            </HBox>
+            <HBox fx:id="navTrainers" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavTrainers">
+                <Label styleClass="nav-icon" text="🧑‍🏫"/><Label text="Trainers"/>
+            </HBox>
             <HBox fx:id="navReports" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavReports">
                 <Label styleClass="nav-icon" text="📊"/><Label text="Reports"/>
             </HBox>
@@ -67,17 +73,17 @@
             <!-- Summary badges row -->
             <HBox spacing="16">
                 <VBox styleClass="summary-card" spacing="8" HBox.hgrow="ALWAYS" prefHeight="90">
-                    <Label styleClass="card-label" text="SCHEDULED TODAY"/>
+                    <Label styleClass="card-label" text="TOTAL SCHEDULED"/>
                     <Label fx:id="scheduledTodayLabel" styleClass="card-value" text="0"/>
                 </VBox>
                 <VBox styleClass="summary-card" spacing="8" HBox.hgrow="ALWAYS" prefHeight="90">
-                    <Label styleClass="card-label" text="COMPLETED TODAY"/>
+                    <Label styleClass="card-label" text="TOTAL COMPLETED"/>
                     <Label fx:id="completedTodayLabel"
                            style="-fx-text-fill:#00CC66; -fx-font-size:36px; -fx-font-weight:bold;"
                            text="0"/>
                 </VBox>
                 <VBox styleClass="summary-card" spacing="8" HBox.hgrow="ALWAYS" prefHeight="90">
-                    <Label styleClass="card-label" text="CANCELLED TODAY"/>
+                    <Label styleClass="card-label" text="TOTAL CANCELLED"/>
                     <Label fx:id="cancelledTodayLabel"
                            style="-fx-text-fill:#FF4444; -fx-font-size:36px; -fx-font-weight:bold;"
                            text="0"/>
@@ -96,17 +102,7 @@
                             promptText="Filter by date" prefWidth="160"
                             onAction="#handleDateFilter"/>
                 <ComboBox fx:id="statusFilterCombo" styleClass="combo-box"
-                          promptText="All Statuses" prefWidth="150">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="All"/>
-                            <String fx:value="SCHEDULED"/>
-                            <String fx:value="COMPLETED"/>
-                            <String fx:value="CANCELLED"/>
-                            <String fx:value="NO_SHOW"/>
-                        </FXCollections>
-                    </items>
-                </ComboBox>
+                          promptText="Filter by status" prefWidth="150"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button fx:id="scheduleSessionBtn" styleClass="btn-primary"
                         text="+ Schedule Session" onAction="#handleScheduleSession"/>
