@@ -10,9 +10,7 @@
             styleClass="root-pane"
             stylesheets="@css/neon-theme.css">
 
-    <!-- ══════════════════════════════════════════════════════
-         LEFT: Sidebar navigation
-    ══════════════════════════════════════════════════════════ -->
+
     <left>
         <VBox styleClass="sidebar" spacing="0">
             <VBox styleClass="sidebar-logo-box" spacing="4">
@@ -47,6 +45,14 @@
                 <Label styleClass="nav-icon" text="📅"/>
                 <Label text="Sessions"/>
             </HBox>
+            <HBox fx:id="navPayments" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavPayments">
+                <Label styleClass="nav-icon" text="💳"/>
+                <Label text="Payments"/>
+            </HBox>
+            <HBox fx:id="navTrainers" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavTrainers">
+                <Label styleClass="nav-icon" text="🧑‍🏫"/>
+                <Label text="Trainers"/>
+            </HBox>
             <!-- Active nav item -->
             <HBox styleClass="nav-item, nav-item-active" spacing="12" alignment="CENTER_LEFT">
                 <Label styleClass="nav-icon" text="📊"/>
@@ -64,9 +70,8 @@
         </VBox>
     </left>
 
-    <!-- ══════════════════════════════════════════════════════
-         TOP: Top bar with date-range controls
-    ══════════════════════════════════════════════════════════ -->
+
+      <!-- TOP: Top bar with date-range controls -->
     <top>
         <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="0">
             <VBox spacing="2">
@@ -98,16 +103,16 @@
         </HBox>
     </top>
 
-    <!-- ══════════════════════════════════════════════════════
-         CENTER: Scrollable charts area
-    ══════════════════════════════════════════════════════════ -->
+
+<!--        CENTER: Scrollable charts area-->
+
     <center>
         <ScrollPane fitToWidth="true" styleClass="scroll-pane">
             <VBox styleClass="content-area" spacing="24">
 
-                <!-- ── Stat cards row ────────────────────────────────────── -->
+                <!-- Stat cards row  -->
                 <HBox spacing="16">
-                    <VBox styleClass="summary-card" spacing="8"
+                    <VBox fx:id="totalRevenueCard" styleClass="summary-card" spacing="8"
                           HBox.hgrow="ALWAYS" prefHeight="90">
                         <Label styleClass="card-label" text="TOTAL REVENUE (PERIOD)"/>
                         <Label fx:id="totalRevenueStat" styleClass="card-value" text="Rs 0"/>
@@ -184,7 +189,7 @@
                         BarChart: X = week label, Y = total volume across all clients
                         fx:id wired to gymVolumeChart in ReportController
                     -->
-                    <VBox styleClass="chart-container" spacing="12" HBox.hgrow="ALWAYS">
+                    <VBox fx:id="gymVolumeChartSection" styleClass="chart-container" spacing="12" HBox.hgrow="ALWAYS">
                         <Label text="Gym Workout Volume"
                                style="-fx-text-fill:#FFFFFF;
                                       -fx-font-size:15px;
@@ -249,7 +254,7 @@
                 <!-- ── Row 3: Pie + Revenue trend (original, unchanged) ─── -->
                 <HBox spacing="16" alignment="TOP_LEFT">
 
-                    <VBox styleClass="chart-container" spacing="10"
+                    <VBox fx:id="membershipDistributionSection" styleClass="chart-container" spacing="10"
                           prefWidth="320" minWidth="320">
                         <Label text="Membership Distribution"
                                style="-fx-text-fill:#FFFFFF;
@@ -264,26 +269,31 @@
                                   labelsVisible="true"/>
                     </VBox>
 
-                    <VBox styleClass="chart-container" spacing="10" HBox.hgrow="ALWAYS">
+                    <VBox fx:id="revenueTrendChartSection" styleClass="chart-container" spacing="10" HBox.hgrow="ALWAYS">
                         <Label text="Monthly Revenue Trend"
                                style="-fx-text-fill:#FFFFFF;
                                       -fx-font-size:14px;
                                       -fx-font-weight:bold;"/>
                         <Label text="Total payments collected per month (NPR)"
                                style="-fx-text-fill:#555555; -fx-font-size:11px;"/>
-                        <BarChart fx:id="revenueTrendChart"
-                                  prefHeight="220"
-                                  animated="false"
-                                  legendVisible="false"
-                                  styleClass="chart">
-                            <xAxis><CategoryAxis/></xAxis>
-                            <yAxis><NumberAxis/></yAxis>
-                        </BarChart>
+                        <LineChart fx:id="revenueTrendChart"
+                                   prefHeight="220"
+                                   animated="false"
+                                   legendVisible="false"
+                                   styleClass="chart"
+                                   createSymbols="true">
+                            <xAxis>
+                                <CategoryAxis label="Month"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="Revenue (NPR)" minorTickVisible="false"/>
+                            </yAxis>
+                        </LineChart>
                     </VBox>
 
                 </HBox>
 
-                <!-- ── Export ─────────────────────────────────────────────── -->
+                <!-- ── Export  -->
                 <HBox alignment="CENTER_RIGHT">
                     <Button fx:id="exportBtn"
                             styleClass="btn-secondary"
