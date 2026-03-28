@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.layout.Region?>
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.trainerclienthub.controller.TrainersController"
+            styleClass="root-pane"
+            stylesheets="@css/neon-theme.css">
+
+    <left>
+        <fx:include fx:id="sidebar" source="Sidebar.fxml"/>
+    </left>
+
+    <top>
+        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="0">
+            <VBox spacing="2">
+                <Label styleClass="top-bar-title" text="Trainers"/>
+                <Label styleClass="top-bar-sub" text="Manage admins and training staff"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <StackPane styleClass="avatar-circle">
+                <Label fx:id="avatarLabel" styleClass="avatar-label" text="T"/>
+            </StackPane>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox styleClass="content-area" spacing="16">
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <Label styleClass="section-title" text="Trainer Directory"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="addTrainerBtn" styleClass="btn-primary" text="+ Add New Trainer" onAction="#handleAddTrainer"/>
+            </HBox>
+            <TableView fx:id="trainerTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                <columns>
+                    <TableColumn fx:id="colTrainerId" text="ID" prefWidth="80"/>
+                    <TableColumn fx:id="colTrainerName" text="Name" prefWidth="220"/>
+                    <TableColumn fx:id="colTrainerEmail" text="Email" prefWidth="260"/>
+                    <TableColumn fx:id="colTrainerPhone" text="Phone" prefWidth="180"/>
+                    <TableColumn fx:id="colTrainerStatusAction" text="Status / Action" prefWidth="240"/>
+                </columns>
+                <placeholder>
+                    <Label text="No trainers registered yet." style="-fx-text-fill:#888888; -fx-font-size:14px;"/>
+                </placeholder>
+            </TableView>
+        </VBox>
+    </center>
+
+</BorderPane>
