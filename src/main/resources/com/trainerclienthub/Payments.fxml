@@ -27,7 +27,7 @@
             <Region styleClass="sidebar-divider"/>
             <Label styleClass="sidebar-section-label" text="MAIN MENU"/>
             <HBox fx:id="navDashboard" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavDashboard">
-                <Label styleClass="nav-icon" text="⚡"/><Label text="Dashboard"/>
+                <Label styleClass="nav-icon" text="⊞"/><Label text="Dashboard"/>
             </HBox>
             <HBox fx:id="navClients" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavClients">
                 <Label styleClass="nav-icon" text="👥"/><Label text="Clients"/>
