@@ -134,13 +134,14 @@
                     </VBox>
 
                     <HBox spacing="10">
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                        <VBox spacing="3" HBox.hgrow="ALWAYS">
                             <Label styleClass="form-label" text="AGE *"/>
-                            <TextField fx:id="fAge" styleClass="text-field" promptText="22"/>
+                            <TextField fx:id="fAge" styleClass="text-field" prefWidth="400" maxWidth="Infinity" promptText="22"/>
                         </VBox>
-                        <VBox spacing="10" HBox.hgrow="ALWAYS">
+
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
                             <Label styleClass="form-label" text="GENDER *"/>
-                            <ComboBox fx:id="fGender" styleClass="combo-box" maxWidth="Infinity" promptText="Select"/>
+                            <ComboBox fx:id="fGender" styleClass="combo-box" prefWidth="500" maxWidth="Infinity" promptText="Select"/>
                         </VBox>
                     </HBox>
 
