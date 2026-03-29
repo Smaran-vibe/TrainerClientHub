@@ -1,15 +1,9 @@
-/* =============================================================
-   Trainer Client Hub  |  neon-theme.css
-   Neon Fitness Dark Theme — FitMe+ inspired
-   ============================================================= */
-
-/* ── Root variables ─────────────────────────────────────────── */
 .root {
     -fx-background-color: #0B0B0B;
     -fx-font-family: "Segoe UI", "Helvetica Neue", sans-serif;
 }
 
-/* ── Base text ──────────────────────────────────────────────── */
+/* ── Base text  */
 .label { -fx-text-fill: #FFFFFF; }
 .text-secondary { -fx-text-fill: #AAAAAA; }
 .text-muted     { -fx-text-fill: #555555; }
@@ -17,12 +11,12 @@
 .text-danger    { -fx-text-fill: #FF4444; }
 .text-success   { -fx-text-fill: #00CC66; }
 
-/* ── Root pane ──────────────────────────────────────────────── */
+/* ── Root pane  */
 .root-pane {
     -fx-background-color: #0B0B0B;
 }
 
-/* ── Sidebar ─────────────────────────────────────────────────── */
+/* ── Sidebar */
 .sidebar {
     -fx-background-color: #0E0E0E;
     -fx-min-width: 220px;
@@ -114,7 +108,7 @@
     -fx-padding: 16 20 24 20;
 }
 
-/* ── Top bar ─────────────────────────────────────────────────── */
+/* ── Top bar */
 .top-bar {
     -fx-background-color: #0E0E0E;
     -fx-padding: 14 28 14 28;
@@ -152,7 +146,7 @@
     -fx-font-weight: bold;
 }
 
-/* ── Content area ────────────────────────────────────────────── */
+/* ── Content area  */
 .content-area {
     -fx-background-color: #0B0B0B;
     -fx-padding: 28;
@@ -171,7 +165,7 @@
     -fx-font-family: "Segoe UI", sans-serif;
 }
 
-/* ── Summary cards ───────────────────────────────────────────── */
+/* ── Summary cards  */
 .summary-card {
     -fx-background-color: #121212;
     -fx-background-radius: 14;
@@ -198,6 +192,28 @@
     -fx-font-size: 36px;
     -fx-font-weight: bold;
     -fx-font-family: "Segoe UI", sans-serif;
+}
+
+/*
+   Membership pie chart (dark neon)
+    */
+#membershipPieChart {
+    -fx-background-color: transparent;
+}
+
+#membershipPieChart .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+#membershipPieChart .chart-legend,
+#membershipPieChart .chart-legend-item .label,
+#membershipPieChart .chart-pie-label {
+    -fx-text-fill: #FFFFFF;
+}
+
+#membershipPieChart .chart-pie-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
 }
 
 .card-accent-dot {
@@ -228,7 +244,7 @@
 .card-trend-up   { -fx-text-fill: #00CC66; -fx-font-size: 11px; }
 .card-trend-down { -fx-text-fill: #FF4444; -fx-font-size: 11px; }
 
-/* ── Buttons ─────────────────────────────────────────────────── */
+/* ── Buttons */
 .btn-primary {
     -fx-background-color: #CCFF00;
     -fx-text-fill: #0B0B0B;
@@ -303,7 +319,7 @@
     -fx-border-color: #CCFF00;
 }
 
-/* ── Text fields & inputs ────────────────────────────────────── */
+/* ── Text fields & inputs  */
 .text-field, .password-field, .combo-box, .date-picker .text-field {
     -fx-background-color: #1A1A1A;
     -fx-text-fill: #FFFFFF;
@@ -352,7 +368,7 @@
     -fx-padding: 0 0 4 0;
 }
 
-/* ── ComboBox ────────────────────────────────────────────────── */
+/* ── ComboBox  */
 .combo-box {
     -fx-background-color: #1A1A1A;
     -fx-border-color: #2E2E2E;
@@ -389,7 +405,7 @@
     -fx-background-color: #AAAAAA;
 }
 
-/* ── TableView ───────────────────────────────────────────────── */
+/* ── TableView  */
 .table-view {
     -fx-background-color: #121212;
     -fx-border-color: #1E1E1E;
@@ -459,7 +475,7 @@
     -fx-background-color: #CCFF00;
 }
 
-/* ── Status badges ───────────────────────────────────────────── */
+/* ── Status badges  */
 .badge-active {
     -fx-background-color: #0A2A15;
     -fx-text-fill: #00CC66;
@@ -504,7 +520,7 @@
     -fx-border-width: 1;
 }
 
-/* ── Charts ──────────────────────────────────────────────────── */
+/* ── Charts */
 .chart {
     -fx-background-color: #121212;
     -fx-padding: 16;
@@ -558,7 +574,7 @@
     -fx-font-size: 11px;
 }
 
-/* ── Progress indicator ──────────────────────────────────────── */
+/* ── Progress indicator  */
 .progress-indicator {
     -fx-progress-color: #CCFF00;
     -fx-background-color: transparent;
@@ -575,7 +591,7 @@
     -fx-background-color: transparent;
 }
 
-/* ── Search bar ──────────────────────────────────────────────── */
+/* ── Search bar  */
 .search-field {
     -fx-background-color: #1A1A1A;
     -fx-text-fill: #FFFFFF;
@@ -594,7 +610,7 @@
     -fx-border-color: #CCFF00;
 }
 
-/* ── Login / Register ────────────────────────────────────────── */
+/* ── Login / Register  */
 .login-root {
     -fx-background-color: #0B0B0B;
 }
@@ -648,7 +664,7 @@
     -fx-text-fill: #CCFF00;
 }
 
-/* ── Side panel / form panel ─────────────────────────────────── */
+/* ── Side panel / form panel  */
 .form-panel {
     -fx-background-color: #121212;
     -fx-border-color: #1E1E1E transparent transparent transparent;
@@ -663,13 +679,13 @@
     -fx-font-family: "Segoe UI", sans-serif;
 }
 
-/* ── Separator ───────────────────────────────────────────────── */
+/* ── Separator */
 .separator .line {
     -fx-border-color: #1E1E1E;
     -fx-border-width: 1 0 0 0;
 }
 
-/* ── ScrollPane ──────────────────────────────────────────────── */
+/* ── ScrollPane */
 .scroll-pane {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
@@ -698,7 +714,7 @@
     -fx-padding: 0;
 }
 
-/* ── Tab pane ────────────────────────────────────────────────── */
+/* ── Tab pane  */
 .tab-pane {
     -fx-background-color: transparent;
 }
@@ -736,7 +752,7 @@
     -fx-font-weight: bold;
 }
 
-/* ── DatePicker ──────────────────────────────────────────────── */
+/* ── DatePicker  */
 .date-picker {
     -fx-background-color: #1A1A1A;
     -fx-border-color: #2E2E2E;
@@ -770,7 +786,7 @@
     -fx-text-fill: #0B0B0B;
 }
 
-/* ── Misc utilities ──────────────────────────────────────────── */
+/* ── Misc utilities  */
 .spacer {
     -fx-pref-width: Infinity;
     -fx-hgrow: ALWAYS;
@@ -802,7 +818,7 @@
     -fx-alignment: center;
 }
 
-/* ── Bar chart neon overrides ────────────────────────────────── */
+/* ── Bar chart neon overrides */
 .bar-chart .chart-bar,
 .default-color0.chart-bar {
     -fx-bar-fill: #CCFF00;
@@ -833,7 +849,7 @@
     -fx-font-size: 11px;
 }
 
-/* ── Pie chart neon overrides ────────────────────────────────── */
+/* ── Pie chart neon overrides  */
 .pie-chart .chart-pie-label {
     -fx-fill: #AAAAAA;
     -fx-font-size: 11px;
@@ -845,3 +861,80 @@
 .default-color3.chart-pie { -fx-pie-color: #334000; }
 .default-color4.chart-pie { -fx-pie-color: #1A2000; }
 
+
+.dialog-pane {
+    -fx-background-color: #1a1a1a;
+}
+
+
+.dialog-pane > .header-panel {
+    -fx-background-color: #1a1a1a;
+}
+
+
+.dialog-pane > .header-panel > .label {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+
+.dialog-pane > .content.label {
+    -fx-text-fill: #ffffff;
+}
+
+
+.dialog-pane .button {
+    -fx-background-color: #333333;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+.dialog-pane .button:hover {
+    -fx-background-color: #CCFF00;
+    -fx-text-fill: black;
+}
+
+/* 1. The main box itself */
+.combo-box {
+    -fx-background-color: #1A1A1A;
+    -fx-border-color: #333333;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+/* 2. The text inside the selected box */
+.combo-box > .list-cell {
+    -fx-text-fill: #FFFFFF;
+    -fx-padding: 8px 10px;
+    -fx-font-size: 14px;
+}
+
+/* 3. The dropdown arrow color */
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+.combo-box .arrow {
+    -fx-background-color: #888888; /* Subtle gray arrow */
+}
+
+/* 4. The popup dropdown menu background */
+.combo-box-popup .list-view {
+    -fx-background-color: #1A1A1A;
+    -fx-border-color: #333333;
+    -fx-border-radius: 3px;
+}
+
+/* 5. The items inside the dropdown list */
+.combo-box-popup .list-cell {
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: transparent;
+    -fx-padding: 8px 10px;
+}
+
+/* 6. Hover effect for the dropdown list items */
+.combo-box-popup .list-cell:hover,
+.combo-box-popup .list-cell:filled:selected {
+    -fx-background-color: #2A2A2A;
+    -fx-text-fill: #CCFF00; /* Neon text on hover! */
+}
