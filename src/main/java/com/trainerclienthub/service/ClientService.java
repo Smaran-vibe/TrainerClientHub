@@ -34,9 +34,15 @@ public class ClientService {
         ValidationUtil.requireValidClientWeight(weightKg);
         ValidationUtil.requirePositiveInt(trainerId, "Trainer ID");
 
-        if (clientDAO.findByEmail(email.trim().toLowerCase()).isPresent()) {
+        String normalizedEmail = email.trim().toLowerCase();
+        if (clientDAO.findByEmail(normalizedEmail).isPresent()) {
             throw new IllegalArgumentException(
                     "A client with this email already exists: " + email);
+        }
+
+        String normalizedPhone = phone.trim();
+        if (clientDAO.phoneExists(normalizedPhone)) {
+            throw new IllegalArgumentException("A client with this phone number already exists!");
         }
 
         Client client = new Client(name, age, gender, phone, email,
