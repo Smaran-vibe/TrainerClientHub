@@ -1,9 +1,13 @@
 package com.trainerclienthub.service;
 
+import com.trainerclienthub.DAO.ClientDAO;
 import com.trainerclienthub.DAO.MembershipDAO;
+import com.trainerclienthub.DAO.PaymentDAO;
 import com.trainerclienthub.model.Membership;
 import com.trainerclienthub.model.MembershipPlan;
 import com.trainerclienthub.model.MembershipStatus;
+import com.trainerclienthub.model.Payment;
+import com.trainerclienthub.model.PaymentStatus;
 import com.trainerclienthub.util.ValidationUtil;
 
 import java.time.LocalDate;
@@ -15,10 +19,14 @@ public class MembershipService {
 
     private final MembershipDAO membershipDAO;
     private final ClientService clientService;
+    private final ClientDAO clientDAO;
+    private final PaymentDAO paymentDAO;
 
     public MembershipService() {
         this.membershipDAO = new MembershipDAO();
         this.clientService = new ClientService();
+        this.clientDAO = new ClientDAO();
+        this.paymentDAO = new PaymentDAO();
     }
 
 
@@ -143,6 +151,15 @@ public class MembershipService {
         }
 
         membershipDAO.updateStatus(membershipId, MembershipStatus.CANCELLED);
+
+        membershipDAO.findPlanById(membership.getPlanId())
+                .ifPresent(plan -> clientDAO.deductSessions(
+                        membership.getClientId(), plan.getSessionsIncluded()));
+
+        List<Payment> payments = paymentDAO.findByMembership(membershipId);
+        for (Payment payment : payments) {
+            paymentDAO.updateStatus(payment.getPaymentId(), PaymentStatus.REFUNDED);
+        }
     }
 
 
