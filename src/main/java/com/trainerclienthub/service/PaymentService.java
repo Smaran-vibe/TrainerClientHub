@@ -1,9 +1,9 @@
 package com.trainerclienthub.service;
 
+import com.trainerclienthub.DAO.MembershipDAO;
+import com.trainerclienthub.DAO.ClientDAO;
 import com.trainerclienthub.DAO.PaymentDAO;
-import com.trainerclienthub.model.Payment;
-import com.trainerclienthub.model.PaymentMethod;
-import com.trainerclienthub.model.PaymentStatus;
+import com.trainerclienthub.model.*;
 import com.trainerclienthub.util.ValidationUtil;
 
 import java.math.BigDecimal;
@@ -11,9 +11,14 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Locale;
 
 public class PaymentService {
     // Manages payment recording and queries.
+
+    private MembershipDAO membershipDAO = new MembershipDAO();
+
+    private ClientDAO clientDAO = new ClientDAO();
 
     private final PaymentDAO paymentDAO;
 
@@ -75,6 +80,8 @@ public class PaymentService {
             throw new IllegalArgumentException("Payment status must not be null or blank.");
         }
         paymentDAO.updatePaymentStatus(paymentId, newStatus);
+
+        handleMembershipStatusBasedOnPayment(paymentId, newStatus);
     }
 
     public void updatePaymentStatusAndMethod(int paymentId, String newStatus, PaymentMethod method) {
@@ -86,6 +93,40 @@ public class PaymentService {
             throw new IllegalArgumentException("Payment method must not be null.");
         }
         paymentDAO.updatePaymentStatusAndMethod(paymentId, newStatus, method);
+
+        handleMembershipStatusBasedOnPayment(paymentId, newStatus);
+    }
+
+    private void handleMembershipStatusBasedOnPayment(int paymentId, String newStatus) {
+        if (newStatus == null || newStatus.isBlank()) {
+            return;
+        }
+
+        String normalizedStatus = newStatus.strip().toUpperCase(Locale.ROOT);
+        Optional<Payment> paymentOpt = paymentDAO.findById(paymentId);
+        if (paymentOpt.isEmpty()) {
+            return;
+        }
+
+        Payment payment = paymentOpt.get();
+        Optional<Membership> membershipOpt = membershipDAO.findById(payment.getMembershipId());
+        if (membershipOpt.isEmpty()) {
+            return;
+        }
+
+        Membership membership = membershipOpt.get();
+
+        boolean isCancellationStatus = normalizedStatus.equals("FAILED")
+                || normalizedStatus.equals("REFUNDED")
+                || normalizedStatus.equals("CANCELLED");
+
+        if (isCancellationStatus) {
+            membershipDAO.updateStatus(membership.getMembershipId(), MembershipStatus.CANCELLED);
+            membershipDAO.findPlanById(membership.getPlanId())
+                    .ifPresent(plan -> clientDAO.deductSessions(payment.getClientId(), plan.getSessionsIncluded()));
+        } else if (normalizedStatus.equals("COMPLETED")) {
+            membershipDAO.updateStatus(membership.getMembershipId(), MembershipStatus.ACTIVE);
+        }
     }
 
     public void refundPayment(int paymentId) {
@@ -104,7 +145,11 @@ public class PaymentService {
         }
 
         paymentDAO.updateStatus(paymentId, PaymentStatus.REFUNDED);
+
+        handleMembershipStatusBasedOnPayment(paymentId, "REFUNDED");
     }
+
+
 
 
     public void deletePayment(int paymentId) {
