@@ -52,6 +52,12 @@ public class ClientDAO {
     private static final String SEARCH =
             "SELECT * FROM client WHERE name LIKE ? OR email LIKE ? OR phone LIKE ? ORDER BY name";
 
+    private static final String DEDUCT_SESSIONS =
+            "UPDATE client SET session_balance = GREATEST(0, session_balance - ?) WHERE client_id = ?";
+
+    private static final String PHONE_EXISTS =
+            "SELECT 1 FROM client WHERE phone = ? LIMIT 1";
+
 
     public void insert(Client client) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -75,6 +81,23 @@ public class ClientDAO {
             }
         } catch (SQLException e) {
             throw new DatabaseException("Failed to insert client: " + client.getEmail(), e);
+        }
+    }
+
+    public boolean phoneExists(String phone) {
+        if (phone == null) {
+            throw new IllegalArgumentException("Phone number must not be null.");
+        }
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(PHONE_EXISTS)) {
+
+            ps.setString(1, phone.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to check phone uniqueness for: " + phone, e);
         }
     }
 
@@ -218,6 +241,18 @@ public class ClientDAO {
         }
     }
 
+    public void deductSessions(int clientId, int sessionsToDeduct) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(DEDUCT_SESSIONS)) {
+
+            ps.setInt(1, sessionsToDeduct);
+            ps.setInt(2, clientId);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to deduct sessions for client id: " + clientId, e);
+        }
+    }
 
     private Client map(ResultSet rs) throws SQLException {
         return new Client(
