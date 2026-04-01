@@ -15,6 +15,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
@@ -24,14 +25,25 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
 
-    //FXML injections
 
-    /** Single field — accepts either an email address or a Nepal phone number. */
-    @FXML private TextField     emailField;
-    @FXML private PasswordField passwordField;
-    @FXML private Button        loginButton;
-    @FXML private Hyperlink     registerLink;
-    @FXML private Label         errorLabel;
+
+    /**
+     * Single field — accepts either an email address or a Nepal phone number.
+     */
+    @FXML
+    private TextField emailField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private TextField passwordVisibleField;
+    @FXML
+    private ToggleButton showPasswordToggle;
+    @FXML
+    private Button loginButton;
+    @FXML
+    private Hyperlink registerLink;
+    @FXML
+    private Label errorLabel;
 
     //  Services
 
@@ -53,6 +65,12 @@ public class LoginController implements Initializable {
 
         // Auto-focus the identifier field when the view loads
         Platform.runLater(() -> emailField.requestFocus());
+
+        passwordVisibleField.managedProperty().bind(showPasswordToggle.selectedProperty());
+        passwordVisibleField.visibleProperty().bind(showPasswordToggle.selectedProperty());
+        passwordField.managedProperty().bind(showPasswordToggle.selectedProperty().not());
+        passwordField.visibleProperty().bind(showPasswordToggle.selectedProperty().not());
+        passwordVisibleField.textProperty().bindBidirectional(passwordField.textProperty());
     }
 
     //  Event handlers
@@ -62,7 +80,7 @@ public class LoginController implements Initializable {
         clearError();
 
         String identifier = emailField.getText();
-        String password   = passwordField.getText();
+        String password = passwordField.getText();
 
         //  Both fields must be filled before we hit the database
         if (identifier == null || identifier.isBlank()
@@ -156,5 +174,17 @@ public class LoginController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void handleShowPasswordToggle(ActionEvent event) {
+
+
+
+        boolean showing = showPasswordToggle.isSelected();
+        TextField focusTarget = showing ? passwordVisibleField : passwordField;
+
+        focusTarget.requestFocus();
+        focusTarget.positionCaret(focusTarget.getText().length());
     }
 }
