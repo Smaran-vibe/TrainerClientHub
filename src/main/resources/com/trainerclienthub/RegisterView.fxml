@@ -56,17 +56,46 @@
                 <!-- Password -->
                 <VBox spacing="6">
                     <Label styleClass="login-field-label" text="PASSWORD"/>
-                    <PasswordField fx:id="passwordField" styleClass="password-field"
-                                   promptText="Min. 8 characters and atleast 1 unique character" prefWidth="352"/>
+                    <StackPane prefWidth="352" styleClass="login-stack-pane">
+                        <TextField fx:id="passwordVisibleField"
+                                   styleClass="text-field"
+                                   promptText="Min. 8 characters and atleast 1 unique character"
+                                   prefWidth="352"/>
+                        <PasswordField fx:id="passwordField"
+                                       styleClass="password-field"
+                                       promptText="Min. 8 characters and atleast 1 unique character"
+                                       prefWidth="352"/>
+                        <ToggleButton fx:id="showPasswordToggle"
+                                      text="👁"
+                                      styleClass="icon-button"
+                                      onAction="#handleShowPasswordToggle"
+                                      StackPane.alignment="CENTER_RIGHT"
+                                      translateX="-12"
+                                      prefHeight="34"/>
+                    </StackPane>
                 </VBox>
 
                 <Region minHeight="14" />
 
-                <!-- Confirm Password -->
                 <VBox spacing="6">
                     <Label styleClass="login-field-label" text="CONFIRM PASSWORD"/>
-                    <PasswordField fx:id="confirmPasswordField" styleClass="password-field"
-                                   promptText="Repeat your password" prefWidth="352"/>
+                    <StackPane prefWidth="352" styleClass="login-stack-pane">
+                        <TextField fx:id="confirmPasswordVisibleField"
+                                   styleClass="text-field"
+                                   promptText="Repeat your password"
+                                   prefWidth="352"/>
+                        <PasswordField fx:id="confirmPasswordField"
+                                       styleClass="password-field"
+                                       promptText="Repeat your password"
+                                       prefWidth="352"/>
+                        <ToggleButton fx:id="showConfirmPasswordToggle"
+                                      text="👁"
+                                      styleClass="icon-button"
+                                      onAction="#handleShowConfirmPasswordToggle"
+                                      StackPane.alignment="CENTER_RIGHT"
+                                      translateX="-12"
+                                      prefHeight="34"/>
+                    </StackPane>
                 </VBox>
 
                 <Region minHeight="8" />
