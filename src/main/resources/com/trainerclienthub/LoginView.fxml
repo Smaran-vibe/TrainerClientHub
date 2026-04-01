@@ -45,12 +45,28 @@
                 <!-- Password field -->
                 <VBox spacing="6">
                     <Label styleClass="login-field-label" text="PASSWORD"/>
-                    <PasswordField fx:id="passwordField"
-                                   styleClass="password-field"
+
+                    <StackPane prefWidth="332" prefHeight="44" styleClass="login-stack-pane">
+
+                        <TextField fx:id="passwordVisibleField"
+                                   styleClass="text-field"
                                    promptText="Enter your password"
                                    prefWidth="332"/>
-                </VBox>
 
+                        <PasswordField fx:id="passwordField"
+                                       styleClass="password-field"
+                                       promptText="Enter your password"
+                                       prefWidth="332"/>
+
+                        <ToggleButton fx:id="showPasswordToggle"
+                                      text="👁"
+                                      styleClass="icon-button"
+                                      onAction="#handleShowPasswordToggle"
+                                      StackPane.alignment="CENTER_RIGHT"
+                                      translateX="-12"
+                                      prefHeight="34"/>
+                    </StackPane>
+                </VBox>
                 <Region minHeight="8" />
 
                 <!-- Error label -->
