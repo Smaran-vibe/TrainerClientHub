@@ -16,6 +16,24 @@
     -fx-background-color: #0B0B0B;
 }
 
+.login-stack-pane .icon-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0 5 0 0;
+    -fx-cursor: hand;
+}
+
+
+.login-stack-pane .icon-button .text {
+
+    -fx-fill: #D4FF00;
+}
+
+
+.login-stack-pane .icon-button:hover .text {
+    -fx-opacity: 0.7;
+}
+
 /* ── Sidebar */
 .sidebar {
     -fx-background-color: #0E0E0E;
