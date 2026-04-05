@@ -2,19 +2,6 @@ package com.trainerclienthub.model;
 
 import java.math.BigDecimal;
 
-/**
- * Represents a single exercise entry within a workout session.
- * Maps to the {@code exercise} database table.
- *
- * <p>Exercise has a <strong>composition</strong> relationship with {@link Workout}:
- * it cannot exist without a parent workout. This is enforced at the database
- * level via {@code ON DELETE CASCADE} on the {@code workout_id} FK, and at the
- * model level by requiring a non-zero {@code workoutId} in all constructors.</p>
- *
- * <p>{@code volume} is a derived value calculated as {@code sets × reps × weightKg},
- * mirroring the MySQL {@code GENERATED ALWAYS AS} column. It is recalculated
- * automatically whenever sets, reps, or weight are updated.</p>
- */
 public class Exercise {
 
     // ── Fields ──────────────────────────────────────────────────────────────
@@ -29,7 +16,7 @@ public class Exercise {
     /** Derived: sets × reps × weightKg. Recalculated on any component change. */
     private BigDecimal volume;
 
-    // ── Constructors ─────────────────────────────────────────────────────────
+    //  Constructors
 
     /** Default constructor required by the DAO layer when mapping ResultSets. */
     public Exercise() {}
