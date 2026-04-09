@@ -14,9 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * DAO for {@link Client} — handles all SQL operations on the {@code client} table.
- */
+
 public class ClientDAO {
 
 
@@ -161,7 +159,7 @@ public class ClientDAO {
         return list;
     }
 
-    /** Searches by name, email, or phone (partial match). */
+    
     public List<Client> search(String keyword) {
         List<Client> list = new ArrayList<>();
         String pattern = "%" + keyword + "%";
@@ -201,7 +199,7 @@ public class ClientDAO {
         }
     }
 
-    /** Updates only the session balance column — avoids a full-row update. */
+    
     public void updateSessionBalance(int clientId, int newBalance) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_SESSION_BALANCE)) {
