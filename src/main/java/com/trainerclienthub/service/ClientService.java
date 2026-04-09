@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class ClientService {
-    // Handles client validation and DAO coordination.
+    
 
     private final ClientDAO clientDAO;
 
