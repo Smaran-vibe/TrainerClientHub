@@ -7,7 +7,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
-// Entry point for the Trainer Client Hub JavaFX desktop application.
+
 
 public class MainApp extends Application {
 
@@ -17,7 +17,7 @@ public class MainApp extends Application {
     private static final double INIT_WIDTH = 1200;
     private static final double INIT_HEIGHT = 850;
 
-    // JavaFX lifecycle
+    
 
     @Override
     public void start(Stage primaryStage) {
@@ -26,7 +26,7 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
-    /** Close the shared JDBC connection when the app exits. */
+    
     @Override
     public void stop() {
         DatabaseConnection.getInstance().close();
@@ -37,7 +37,7 @@ public class MainApp extends Application {
         launch(args);
     }
 
-    //  Private helpers
+    
 
     private void configurePrimaryStage(Stage stage) {
         stage.setTitle(APP_TITLE);
