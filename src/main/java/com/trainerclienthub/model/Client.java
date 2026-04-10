@@ -12,7 +12,7 @@ public class Client {
     private static final BigDecimal MIN_WEIGHT = new BigDecimal("20.00");
     private static final BigDecimal MAX_WEIGHT = new BigDecimal("300.00");
 
-    // Fields
+    // Field
     private int clientId;
     private String name;
     private int age;
