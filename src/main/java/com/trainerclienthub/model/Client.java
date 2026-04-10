@@ -3,10 +3,10 @@ package com.trainerclienthub.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+
 public class Client {
 
-    // Constants
-
+    // Validation Constraints
     private static final int MIN_AGE = 10;
     private static final int MAX_AGE = 100;
     private static final BigDecimal MIN_WEIGHT = new BigDecimal("20.00");
@@ -24,11 +24,9 @@ public class Client {
     private int trainerId;
     private LocalDateTime createdAt;
 
-    //  Constructors
-
-    /** Default constructor required by the DAO layer when mapping ResultSets. */
     public Client() {}
 
+    // Constructor for new clients (auto-sets timestamp)
     public Client(String name, int age, Gender gender, String phone,
                   String email, int sessionBalance, BigDecimal weightKg, int trainerId) {
         setName(name);
@@ -42,6 +40,7 @@ public class Client {
         this.createdAt = LocalDateTime.now();
     }
 
+    // Constructor for existing clients
     public Client(int clientId, String name, int age, Gender gender, String phone,
                   String email, int sessionBalance, BigDecimal weightKg, int trainerId, LocalDateTime createdAt) {
         this.clientId = clientId;
@@ -56,7 +55,7 @@ public class Client {
         this.createdAt = createdAt;
     }
 
-    // Getters & Setters
+    // Getters and Setters
     public int getClientId() {
         return clientId;
     }
@@ -103,20 +102,18 @@ public class Client {
         return phone;
     }
 
-    /**
-     * Validates and sets the client's phone number.
-     */
     public void setPhone(String phone) {
         if (phone == null || phone.isBlank()) {
             throw new IllegalArgumentException("Client phone must not be blank.");
         }
         String trimmed = phone.trim();
-        // Accepts: +977XXXXXXXXXX | 977XXXXXXXXXX | XXXXXXXXXX  (X = 10 local digits)
+
+        // Validates Nepal formats: +977..., 977..., or 10-digit local
         if (!trimmed.matches("^(\\+977|977)?[0-9]{10}$")) {
             throw new IllegalArgumentException(
                     "Invalid Nepal phone number: \"" + trimmed + "\". "
-                    + "Expected format: +977XXXXXXXXXX, 977XXXXXXXXXX, or XXXXXXXXXX "
-                    + "(exactly 10 local digits after the optional +977 country code).");
+                            + "Expected format: +977XXXXXXXXXX, 977XXXXXXXXXX, or XXXXXXXXXX "
+                            + "(exactly 10 local digits after the optional +977 country code).");
         }
         this.phone = trimmed;
     }
@@ -126,6 +123,7 @@ public class Client {
     }
 
     public void setEmail(String email) {
+        // Basic regex for standard email validation
         if (email == null || !email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
             throw new IllegalArgumentException("Invalid email format: " + email);
         }
@@ -143,9 +141,7 @@ public class Client {
         this.sessionBalance = sessionBalance;
     }
 
-    /**
-     * Convenience method to decrement the session balance by one.
-     */
+    // Logic for burning a session after a workout
     public void decrementSessionBalance() {
         if (sessionBalance == 0) {
             throw new IllegalStateException("No remaining sessions to decrement for client: " + name);
@@ -157,13 +153,11 @@ public class Client {
         return weightKg;
     }
 
-    /**
-     * Validates and sets the client's body weight.
-     */
     public void setWeightKg(BigDecimal weightKg) {
         if (weightKg == null) {
             throw new IllegalArgumentException("Weight must not be null.");
         }
+        // Ensuring weight stays within limit
         if (weightKg.compareTo(MIN_WEIGHT) < 0 || weightKg.compareTo(MAX_WEIGHT) > 0) {
             throw new IllegalArgumentException(
                     "Weight must be between " + MIN_WEIGHT + " kg and " + MAX_WEIGHT + " kg. Provided: " + weightKg);
@@ -190,8 +184,6 @@ public class Client {
         this.createdAt = createdAt;
     }
 
-    //  Object overrides
-
     @Override
     public String toString() {
         return "Client{" +
@@ -204,6 +196,7 @@ public class Client {
                 '}';
     }
 
+    // Clients are unique by their ID
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
