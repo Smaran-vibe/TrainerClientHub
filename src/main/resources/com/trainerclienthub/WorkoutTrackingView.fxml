@@ -14,38 +14,54 @@
         <VBox styleClass="sidebar" spacing="0">
             <VBox styleClass="sidebar-logo-box" spacing="4">
                 <Label styleClass="sidebar-logo-title" text="TCH"/>
-                <Label styleClass="sidebar-logo-sub"   text="TRAINER CLIENT HUB"/>
+                <Label styleClass="sidebar-logo-sub" text="TRAINER CLIENT HUB"/>
             </VBox>
             <Region styleClass="sidebar-divider"/>
             <Label styleClass="sidebar-section-label" text="MAIN MENU"/>
-            <HBox fx:id="navDashboard" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavDashboard">
-                <Label styleClass="nav-icon" text="⊞"/><Label text="Dashboard"/>
+            <HBox fx:id="navDashboard" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavDashboard">
+                <Label styleClass="nav-icon" text="⊞"/>
+                <Label text="Dashboard"/>
             </HBox>
-            <HBox fx:id="navClients" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavClients">
-                <Label styleClass="nav-icon" text="👥"/><Label text="Clients"/>
+            <HBox fx:id="navClients" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavClients">
+                <Label styleClass="nav-icon" text="👥"/>
+                <Label text="Clients"/>
             </HBox>
             <HBox styleClass="nav-item, nav-item-active" spacing="12" alignment="CENTER_LEFT">
-                <Label styleClass="nav-icon" text="🏋"/><Label text="Workouts"/>
+                <Label styleClass="nav-icon" text="🏋"/>
+                <Label text="Workouts"/>
             </HBox>
-            <HBox fx:id="navMemberships" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavMemberships">
-                <Label styleClass="nav-icon" text="🪪"/><Label text="Memberships"/>
+            <HBox fx:id="navMemberships" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavMemberships">
+                <Label styleClass="nav-icon" text="🪪"/>
+                <Label text="Memberships"/>
             </HBox>
-            <HBox fx:id="navSessions" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavSessions">
-                <Label styleClass="nav-icon" text="📅"/><Label text="Sessions"/>
+            <HBox fx:id="navSessions" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavSessions">
+                <Label styleClass="nav-icon" text="📅"/>
+                <Label text="Sessions"/>
             </HBox>
-            <HBox fx:id="navPayments" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavPayments">
-                <Label styleClass="nav-icon" text="💳"/><Label text="Payments"/>
+            <HBox fx:id="navPayments" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavPayments">
+                <Label styleClass="nav-icon" text="💳"/>
+                <Label text="Payments"/>
             </HBox>
-            <HBox fx:id="navTrainers" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavTrainers">
-                <Label styleClass="nav-icon" text="🧑‍🏫"/><Label text="Trainers"/>
+            <HBox fx:id="navTrainers" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavTrainers">
+                <Label styleClass="nav-icon" text="🧑‍🏫"/>
+                <Label text="Trainers"/>
             </HBox>
-            <HBox fx:id="navReports" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavReports">
-                <Label styleClass="nav-icon" text="📊"/><Label text="Reports"/>
+            <HBox fx:id="navReports" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavReports">
+                <Label styleClass="nav-icon" text="📊"/>
+                <Label text="Reports"/>
             </HBox>
             <Region VBox.vgrow="ALWAYS"/>
             <Region styleClass="sidebar-divider"/>
             <HBox styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleLogout">
-                <Label styleClass="nav-icon" text="⏻"/><Label text="Logout" style="-fx-text-fill:#AAAAAA;"/>
+                <Label styleClass="nav-icon" text="⏻"/>
+                <Label text="Logout" style="-fx-text-fill:#AAAAAA;"/>
             </HBox>
         </VBox>
     </left>
@@ -88,11 +104,11 @@
                 <TableView fx:id="workoutTable" VBox.vgrow="ALWAYS" styleClass="table-view"
                            prefHeight="220" onMouseClicked="#handleWorkoutSelected">
                     <columns>
-                        <TableColumn fx:id="colWorkoutId"     text="ID"           prefWidth="60"/>
-                        <TableColumn fx:id="colWorkoutDate"   text="DATE"         prefWidth="120"/>
-                        <TableColumn fx:id="colWorkoutTrainer" text="TRAINER"     prefWidth="150"/>
-                        <TableColumn fx:id="colTotalVolume"   text="TOTAL VOLUME" prefWidth="140"/>
-                        <TableColumn fx:id="colWorkoutNotes"  text="NOTES"        prefWidth="250"/>
+                        <TableColumn fx:id="colWorkoutId" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colWorkoutDate" text="DATE" prefWidth="120"/>
+                        <TableColumn fx:id="colWorkoutTrainer" text="TRAINER" prefWidth="150"/>
+                        <TableColumn fx:id="colTotalVolume" text="TOTAL VOLUME" prefWidth="140"/>
+                        <TableColumn fx:id="colWorkoutNotes" text="NOTES" prefWidth="250"/>
                     </columns>
                     <placeholder>
                         <Label text="Select a client to view workout history."
@@ -121,11 +137,11 @@
                 <TableView fx:id="exerciseTable" VBox.vgrow="ALWAYS" styleClass="table-view"
                            prefHeight="180">
                     <columns>
-                        <TableColumn fx:id="colExerciseName" text="EXERCISE"  prefWidth="180"/>
-                        <TableColumn fx:id="colSets"         text="SETS"      prefWidth="80"/>
-                        <TableColumn fx:id="colReps"         text="REPS"      prefWidth="80"/>
-                        <TableColumn fx:id="colWeight"       text="WEIGHT KG" prefWidth="110"/>
-                        <TableColumn fx:id="colVolume"       text="VOLUME"    prefWidth="110"/>
+                        <TableColumn fx:id="colExerciseName" text="EXERCISE" prefWidth="180"/>
+                        <TableColumn fx:id="colSets" text="SETS" prefWidth="80"/>
+                        <TableColumn fx:id="colReps" text="REPS" prefWidth="80"/>
+                        <TableColumn fx:id="colWeight" text="WEIGHT KG" prefWidth="110"/>
+                        <TableColumn fx:id="colVolume" text="VOLUME" prefWidth="110"/>
                     </columns>
                     <placeholder>
                         <Label text="Select a workout to see exercises."
