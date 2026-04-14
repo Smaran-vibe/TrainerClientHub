@@ -14,36 +14,50 @@
         <VBox styleClass="sidebar" spacing="0">
             <VBox styleClass="sidebar-logo-box" spacing="4">
                 <Label styleClass="sidebar-logo-title" text="TCH"/>
-                <Label styleClass="sidebar-logo-sub"   text="TRAINER CLIENT HUB"/>
+                <Label styleClass="sidebar-logo-sub" text="TRAINER CLIENT HUB"/>
             </VBox>
             <Region styleClass="sidebar-divider"/>
             <Label styleClass="sidebar-section-label" text="MAIN MENU"/>
-            <HBox fx:id="navDashboard" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavDashboard">
-                <Label styleClass="nav-icon" text="⊞"/><Label text="Dashboard"/>
+            <HBox fx:id="navDashboard" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavDashboard">
+                <Label styleClass="nav-icon" text="⊞"/>
+                <Label text="Dashboard"/>
             </HBox>
-            <HBox fx:id="navClients" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavClients">
-                <Label styleClass="nav-icon" text="👥"/><Label text="Clients"/>
+            <HBox fx:id="navClients" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavClients">
+                <Label styleClass="nav-icon" text="👥"/>
+                <Label text="Clients"/>
             </HBox>
-            <HBox fx:id="navWorkouts" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavWorkouts">
-                <Label styleClass="nav-icon" text="🏋"/><Label text="Workouts"/>
+            <HBox fx:id="navWorkouts" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavWorkouts">
+                <Label styleClass="nav-icon" text="🏋"/>
+                <Label text="Workouts"/>
             </HBox>
-            <HBox fx:id="navMemberships" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavMemberships">
-                <Label styleClass="nav-icon" text="🪪"/><Label text="Memberships"/>
+            <HBox fx:id="navMemberships" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavMemberships">
+                <Label styleClass="nav-icon" text="🪪"/>
+                <Label text="Memberships"/>
             </HBox>
-            <HBox fx:id="navSessions" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavSessions">
-                <Label styleClass="nav-icon" text="📅"/><Label text="Sessions"/>
+            <HBox fx:id="navSessions" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavSessions">
+                <Label styleClass="nav-icon" text="📅"/>
+                <Label text="Sessions"/>
             </HBox>
             <!-- Active page -->
             <HBox styleClass="nav-item, nav-item-active" spacing="12" alignment="CENTER_LEFT">
-                <Label styleClass="nav-icon" text="💳"/><Label text="Payments"/>
+                <Label styleClass="nav-icon" text="💳"/>
+                <Label text="Payments"/>
             </HBox>
-            <HBox fx:id="navReports" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavReports">
-                <Label styleClass="nav-icon" text="📊"/><Label text="Reports"/>
+            <HBox fx:id="navReports" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavReports">
+                <Label styleClass="nav-icon" text="📊"/>
+                <Label text="Reports"/>
             </HBox>
             <Region VBox.vgrow="ALWAYS"/>
             <Region styleClass="sidebar-divider"/>
             <HBox styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleLogout">
-                <Label styleClass="nav-icon" text="⏻"/><Label text="Logout" style="-fx-text-fill:#AAAAAA;"/>
+                <Label styleClass="nav-icon" text="⏻"/>
+                <Label text="Logout" style="-fx-text-fill:#AAAAAA;"/>
             </HBox>
         </VBox>
     </left>
@@ -127,9 +141,9 @@
                            promptText="Search by client name..."
                            prefWidth="260"/>
                 <DatePicker fx:id="filterFrom" styleClass="date-picker" promptText="From date"/>
-                <DatePicker fx:id="filterTo"   styleClass="date-picker" promptText="To date"/>
+                <DatePicker fx:id="filterTo" styleClass="date-picker" promptText="To date"/>
                 <Button styleClass="btn-secondary" text="Filter" onAction="#handleFilter"/>
-                <Button styleClass="btn-secondary" text="Clear"  onAction="#handleClearFilter"/>
+                <Button styleClass="btn-secondary" text="Clear" onAction="#handleClearFilter"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button fx:id="addPaymentBtn" styleClass="btn-primary"
                         text="+ Record Payment" onAction="#handleAddPayment"/>
@@ -138,13 +152,13 @@
             <!-- Payments table -->
             <TableView fx:id="paymentTable" VBox.vgrow="ALWAYS" styleClass="table-view">
                 <columns>
-                    <TableColumn fx:id="colPaymentId"     text="ID"             prefWidth="60"/>
-                    <TableColumn fx:id="colClientName"    text="CLIENT"         prefWidth="180"/>
-                    <TableColumn fx:id="colMembershipPlan" text="PLAN"          prefWidth="160"/>
-                    <TableColumn fx:id="colAmount"        text="AMOUNT (NPR)"   prefWidth="140"/>
-                    <TableColumn fx:id="colPaymentDate"   text="DATE"           prefWidth="130"/>
-                    <TableColumn fx:id="colPaymentMethod" text="METHOD"         prefWidth="120"/>
-                    <TableColumn fx:id="colPaymentStatus" text="STATUS"         prefWidth="110"/>
+                    <TableColumn fx:id="colPaymentId" text="ID" prefWidth="60"/>
+                    <TableColumn fx:id="colClientName" text="CLIENT" prefWidth="180"/>
+                    <TableColumn fx:id="colMembershipPlan" text="PLAN" prefWidth="160"/>
+                    <TableColumn fx:id="colAmount" text="AMOUNT (NPR)" prefWidth="140"/>
+                    <TableColumn fx:id="colPaymentDate" text="DATE" prefWidth="130"/>
+                    <TableColumn fx:id="colPaymentMethod" text="METHOD" prefWidth="120"/>
+                    <TableColumn fx:id="colPaymentStatus" text="STATUS" prefWidth="110"/>
                 </columns>
                 <placeholder>
                     <Label text="No payments found." style="-fx-text-fill:#555555; -fx-font-size:14px;"/>
