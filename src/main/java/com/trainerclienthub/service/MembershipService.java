@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class MembershipService {
-    // Enforces membership business rules and DAO operations.
+
 
     private final MembershipDAO membershipDAO;
     private final ClientService clientService;
@@ -66,19 +66,18 @@ public class MembershipService {
     }
 
 
-
     public Membership assignMembership(int clientId, int planId,
                                        LocalDate startDate, LocalDate endDate) {
         ValidationUtil.requirePositiveInt(clientId, "Client ID");
-        ValidationUtil.requirePositiveInt(planId,   "Plan ID");
+        ValidationUtil.requirePositiveInt(planId, "Plan ID");
         ValidationUtil.requireEndAfterStart(startDate, endDate);
 
         Optional<Membership> active = membershipDAO.findActiveByClient(clientId);
         if (active.isPresent()) {
             throw new IllegalStateException(
                     "Client already has an ACTIVE membership (ID: "
-                    + active.get().getMembershipId()
-                    + "). Cancel it before assigning a new one.");
+                            + active.get().getMembershipId()
+                            + "). Cancel it before assigning a new one.");
         }
 
         MembershipPlan plan = membershipDAO.findPlanById(planId)
@@ -128,7 +127,7 @@ public class MembershipService {
         if (membership.getStatus() != MembershipStatus.ACTIVE) {
             throw new IllegalStateException(
                     "Only ACTIVE memberships can be renewed. "
-                    + "Current status: " + membership.getStatus());
+                            + "Current status: " + membership.getStatus());
         }
 
         ValidationUtil.requireEndAfterStart(membership.getEndDate(), newEndDate);
@@ -147,7 +146,7 @@ public class MembershipService {
         if (membership.getStatus() != MembershipStatus.ACTIVE) {
             throw new IllegalStateException(
                     "Only ACTIVE memberships can be cancelled. "
-                    + "Current status: " + membership.getStatus());
+                            + "Current status: " + membership.getStatus());
         }
 
         membershipDAO.updateStatus(membershipId, MembershipStatus.CANCELLED);
