@@ -31,21 +31,31 @@ import java.util.ResourceBundle;
 
 public class TrainersController implements Initializable {
 
-    @FXML private Label avatarLabel;
-    @FXML private SidebarController sidebarController;
-    @FXML private Button addTrainerBtn;
+    @FXML
+    private Label avatarLabel;
+    @FXML
+    private SidebarController sidebarController;
+    @FXML
+    private Button addTrainerBtn;
 
-    @FXML private TableView<Trainer> trainerTable;
-    @FXML private TableColumn<Trainer, Integer> colTrainerId;
-    @FXML private TableColumn<Trainer, String> colTrainerName;
-    @FXML private TableColumn<Trainer, String> colTrainerEmail;
-    @FXML private TableColumn<Trainer, String> colTrainerPhone;
-    @FXML private TableColumn<Trainer, Trainer> colTrainerStatusAction;
+    @FXML
+    private TableView<Trainer> trainerTable;
+    @FXML
+    private TableColumn<Trainer, Integer> colTrainerId;
+    @FXML
+    private TableColumn<Trainer, String> colTrainerName;
+    @FXML
+    private TableColumn<Trainer, String> colTrainerEmail;
+    @FXML
+    private TableColumn<Trainer, String> colTrainerPhone;
+    @FXML
+    private TableColumn<Trainer, Trainer> colTrainerStatusAction;
 
     private final TrainerDAO trainerDAO = new TrainerDAO();
     private final ObservableList<Trainer> trainers = FXCollections.observableArrayList();
 
     @Override
+    // Setup table and load trainer list
     public void initialize(URL location, ResourceBundle resources) {
         applyRoleBasedUI();
         configureTable();
@@ -56,6 +66,7 @@ public class TrainersController implements Initializable {
         }
     }
 
+    // Block trainer accounts from accessing this screen
     private void applyRoleBasedUI() {
         boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
         if (isTrainer) {
@@ -79,7 +90,7 @@ public class TrainersController implements Initializable {
         colTrainerStatusAction.setCellValueFactory(data ->
                 new SimpleObjectProperty<>(data.getValue()));
 
-        // Right-align the Status/Action column
+
         colTrainerStatusAction.setStyle("-fx-alignment: CENTER-RIGHT;");
 
         colTrainerStatusAction.setCellFactory(column -> new TableCell<>() {
@@ -95,7 +106,7 @@ public class TrainersController implements Initializable {
                 statusLabel.getStyleClass().removeAll("text-success", "text-secondary");
                 statusLabel.getStyleClass().add(trainer.isAdmin() ? "text-success" : "text-secondary");
 
-                // View Button with custom theme styling
+
                 javafx.scene.shape.SVGPath eyeIcon = new javafx.scene.shape.SVGPath();
                 eyeIcon.setContent("M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z");
                 eyeIcon.setFill(javafx.scene.paint.Color.web("#CCFF00"));
@@ -109,8 +120,7 @@ public class TrainersController implements Initializable {
                                 "Trainer Details",
                                 trainer.getName() + " • " + trainer.getEmail() + "\nPhone: " + trainer.getPhone()));
 
-                // Delete Button with red styling
-                // --- 2. The Delete (Trash Can) Icon ---
+
                 javafx.scene.shape.SVGPath trashIcon = new javafx.scene.shape.SVGPath();
                 trashIcon.setContent("M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z");
                 trashIcon.setFill(javafx.scene.paint.Color.web("#FF3333"));
@@ -131,6 +141,7 @@ public class TrainersController implements Initializable {
         trainerTable.setPlaceholder(new Label("No trainers registered yet."));
     }
 
+    // Pull trainers from DAO and refresh the table
     private void loadTrainers() {
         trainers.setAll(trainerDAO.getAllTrainers());
     }
@@ -143,14 +154,15 @@ public class TrainersController implements Initializable {
     }
 
     @FXML
+    // Opens the "Add Trainer" modal dialog
     private void handleAddTrainer() {
         try {
-            // Load the AddTrainerDialog FXML
+
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/trainerclienthub/AddTrainerDialog.fxml"));
             javafx.scene.layout.BorderPane dialogRoot = loader.load();
 
-            // Create a new Stage for the modal dialog
+
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Add New Trainer");
             dialogStage.setScene(new Scene(dialogRoot));
@@ -159,10 +171,10 @@ public class TrainersController implements Initializable {
             dialogStage.initStyle(StageStyle.UTILITY);
             dialogStage.initOwner((Stage) avatarLabel.getScene().getWindow());
 
-            // Show the dialog and wait for user action
+
             dialogStage.showAndWait();
 
-            // Refresh the trainers table after dialog closes
+
             loadTrainers();
 
         } catch (Exception e) {
@@ -185,7 +197,7 @@ public class TrainersController implements Initializable {
         confirmDialog.setTitle("Confirm Delete");
         confirmDialog.setHeaderText(null);
         confirmDialog.setContentText("Are you sure you want to delete " + trainer.getName() + "?");
-        
+
         if (confirmDialog.showAndWait().isPresent() && confirmDialog.getResult() == javafx.scene.control.ButtonType.OK) {
             try {
                 trainerDAO.delete(trainer.getTrainerId());
