@@ -14,10 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 public class ClientDAO {
 
-
+    // SQL Queries defined as constants for maintainability
     private static final String INSERT =
             "INSERT INTO client (name, age, gender, phone, email, session_balance, weight_kg, trainer_id, created_at) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -50,13 +49,14 @@ public class ClientDAO {
     private static final String SEARCH =
             "SELECT * FROM client WHERE name LIKE ? OR email LIKE ? OR phone LIKE ? ORDER BY name";
 
+    // Deducts sessions but prevents the balance from going below zero using GREATEST
     private static final String DEDUCT_SESSIONS =
             "UPDATE client SET session_balance = GREATEST(0, session_balance - ?) WHERE client_id = ?";
 
     private static final String PHONE_EXISTS =
             "SELECT 1 FROM client WHERE phone = ? LIMIT 1";
 
-
+    // Inserts a new client and retrieves the auto-generated ID
     public void insert(Client client) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
@@ -82,6 +82,7 @@ public class ClientDAO {
         }
     }
 
+    // Quick check to see if a phone number is already registered
     public boolean phoneExists(String phone) {
         if (phone == null) {
             throw new IllegalArgumentException("Phone number must not be null.");
@@ -98,7 +99,6 @@ public class ClientDAO {
             throw new DatabaseException("Failed to check phone uniqueness for: " + phone, e);
         }
     }
-
 
     public Optional<Client> findById(int clientId) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -126,6 +126,7 @@ public class ClientDAO {
         }
     }
 
+    // Fetches clients based on user role: Admin sees all, Trainers see only their own
     public List<Client> findAll() {
         var role = SessionManager.getInstance().getRole();
         if (role == TrainerRole.TRAINER) {
@@ -159,7 +160,7 @@ public class ClientDAO {
         return list;
     }
 
-    
+    // Performs a wildcard search across name, email, and phone
     public List<Client> search(String keyword) {
         List<Client> list = new ArrayList<>();
         String pattern = "%" + keyword + "%";
@@ -177,7 +178,6 @@ public class ClientDAO {
         }
         return list;
     }
-
 
     public void update(Client client) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -199,7 +199,6 @@ public class ClientDAO {
         }
     }
 
-    
     public void updateSessionBalance(int clientId, int newBalance) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_SESSION_BALANCE)) {
@@ -213,6 +212,7 @@ public class ClientDAO {
         }
     }
 
+    // Adds a specific amount of sessions 
     public void incrementSessionBalance(int clientId, int delta) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(INCREMENT_SESSION_BALANCE)) {
@@ -226,7 +226,6 @@ public class ClientDAO {
         }
     }
 
-
     public void delete(int clientId) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(DELETE)) {
@@ -239,6 +238,7 @@ public class ClientDAO {
         }
     }
 
+    // Reduces balance when a workout is logged or session completed
     public void deductSessions(int clientId, int sessionsToDeduct) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(DEDUCT_SESSIONS)) {
@@ -252,6 +252,7 @@ public class ClientDAO {
         }
     }
 
+    // Maps a database row to a Java Client object
     private Client map(ResultSet rs) throws SQLException {
         return new Client(
                 rs.getInt("client_id"),

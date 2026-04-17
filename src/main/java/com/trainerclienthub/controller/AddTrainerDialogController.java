@@ -14,32 +14,36 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-/**
- * Controller for the Add Trainer dialog.
- * Handles validation and saving of new trainer records.
- */
 public class AddTrainerDialogController implements Initializable {
 
-    @FXML private TextField nameField;
-    @FXML private TextField emailField;
-    @FXML private TextField phoneField;
-    @FXML private PasswordField passwordField;
-    @FXML private Label errorLabel;
+    // Dialog fields
+    @FXML
+    private TextField nameField;
+    @FXML
+    private TextField emailField;
+    @FXML
+    private TextField phoneField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private Label errorLabel;
 
     private final TrainerDAO trainerDAO = new TrainerDAO();
 
     @Override
+    // No special setup needed for this dialog yet
     public void initialize(URL location, ResourceBundle resources) {
-        // Initialization logic if needed
+
     }
 
     @FXML
+    // Validate input and create a trainer record
     private void handleSave() {
-        // Clear previous error
+
         clearError();
 
         try {
-            // Validate inputs
+
             String name = nameField.getText().trim();
             String email = emailField.getText().trim();
             String phone = phoneField.getText().trim();
@@ -50,7 +54,7 @@ public class AddTrainerDialogController implements Initializable {
             ValidationUtil.requireValidNepalPhone(phone);
             ValidationUtil.requireValidPassword(password);
 
-            // Check for duplicates
+
             if (trainerDAO.findByEmail(email.toLowerCase()).isPresent()) {
                 showError("Email already registered. Please use a different email address.");
                 return;
@@ -61,12 +65,12 @@ public class AddTrainerDialogController implements Initializable {
                 return;
             }
 
-            // Create and save the trainer
+
             String passwordHash = hashPassword(password);
             Trainer trainer = new Trainer(name, email, phone, passwordHash);
             trainerDAO.insert(trainer);
 
-            // Close the dialog on success
+
             closeDialog();
 
         } catch (IllegalArgumentException e) {
@@ -77,41 +81,33 @@ public class AddTrainerDialogController implements Initializable {
     }
 
     @FXML
+    // Close without saving
     private void handleCancel() {
         closeDialog();
     }
 
-    /**
-     * Hash the plain-text password using BCrypt.
-     */
+
     private String hashPassword(String plain) {
         return BCrypt.hashpw(plain, BCrypt.gensalt(12));
     }
 
-    /**
-     * Display an error message in the error label.
-     */
+
     private void showError(String message) {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
         errorLabel.setManaged(true);
     }
 
-    /**
-     * Clear the error message.
-     */
+
     private void clearError() {
         errorLabel.setText("");
         errorLabel.setVisible(false);
         errorLabel.setManaged(false);
     }
 
-    /**
-     * Close the dialog window.
-     */
+
     private void closeDialog() {
         Stage stage = (Stage) nameField.getScene().getWindow();
         stage.close();
     }
 }
-

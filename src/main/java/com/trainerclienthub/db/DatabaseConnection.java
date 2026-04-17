@@ -1,5 +1,4 @@
 package com.trainerclienthub.db;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -8,36 +7,31 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-
- // Manages the single shared JDBC connection for the Trainer-Client Hub application.
+// Manages the single shared JDBC connection for the Trainer-Client Hub application.
 
 public class DatabaseConnection {
 
     // Logger
 
-    private static final Logger LOGGER =
-            Logger.getLogger(DatabaseConnection.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DatabaseConnection.class.getName());
 
     // Configuration keys
 
-    private static final String PROPERTIES_FILE  = "db.properties";
-    private static final String KEY_DRIVER        = "db.driver";
-    private static final String KEY_URL           = "db.url";
-    private static final String KEY_USERNAME      = "db.username";
-    private static final String KEY_PASSWORD      = "db.password";
+    private static final String PROPERTIES_FILE = "db.properties";
+    private static final String KEY_DRIVER = "db.driver";
+    private static final String KEY_URL = "db.url";
+    private static final String KEY_USERNAME = "db.username";
+    private static final String KEY_PASSWORD = "db.password";
     private static final String KEY_LOGIN_TIMEOUT = "db.loginTimeout";
-    private static final int    DEFAULT_TIMEOUT   = 10; // seconds
+    private static final int DEFAULT_TIMEOUT = 10; // seconds
 
     // Singleton state
 
-
     private static volatile DatabaseConnection instance;
-
 
     private final Properties config;
 
-    //  Private constructor
-
+    // Private constructor
 
     private DatabaseConnection() {
         this.config = loadProperties();
@@ -76,13 +70,12 @@ public class DatabaseConnection {
         }
     }
 
-    //  Private helpers
+    // Private helpers
 
     private Properties loadProperties() {
         Properties props = new Properties();
 
-        try (InputStream stream =
-                     getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE)) {
+        try (InputStream stream = getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE)) {
 
             if (stream == null) {
                 throw new DatabaseException(
@@ -97,14 +90,13 @@ public class DatabaseConnection {
                     "Failed to read database configuration from \"" + PROPERTIES_FILE + "\".", e);
         }
 
-        // Validate that all mandatory keys are present
-        validateProperty(props, KEY_URL,      "db.url");
+        // Validate required properties
+        validateProperty(props, KEY_URL, "db.url");
         validateProperty(props, KEY_USERNAME, "db.username");
         validateProperty(props, KEY_PASSWORD, "db.password");
 
         return props;
     }
-
 
     private void registerDriver() {
         String driverClass = config.getProperty(KEY_DRIVER, "com.mysql.cj.jdbc.Driver");
@@ -114,13 +106,13 @@ public class DatabaseConnection {
         } catch (ClassNotFoundException e) {
             throw new DatabaseException(
                     "MySQL JDBC driver not found: \"" + driverClass + "\". "
-                            + "Add mysql-connector-j to your project dependencies (pom.xml).", e);
+                            + "Add mysql-connector-j to your project dependencies (pom.xml).",
+                    e);
         }
     }
 
-
     private Connection openConnection() {
-        String url      = config.getProperty(KEY_URL);
+        String url = config.getProperty(KEY_URL);
         String username = config.getProperty(KEY_USERNAME);
         String password = config.getProperty(KEY_PASSWORD);
 
@@ -137,7 +129,7 @@ public class DatabaseConnection {
 
         try {
             Connection conn = DriverManager.getConnection(url, username, password);
-            // Disable auto-commit so individual DAOs can manage their own transactions
+    
             conn.setAutoCommit(true);
             return conn;
 
@@ -147,10 +139,10 @@ public class DatabaseConnection {
                             + "Please verify the URL, credentials, and that MySQL is running.\n"
                             + "URL attempted: " + url + "\n"
                             + "SQL state: " + e.getSQLState()
-                            + " | Error code: " + e.getErrorCode(), e);
+                            + " | Error code: " + e.getErrorCode(),
+                    e);
         }
     }
-
 
     private void validateProperty(Properties props, String key, String friendlyName) {
         String value = props.getProperty(key);

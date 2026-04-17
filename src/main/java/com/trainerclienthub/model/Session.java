@@ -5,8 +5,6 @@ import java.time.LocalTime;
 
 public class Session {
 
-    // ── Fields ──────────────────────────────────────────────────────────────
-
     private int sessionId;
     private int clientId;
     private int trainerId;
@@ -16,30 +14,24 @@ public class Session {
     private SessionStatus status;
     private String notes;
 
-    // ── Constructors ─────────────────────────────────────────────────────────
+    public Session() {
+    }
 
-    /** Default constructor required by the DAO layer when mapping ResultSets. */
-    public Session() {}
-
-    /**
-     * Constructor used when booking a new session.
-     */
+    // Constructor for booking a new session
     public Session(int clientId, int trainerId,
-                   LocalDate sessionDate, LocalTime sessionTime, String notes) {
+            LocalDate sessionDate, LocalTime sessionTime, String notes) {
         setClientId(clientId);
         setTrainerId(trainerId);
         setSessionDate(sessionDate);
         setSessionTime(sessionTime);
-        this.status = SessionStatus.SCHEDULED;
-        this.notes  = notes;
+        this.status = SessionStatus.SCHEDULED; // All new bookings start as scheduled
+        this.notes = notes;
     }
 
-    /**
-     * Full constructor used when reconstructing a session from the database.
-     */
+    // Constructor for loading existing sessions from the database
     public Session(int sessionId, int clientId, int trainerId,
-                   LocalDate sessionDate, LocalTime sessionTime,
-                   SessionStatus status, String notes) {
+            LocalDate sessionDate, LocalTime sessionTime,
+            SessionStatus status, String notes) {
         this.sessionId = sessionId;
         setClientId(clientId);
         setTrainerId(trainerId);
@@ -48,8 +40,6 @@ public class Session {
         setStatus(status);
         this.notes = notes;
     }
-
-    //  Getters & Setters
 
     public int getSessionId() {
         return sessionId;
@@ -130,19 +120,15 @@ public class Session {
         this.notes = notes;
     }
 
-    //Convenience methods
-
-    /** Returns {@code true} if this session is still in SCHEDULED state. */
+    // Quick check to see if the session is still upcoming
     public boolean isScheduled() {
         return status == SessionStatus.SCHEDULED;
     }
 
-    /** Returns {@code true} if this session has been marked as COMPLETED. */
+    // Quick check for attendance/billing purposes
     public boolean isCompleted() {
         return status == SessionStatus.COMPLETED;
     }
-
-    //Object overrides
 
     @Override
     public String toString() {
@@ -158,8 +144,10 @@ public class Session {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Session)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Session))
+            return false;
         Session other = (Session) o;
         return sessionId == other.sessionId;
     }

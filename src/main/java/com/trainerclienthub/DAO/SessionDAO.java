@@ -20,12 +20,12 @@ public class SessionDAO {
 
     private static final String INSERT =
             "INSERT INTO session (client_id, trainer_id, session_date, session_time, status, notes) " +
-            "VALUES (?, ?, ?, ?, ?, ?)";
+                    "VALUES (?, ?, ?, ?, ?, ?)";
 
-private static final String SESSION_SELECT_BASE =
-        "SELECT s.*, t.name AS trainer_name " +
-        "FROM session s " +
-        "JOIN trainer t ON s.trainer_id = t.trainer_id ";
+    private static final String SESSION_SELECT_BASE =
+            "SELECT s.*, t.name AS trainer_name " +
+                    "FROM session s " +
+                    "JOIN trainer t ON s.trainer_id = t.trainer_id ";
 
     private static final String SELECT_BY_ID =
             SESSION_SELECT_BASE + "WHERE s.session_id = ?";
@@ -44,19 +44,19 @@ private static final String SESSION_SELECT_BASE =
 
     private static final String SELECT_UPCOMING_BY_CLIENT =
             SESSION_SELECT_BASE + "WHERE s.client_id = ? AND s.status = 'SCHEDULED' AND s.session_date >= CURDATE() " +
-            "ORDER BY s.session_date, s.session_time";
+                    "ORDER BY s.session_date, s.session_time";
 
     private static final String SELECT_ALL =
             SESSION_SELECT_BASE + "ORDER BY s.session_date DESC, s.session_time DESC";
 
     private static final String SELECT_ALL_BY_TRAINER_CLIENTS =
             SESSION_SELECT_BASE +
-            "JOIN client c ON s.client_id = c.client_id " +
-            "WHERE c.trainer_id = ? ORDER BY s.session_date DESC, s.session_time DESC";
+                    "JOIN client c ON s.client_id = c.client_id " +
+                    "WHERE c.trainer_id = ? ORDER BY s.session_date DESC, s.session_time DESC";
 
     private static final String UPDATE =
             "UPDATE session SET client_id = ?, trainer_id = ?, session_date = ?, session_time = ?, " +
-            "status = ?, notes = ? WHERE session_id = ?";
+                    "status = ?, notes = ? WHERE session_id = ?";
 
     private static final String UPDATE_STATUS =
             "UPDATE session SET status = ? WHERE session_id = ?";
@@ -66,26 +66,26 @@ private static final String SESSION_SELECT_BASE =
 
     private static final String CHECK_DUPLICATE_TIME_SLOT =
             "SELECT COUNT(1) FROM session " +
-            "WHERE client_id = ? AND trainer_id = ? AND session_date = ? AND session_time = ?";
+                    "WHERE client_id = ? AND trainer_id = ? AND session_date = ? AND session_time = ?";
 
 
     private static final String SELECT_MOST_ACTIVE_CLIENTS =
             "SELECT c.name AS client_name, COUNT(*) AS completed_sessions " +
-            "FROM session s " +
-            "JOIN client c ON s.client_id = c.client_id " +
-            "WHERE s.status = 'COMPLETED' AND s.session_date BETWEEN ? AND ? " +
-            "GROUP BY c.client_id, c.name " +
-            "ORDER BY completed_sessions DESC, c.name ASC " +
-            "LIMIT ?";
+                    "FROM session s " +
+                    "JOIN client c ON s.client_id = c.client_id " +
+                    "WHERE s.status = 'COMPLETED' AND s.session_date BETWEEN ? AND ? " +
+                    "GROUP BY c.client_id, c.name " +
+                    "ORDER BY completed_sessions DESC, c.name ASC " +
+                    "LIMIT ?";
 
     private static final String SELECT_MOST_ACTIVE_CLIENTS_BY_TRAINER =
             "SELECT c.name AS client_name, COUNT(*) AS completed_sessions " +
-            "FROM session s " +
-            "JOIN client c ON s.client_id = c.client_id " +
-            "WHERE s.status = 'COMPLETED' AND s.session_date BETWEEN ? AND ? AND s.trainer_id = ? " +
-            "GROUP BY c.client_id, c.name " +
-            "ORDER BY completed_sessions DESC, c.name ASC " +
-            "LIMIT ?";
+                    "FROM session s " +
+                    "JOIN client c ON s.client_id = c.client_id " +
+                    "WHERE s.status = 'COMPLETED' AND s.session_date BETWEEN ? AND ? AND s.trainer_id = ? " +
+                    "GROUP BY c.client_id, c.name " +
+                    "ORDER BY completed_sessions DESC, c.name ASC " +
+                    "LIMIT ?";
 
 
     public void insert(Session session) {
@@ -141,10 +141,7 @@ private static final String SESSION_SELECT_BASE =
         return findMostActiveClients(from, to, limit, null);
     }
 
-    /**
-     * Returns most active clients by completed session count.
-     * @param trainerId if non-null, restricts to sessions for that trainer only (TRAINER role).
-     */
+
     public List<Map.Entry<String, Integer>> findMostActiveClients(LocalDate from, LocalDate to, int limit, Integer trainerId) {
         List<Map.Entry<String, Integer>> list = new ArrayList<>();
         boolean filterByTrainer = trainerId != null;
@@ -220,7 +217,7 @@ private static final String SESSION_SELECT_BASE =
         return list;
     }
 
-    /** Returns upcoming SCHEDULED sessions for a client from today onwards. */
+
     public List<Session> findUpcomingByClient(int clientId) {
         List<Session> list = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -284,7 +281,7 @@ private static final String SESSION_SELECT_BASE =
         }
     }
 
-    /** Updates only the status column — used for complete/cancel/no-show transitions. */
+
     public void updateStatus(int sessionId, SessionStatus status) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_STATUS)) {

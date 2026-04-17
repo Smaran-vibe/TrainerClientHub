@@ -11,7 +11,7 @@
            stylesheets="@css/neon-theme.css">
 
     <VBox alignment="CENTER" spacing="0">
-        <HBox minHeight="4" maxHeight="4" style="-fx-background-color: #CCFF00;" />
+        <HBox minHeight="4" maxHeight="4" style="-fx-background-color: #CCFF00;"/>
 
         <StackPane VBox.vgrow="ALWAYS">
             <VBox styleClass="login-card" alignment="TOP_CENTER" spacing="0"
@@ -20,16 +20,16 @@
 
                 <!-- Branding -->
                 <VBox alignment="CENTER" spacing="6">
-                        <ImageView fitHeight="140" fitWidth="140" preserveRatio="true">
-                            <image>
-                                <Image url="@image/Transparent_logo.png"/>
-                            </image>
-                        </ImageView>
+                    <ImageView fitHeight="140" fitWidth="140" preserveRatio="true">
+                        <image>
+                            <Image url="@image/Transparent_logo.png"/>
+                        </image>
+                    </ImageView>
                     <Label styleClass="login-title" text="CREATE ACCOUNT"/>
                     <Label styleClass="login-subtitle" text="Join Trainer Client Hub"/>
                 </VBox>
 
-                <Region minHeight="28" />
+                <Region minHeight="28"/>
 
                 <!-- Full Name -->
                 <VBox spacing="6">
@@ -38,7 +38,7 @@
                                promptText="e.g. Smaran Aryal" prefWidth="352"/>
                 </VBox>
 
-                <Region minHeight="14" />
+                <Region minHeight="14"/>
 
                 <!-- Email -->
                 <VBox spacing="6">
@@ -47,7 +47,7 @@
                                promptText="trainer@gymhub.com" prefWidth="352"/>
                 </VBox>
 
-                <Region minHeight="14" />
+                <Region minHeight="14"/>
 
                 <!-- Phone -->
                 <VBox spacing="6">
@@ -56,7 +56,7 @@
                                promptText="+977XXXXXXXXXX" prefWidth="352"/>
                 </VBox>
 
-                <Region minHeight="14" />
+                <Region minHeight="14"/>
 
                 <!-- Password -->
                 <VBox spacing="6">
@@ -80,7 +80,7 @@
                     </StackPane>
                 </VBox>
 
-                <Region minHeight="14" />
+                <Region minHeight="14"/>
 
                 <VBox spacing="6">
                     <Label styleClass="login-field-label" text="CONFIRM PASSWORD"/>
@@ -103,14 +103,14 @@
                     </StackPane>
                 </VBox>
 
-                <Region minHeight="8" />
+                <Region minHeight="8"/>
 
                 <!-- Error / info label -->
                 <Label fx:id="errorLabel" styleClass="text-danger"
                        text="" wrapText="true" prefWidth="352"
                        style="-fx-font-size:12px;"/>
 
-                <Region minHeight="20" />
+                <Region minHeight="20"/>
 
                 <!-- Register button -->
                 <Button fx:id="registerButton"
@@ -120,7 +120,7 @@
                         prefHeight="46"
                         onAction="#handleRegister"/>
 
-                <Region minHeight="18" />
+                <Region minHeight="18"/>
 
                 <!-- Login link -->
                 <HBox alignment="CENTER" spacing="4">

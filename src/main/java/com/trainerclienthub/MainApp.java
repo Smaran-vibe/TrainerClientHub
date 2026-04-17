@@ -8,16 +8,14 @@ import javafx.application.Platform;
 import javafx.stage.Stage;
 
 
-
 public class MainApp extends Application {
 
-    private static final String APP_TITLE  = "Trainer Client Hub";
-    private static final double MIN_WIDTH  = 1080;
+    private static final String APP_TITLE = "Trainer Client Hub";
+    private static final double MIN_WIDTH = 1080;
     private static final double MIN_HEIGHT = 800;
     private static final double INIT_WIDTH = 1200;
     private static final double INIT_HEIGHT = 850;
 
-    
 
     @Override
     public void start(Stage primaryStage) {
@@ -26,7 +24,7 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
-    
+
     @Override
     public void stop() {
         DatabaseConnection.getInstance().close();
@@ -37,7 +35,6 @@ public class MainApp extends Application {
         launch(args);
     }
 
-    
 
     private void configurePrimaryStage(Stage stage) {
         stage.setTitle(APP_TITLE);

@@ -4,39 +4,32 @@ import java.time.LocalDateTime;
 
 public class Report {
 
-    //  Fields
-
     private int reportId;
     private int generatedBy;
     private ReportType reportType;
     private LocalDateTime generatedDate;
     private String content;
 
-    // Constructors
+    public Report() {
+    }
 
-    /** Default constructor required by the DAO layer when mapping ResultSets. */
-    public Report() {}
-
-    /**
-     * Constructor used when generating a new report.
-     */
+    // Use this for generating new reports in the system
     public Report(int generatedBy, ReportType reportType, String content) {
         setGeneratedBy(generatedBy);
         setReportType(reportType);
         setContent(content);
-        this.generatedDate = LocalDateTime.now();
+        this.generatedDate = LocalDateTime.now(); // Sets current timestamp on creation
     }
 
+    // Use this when mapping existing reports from the database
     public Report(int reportId, int generatedBy, ReportType reportType,
-                  LocalDateTime generatedDate, String content) {
+            LocalDateTime generatedDate, String content) {
         this.reportId = reportId;
         setGeneratedBy(generatedBy);
         setReportType(reportType);
         setGeneratedDate(generatedDate);
         setContent(content);
     }
-
-    // Getters & Setters
 
     public int getReportId() {
         return reportId;
@@ -51,6 +44,7 @@ public class Report {
     }
 
     public void setGeneratedBy(int generatedBy) {
+        // Ensures report is linked to a valid trainer/user
         if (generatedBy <= 0) {
             throw new IllegalArgumentException("GeneratedBy must reference a valid trainer ID (> 0).");
         }
@@ -84,13 +78,12 @@ public class Report {
     }
 
     public void setContent(String content) {
+        // Prevents saving empty or null report summaries
         if (content == null || content.isBlank()) {
             throw new IllegalArgumentException("Report content must not be blank.");
         }
         this.content = content;
     }
-
-    // Object overrides
 
     @Override
     public String toString() {
@@ -104,8 +97,10 @@ public class Report {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Report)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Report))
+            return false;
         Report other = (Report) o;
         return reportId == other.reportId;
     }

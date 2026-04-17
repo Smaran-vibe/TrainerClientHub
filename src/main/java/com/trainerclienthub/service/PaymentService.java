@@ -30,9 +30,9 @@ public class PaymentService {
     public Payment recordPayment(int clientId, int membershipId, BigDecimal amount,
                                  LocalDate paymentDate, PaymentMethod paymentMethod) {
 
-        ValidationUtil.requirePositiveInt(clientId,     "Client ID");
+        ValidationUtil.requirePositiveInt(clientId, "Client ID");
         ValidationUtil.requirePositiveInt(membershipId, "Membership ID");
-        ValidationUtil.requirePositiveDecimal(amount,   "Payment amount");
+        ValidationUtil.requirePositiveDecimal(amount, "Payment amount");
         ValidationUtil.requireNotFutureDate(paymentDate, "Payment date");
 
         if (paymentMethod == null) {
@@ -40,7 +40,7 @@ public class PaymentService {
         }
 
         Payment payment = new Payment(clientId, membershipId, amount,
-                                      paymentDate, paymentMethod);
+                paymentDate, paymentMethod);
         paymentDAO.insert(payment);
         return payment;
     }
@@ -71,9 +71,8 @@ public class PaymentService {
     }
 
 
-    /**
-     * Updates the payment status. Allowed values: COMPLETED, PENDING, REFUNDED, FAILED.
-     */
+    // Updates the payment status.
+
     public void updatePaymentStatus(int paymentId, String newStatus) {
         ValidationUtil.requirePositiveInt(paymentId, "Payment ID");
         if (newStatus == null || newStatus.isBlank()) {
@@ -148,8 +147,6 @@ public class PaymentService {
 
         handleMembershipStatusBasedOnPayment(paymentId, "REFUNDED");
     }
-
-
 
 
     public void deletePayment(int paymentId) {

@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Optional;
 
 public class SessionService {
-    // Handles session-related data and lookups.
+
 
     private final SessionDAO sessionDAO;
-    private final ClientDAO  clientDAO;
+    private final ClientDAO clientDAO;
 
     public SessionService() {
         this.sessionDAO = new SessionDAO();
-        this.clientDAO  = new ClientDAO();
+        this.clientDAO = new ClientDAO();
     }
 
 
@@ -29,7 +29,7 @@ public class SessionService {
                                    LocalDate sessionDate, LocalTime sessionTime,
                                    String notes) {
 
-        ValidationUtil.requirePositiveInt(clientId,  "Client ID");
+        ValidationUtil.requirePositiveInt(clientId, "Client ID");
         ValidationUtil.requirePositiveInt(trainerId, "Trainer ID");
 
         if (sessionDate == null) {
@@ -38,7 +38,7 @@ public class SessionService {
         if (sessionDate.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException(
                     "Session date cannot be in the past. "
-                    + "Use workout logging to record past sessions.");
+                            + "Use workout logging to record past sessions.");
         }
         if (sessionTime == null) {
             throw new IllegalArgumentException("Session time must not be null.");
@@ -51,7 +51,7 @@ public class SessionService {
         if (client.getSessionBalance() < 1) {
             throw new IllegalStateException(
                     "Client \"" + client.getName() + "\" has no remaining session balance. "
-                    + "Please assign a new session package before booking.");
+                            + "Please assign a new session package before booking.");
         }
 
         if (sessionDAO.isTimeSlotBooked(clientId, trainerId, sessionDate, sessionTime)) {
@@ -106,7 +106,7 @@ public class SessionService {
         if (session.getStatus() != SessionStatus.SCHEDULED) {
             throw new IllegalStateException(
                     "Only SCHEDULED sessions can be completed. "
-                    + "Current status: " + session.getStatus());
+                            + "Current status: " + session.getStatus());
         }
 
         Client client = clientDAO.findById(session.getClientId())
@@ -131,7 +131,7 @@ public class SessionService {
         if (session.getStatus() != SessionStatus.SCHEDULED) {
             throw new IllegalStateException(
                     "Only SCHEDULED sessions can be cancelled. "
-                    + "Current status: " + session.getStatus());
+                            + "Current status: " + session.getStatus());
         }
 
         sessionDAO.updateStatus(sessionId, SessionStatus.CANCELLED);
@@ -147,7 +147,7 @@ public class SessionService {
         if (session.getStatus() != SessionStatus.SCHEDULED) {
             throw new IllegalStateException(
                     "Only SCHEDULED sessions can be marked as no-show. "
-                    + "Current status: " + session.getStatus());
+                            + "Current status: " + session.getStatus());
         }
 
         Client client = clientDAO.findById(session.getClientId())

@@ -3,15 +3,14 @@ package com.trainerclienthub.util;
 import com.trainerclienthub.model.Trainer;
 import com.trainerclienthub.model.TrainerRole;
 
-/**
- * Application-scoped singleton that holds the currently authenticated trainer.
- */
+
 public class SessionManager {
 
     private static SessionManager instance;
     private Trainer currentTrainer;
 
-    private SessionManager() {}
+    private SessionManager() {
+    }
 
     public static SessionManager getInstance() {
         if (instance == null) {
@@ -20,9 +19,7 @@ public class SessionManager {
         return instance;
     }
 
-    // Session lifecycle
 
-    /** Stores the authenticated trainer for the session. */
     public void login(Trainer trainer) {
         this.currentTrainer = trainer;
     }
@@ -39,18 +36,12 @@ public class SessionManager {
         this.currentTrainer = null;
     }
 
-    // Role helpers
 
-    /**
-     *
-     */
     public boolean isAdmin() {
         return currentTrainer != null && currentTrainer.isAdmin();
     }
 
-    /**
-     * Returns the role of the currently logged-in trainer, or
-     */
+
     public TrainerRole getRole() {
         return currentTrainer != null ? currentTrainer.getRole() : TrainerRole.TRAINER;
     }

@@ -14,20 +14,20 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 
 public class DashboardService {
-    // Provides metrics and summaries for the dashboard.
 
-    private final ClientDAO     clientDAO;
+
+    private final ClientDAO clientDAO;
     private final MembershipDAO membershipDAO;
-    private final SessionDAO    sessionDAO;
-    private final PaymentDAO    paymentDAO;
-    private final WorkoutDAO    workoutDAO;
+    private final SessionDAO sessionDAO;
+    private final PaymentDAO paymentDAO;
+    private final WorkoutDAO workoutDAO;
 
     public DashboardService() {
-        this.clientDAO     = new ClientDAO();
+        this.clientDAO = new ClientDAO();
         this.membershipDAO = new MembershipDAO();
-        this.sessionDAO    = new SessionDAO();
-        this.paymentDAO    = new PaymentDAO();
-        this.workoutDAO    = new WorkoutDAO();
+        this.sessionDAO = new SessionDAO();
+        this.paymentDAO = new PaymentDAO();
+        this.workoutDAO = new WorkoutDAO();
     }
 
     public int getTotalClients() {
@@ -59,14 +59,14 @@ public class DashboardService {
     public BigDecimal getMonthlyRevenue() {
         YearMonth current = YearMonth.now();
         Date from = Date.valueOf(current.atDay(1));
-        Date to   = Date.valueOf(current.atEndOfMonth());
+        Date to = Date.valueOf(current.atEndOfMonth());
         return paymentDAO.sumCompletedAmountByDateRange(from, to);
     }
 
     public BigDecimal getPreviousMonthRevenue() {
         YearMonth prev = YearMonth.now().minusMonths(1);
         Date from = Date.valueOf(prev.atDay(1));
-        Date to   = Date.valueOf(prev.atEndOfMonth());
+        Date to = Date.valueOf(prev.atEndOfMonth());
         return paymentDAO.sumCompletedAmountByDateRange(from, to);
     }
 
@@ -105,7 +105,7 @@ public class DashboardService {
 
     public int getWorkoutsThisWeekForTrainer(int trainerId) {
         LocalDate weekStart = LocalDate.now().with(java.time.DayOfWeek.MONDAY);
-        LocalDate weekEnd   = weekStart.plusDays(6);
+        LocalDate weekEnd = weekStart.plusDays(6);
         return (int) workoutDAO.findByTrainer(trainerId).stream()
                 .filter(w -> w.getWorkoutDate() != null &&
                         !w.getWorkoutDate().isBefore(weekStart) &&

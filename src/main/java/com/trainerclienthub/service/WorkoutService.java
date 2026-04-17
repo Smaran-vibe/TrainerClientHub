@@ -15,18 +15,18 @@ import java.util.Optional;
 public class WorkoutService {
     // Coordinates workout and exercise persistence.
 
-    private final WorkoutDAO  workoutDAO;
+    private final WorkoutDAO workoutDAO;
     private final ExerciseDAO exerciseDAO;
 
     public WorkoutService() {
-        this.workoutDAO  = new WorkoutDAO();
+        this.workoutDAO = new WorkoutDAO();
         this.exerciseDAO = new ExerciseDAO();
     }
 
     public Workout logWorkout(int clientId, int trainerId, LocalDate workoutDate,
                               String notes, List<Exercise> exercises) {
 
-        ValidationUtil.requirePositiveInt(clientId,  "Client ID");
+        ValidationUtil.requirePositiveInt(clientId, "Client ID");
         ValidationUtil.requirePositiveInt(trainerId, "Trainer ID");
         ValidationUtil.requireNotFutureDate(workoutDate, "Workout date");
 
@@ -104,8 +104,8 @@ public class WorkoutService {
         String ctx = position > 0 ? "Exercise #" + position : "Exercise";
 
         ValidationUtil.requireNonBlank(e.getExerciseName(), ctx + " name");
-        ValidationUtil.requirePositiveInt(e.getSets(),    ctx + " sets");
-        ValidationUtil.requirePositiveInt(e.getReps(),    ctx + " reps");
+        ValidationUtil.requirePositiveInt(e.getSets(), ctx + " sets");
+        ValidationUtil.requirePositiveInt(e.getReps(), ctx + " reps");
         ValidationUtil.requirePositiveDecimal(e.getWeightKg(), ctx + " weight");
 
         if (e.getWeightKg().compareTo(new BigDecimal("500.00")) > 0) {

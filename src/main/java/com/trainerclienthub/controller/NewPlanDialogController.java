@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 
 public class NewPlanDialogController {
 
+    // Dialog fields
     @FXML private TextField planNameField;
     @FXML private ComboBox<PlanType> planTypeCombo;
     @FXML private TextField durationField;
@@ -31,6 +32,7 @@ public class NewPlanDialogController {
     private MembershipPlan existingPlan;
 
     @FXML
+    // Default values for a new plan
     private void initialize() {
         planTypeCombo.setItems(FXCollections.observableArrayList(PlanType.values()));
         planTypeCombo.setValue(PlanType.MONTHLY);
@@ -50,6 +52,7 @@ public class NewPlanDialogController {
     }
 
     public void setExistingPlan(MembershipPlan plan) {
+        // If called, this dialog acts as "edit plan"
         if (plan == null) return;
         this.existingPlan = plan;
         planNameField.setText(plan.getPlanName());
@@ -60,6 +63,7 @@ public class NewPlanDialogController {
     }
 
     @FXML
+    // Validate input and create/update the plan
     private void handleSave(ActionEvent event) {
         hideError();
         try {
@@ -109,6 +113,7 @@ public class NewPlanDialogController {
     }
 
     @FXML
+    // Close without saving
     private void handleCancel(ActionEvent event) {
         if (stage != null) {
             stage.close();

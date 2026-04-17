@@ -19,6 +19,7 @@ import java.util.ResourceBundle;
 
 public class SidebarController implements Initializable {
 
+    // Sidebar items (used for navigation + active highlight)
     @FXML private HBox navDashboard;
     @FXML private HBox navClients;
     @FXML private HBox navWorkouts;
@@ -28,9 +29,11 @@ public class SidebarController implements Initializable {
     @FXML private Button trainersButton;
     @FXML private HBox navReports;
 
+    // node mapping for highlight()
     private final Map<String, Node> navItems = new LinkedHashMap<>();
 
     @Override
+    // Build nav map and apply role-based visibility
     public void initialize(URL location, ResourceBundle resources) {
         navItems.put("dashboard", navDashboard);
         navItems.put("clients", navClients);
@@ -43,6 +46,7 @@ public class SidebarController implements Initializable {
         applyAccessControl();
     }
 
+    // Trainers should not see the trainers button
     private void applyAccessControl() {
         boolean hideTrainers = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
         if (trainersButton != null) {
@@ -51,6 +55,7 @@ public class SidebarController implements Initializable {
         }
     }
 
+    // Adds "nav-item-active" to the selected sidebar item
     public void highlight(String key) {
         if (key == null) return;
         navItems.values().forEach(node -> {
@@ -118,6 +123,7 @@ public class SidebarController implements Initializable {
         ViewLoader.navigateTo(stage, fxml, title);
     }
 
+    // Same as above
     private void navigateTo(ActionEvent event, String fxml, String title) {
         Node source = (Node) event.getSource();
         Stage stage = (Stage) source.getScene().getWindow();

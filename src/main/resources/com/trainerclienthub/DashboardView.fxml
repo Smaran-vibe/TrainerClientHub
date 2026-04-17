@@ -18,7 +18,7 @@
             <!-- Logo -->
             <VBox styleClass="sidebar-logo-box" spacing="4">
                 <Label styleClass="sidebar-logo-title" text="TCH"/>
-                <Label styleClass="sidebar-logo-sub"   text="TRAINER CLIENT HUB"/>
+                <Label styleClass="sidebar-logo-sub" text="TRAINER CLIENT HUB"/>
             </VBox>
 
             <Region styleClass="sidebar-divider"/>
@@ -217,7 +217,8 @@
                     <!-- Admin Dashboard: Membership Growth + Utilization -->
                     <VBox fx:id="adminDashboardView" spacing="16" HBox.hgrow="ALWAYS">
                         <HBox spacing="16" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
-                            <VBox fx:id="membershipGrowthChart" styleClass="chart-container" spacing="12" HBox.hgrow="ALWAYS">
+                            <VBox fx:id="membershipGrowthChart" styleClass="chart-container" spacing="12"
+                                  HBox.hgrow="ALWAYS">
                                 <Label text="Membership Growth"
                                        style="-fx-text-fill:#FFFFFF; -fx-font-size:15px; -fx-font-weight:bold;"/>
                                 <Label text="New members over the last 6 months"
@@ -235,7 +236,8 @@
                                     </yAxis>
                                 </LineChart>
                             </VBox>
-                            <VBox fx:id="membershipUtilizationPane" styleClass="progress-container" spacing="16" alignment="CENTER"
+                            <VBox fx:id="membershipUtilizationPane" styleClass="progress-container" spacing="16"
+                                  alignment="CENTER"
                                   prefWidth="220" minWidth="220">
                                 <Label text="Membership Utilization"
                                        style="-fx-text-fill:#FFFFFF; -fx-font-size:14px; -fx-font-weight:bold;"/>
@@ -274,14 +276,16 @@
                                style="-fx-text-fill:#FFFFFF; -fx-font-size:15px; -fx-font-weight:bold;"/>
                         <Label text="Your sessions for today"
                                style="-fx-text-fill:#555555; -fx-font-size:11px;"/>
-                        <TableView fx:id="trainerScheduleTable" prefHeight="220" styleClass="table-view" VBox.vgrow="ALWAYS">
+                        <TableView fx:id="trainerScheduleTable" prefHeight="220" styleClass="table-view"
+                                   VBox.vgrow="ALWAYS">
                             <columns>
                                 <TableColumn fx:id="colScheduleClientName" text="Client Name" prefWidth="220"/>
                                 <TableColumn fx:id="colScheduleTime" text="Time" prefWidth="120"/>
                                 <TableColumn fx:id="colScheduleStatus" text="Status" prefWidth="120"/>
                             </columns>
                             <placeholder>
-                                <Label text="No sessions scheduled for today." style="-fx-text-fill:#888888; -fx-font-size:14px;"/>
+                                <Label text="No sessions scheduled for today."
+                                       style="-fx-text-fill:#888888; -fx-font-size:14px;"/>
                             </placeholder>
                         </TableView>
                     </VBox>

@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 
 public class MembershipPlan {
 
-    //  Fields
-
     private int planId;
     private String planName;
     private PlanType planType;
@@ -13,17 +11,13 @@ public class MembershipPlan {
     private BigDecimal price;
     private int sessionsIncluded;
 
-    // ── Constructors
+    public MembershipPlan() {
+    }
 
-    /** Default constructor required by the DAO layer when mapping ResultSets. */
-    public MembershipPlan() {}
-
-    /**
-     * Constructor used when creating a new membership plan.
-     */
+    // Constructor for defining new subscription levels
     public MembershipPlan(String planName, PlanType planType,
-                          int durationDays, BigDecimal price,
-                          int sessionsIncluded) {
+            int durationDays, BigDecimal price,
+            int sessionsIncluded) {
         setPlanName(planName);
         setPlanType(planType);
         setDurationDays(durationDays);
@@ -31,12 +25,10 @@ public class MembershipPlan {
         setSessionsIncluded(sessionsIncluded);
     }
 
-    /**
-     * Full constructor used when reconstructing a plan from the database.
-     */
+    // Constructor for loading existing plans from database
     public MembershipPlan(int planId, String planName, PlanType planType,
-                          int durationDays, BigDecimal price,
-                          int sessionsIncluded) {
+            int durationDays, BigDecimal price,
+            int sessionsIncluded) {
         this.planId = planId;
         setPlanName(planName);
         setPlanType(planType);
@@ -44,8 +36,6 @@ public class MembershipPlan {
         setPrice(price);
         setSessionsIncluded(sessionsIncluded);
     }
-
-    // Getters & Setters
 
     public int getPlanId() {
         return planId;
@@ -82,6 +72,7 @@ public class MembershipPlan {
     }
 
     public void setDurationDays(int durationDays) {
+        // Enforce a minimum timeframe for any plan
         if (durationDays <= 0) {
             throw new IllegalArgumentException("Duration must be greater than 0. Provided: " + durationDays);
         }
@@ -104,13 +95,12 @@ public class MembershipPlan {
     }
 
     public void setSessionsIncluded(int sessionsIncluded) {
+        // Validation for session-based or unlimited plans
         if (sessionsIncluded < 0) {
             throw new IllegalArgumentException("Sessions included cannot be negative.");
         }
         this.sessionsIncluded = sessionsIncluded;
     }
-
-    // ── Object overrides ─────────────────────────────────────────────────────
 
     @Override
     public String toString() {
@@ -126,8 +116,10 @@ public class MembershipPlan {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MembershipPlan)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof MembershipPlan))
+            return false;
         MembershipPlan other = (MembershipPlan) o;
         return planId == other.planId;
     }

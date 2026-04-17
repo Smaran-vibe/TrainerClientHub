@@ -5,8 +5,6 @@ import java.time.LocalDate;
 
 public class Payment {
 
-    // Fields
-
     private int paymentId;
     private int clientId;
     private String clientName;
@@ -16,30 +14,23 @@ public class Payment {
     private PaymentMethod paymentMethod;
     private PaymentStatus paymentStatus;
 
-    //Constructors
+    public Payment() {
+    }
 
-
-    public Payment() {}
-
-    /**
-     * Constructor used when recording a new payment.
-     * Default status is PENDING so dashboard revenue reflects actual paid amounts until marked COMPLETED.
-     */
+    // Use this constructor when initializing a new transaction
     public Payment(int clientId, int membershipId, BigDecimal amount,
-                   LocalDate paymentDate, PaymentMethod paymentMethod) {
+            LocalDate paymentDate, PaymentMethod paymentMethod) {
         setClientId(clientId);
         setMembershipId(membershipId);
         setAmount(amount);
         setPaymentDate(paymentDate);
         setPaymentMethod(paymentMethod);
-        this.paymentStatus = PaymentStatus.PENDING;
+        this.paymentStatus = PaymentStatus.PENDING; // New payments start as pending until confirmed
     }
 
-    /**
-     * Full constructor used when reconstructing a payment from the database.
-     */
+    // Full constructor for loading historical payment data from the DB
     public Payment(int paymentId, int clientId, int membershipId, BigDecimal amount,
-                   LocalDate paymentDate, PaymentMethod paymentMethod, PaymentStatus paymentStatus) {
+            LocalDate paymentDate, PaymentMethod paymentMethod, PaymentStatus paymentStatus) {
         this.paymentId = paymentId;
         setClientId(clientId);
         setMembershipId(membershipId);
@@ -48,8 +39,6 @@ public class Payment {
         setPaymentMethod(paymentMethod);
         setPaymentStatus(paymentStatus);
     }
-
-    // Getters & Setters
 
     public int getPaymentId() {
         return paymentId;
@@ -94,6 +83,7 @@ public class Payment {
     }
 
     public void setAmount(BigDecimal amount) {
+        // Financial check to ensure no negative or zero-sum payments
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Payment amount must be greater than zero.");
         }
@@ -133,8 +123,6 @@ public class Payment {
         this.paymentStatus = paymentStatus;
     }
 
-    // Object overrides
-
     @Override
     public String toString() {
         return "Payment{" +
@@ -151,8 +139,10 @@ public class Payment {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Payment)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Payment))
+            return false;
         Payment other = (Payment) o;
         return paymentId == other.paymentId;
     }

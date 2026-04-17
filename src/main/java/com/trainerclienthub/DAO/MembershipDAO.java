@@ -15,48 +15,43 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * DAO for {@link Membership} and {@link MembershipPlan}.
- * Covers the {@code membership} and {@code membership_plan} tables.
- */
+
 public class MembershipDAO {
 
 
     private static final String PLAN_INSERT =
             "INSERT INTO membership_plan (plan_name, plan_type, duration_days, price, sessions_included) VALUES (?, ?, ?, ?, ?)";
-    private static final String PLAN_SELECT_BY_ID   = "SELECT * FROM membership_plan WHERE plan_id = ?";
-    private static final String PLAN_SELECT_ALL     = "SELECT * FROM membership_plan ORDER BY plan_name";
+    private static final String PLAN_SELECT_BY_ID = "SELECT * FROM membership_plan WHERE plan_id = ?";
+    private static final String PLAN_SELECT_ALL = "SELECT * FROM membership_plan ORDER BY plan_name";
     private static final String PLAN_UPDATE =
             "UPDATE membership_plan SET plan_name = ?, plan_type = ?, duration_days = ?, price = ?, sessions_included = ? WHERE plan_id = ?";
-    private static final String PLAN_DELETE         = "DELETE FROM membership_plan WHERE plan_id = ?";
+    private static final String PLAN_DELETE = "DELETE FROM membership_plan WHERE plan_id = ?";
 
 
     private static final String INSERT =
             "INSERT INTO membership (client_id, plan_id, start_date, end_date, status, created_at) " +
-            "VALUES (?, ?, ?, ?, ?, ?)";
-    private static final String SELECT_BY_ID        = "SELECT * FROM membership WHERE membership_id = ?";
-    private static final String SELECT_BY_CLIENT    = "SELECT * FROM membership WHERE client_id = ? ORDER BY created_at DESC";
+                    "VALUES (?, ?, ?, ?, ?, ?)";
+    private static final String SELECT_BY_ID = "SELECT * FROM membership WHERE membership_id = ?";
+    private static final String SELECT_BY_CLIENT = "SELECT * FROM membership WHERE client_id = ? ORDER BY created_at DESC";
     private static final String SELECT_ACTIVE_BY_CLIENT =
             "SELECT * FROM membership WHERE client_id = ? AND status = 'ACTIVE' LIMIT 1";
-    private static final String SELECT_ALL          = "SELECT * FROM membership ORDER BY created_at DESC";
+    private static final String SELECT_ALL = "SELECT * FROM membership ORDER BY created_at DESC";
     private static final String SELECT_EXPIRING_BEFORE =
             "SELECT * FROM membership WHERE status = 'ACTIVE' AND end_date <= ?";
 
     private static final String SELECT_EXPIRING_BEFORE_BY_TRAINER =
             "SELECT m.* FROM membership m JOIN client c ON m.client_id = c.client_id " +
-            "WHERE m.status = 'ACTIVE' AND m.end_date <= ? AND c.trainer_id = ?";
+                    "WHERE m.status = 'ACTIVE' AND m.end_date <= ? AND c.trainer_id = ?";
 
     private static final String COUNT_ACTIVE = "SELECT COUNT(*) FROM membership WHERE status = 'ACTIVE'";
 
     private static final String COUNT_ACTIVE_BY_TRAINER =
             "SELECT COUNT(*) FROM membership m JOIN client c ON m.client_id = c.client_id " +
-            "WHERE m.status = 'ACTIVE' AND c.trainer_id = ?";
+                    "WHERE m.status = 'ACTIVE' AND c.trainer_id = ?";
     private static final String UPDATE =
             "UPDATE membership SET plan_id = ?, start_date = ?, end_date = ?, status = ? WHERE membership_id = ?";
-    private static final String UPDATE_STATUS       = "UPDATE membership SET status = ? WHERE membership_id = ?";
-    private static final String DELETE              = "DELETE FROM membership WHERE membership_id = ?";
-
-
+    private static final String UPDATE_STATUS = "UPDATE membership SET status = ? WHERE membership_id = ?";
+    private static final String DELETE = "DELETE FROM membership WHERE membership_id = ?";
 
 
     public void insertPlan(MembershipPlan plan) {
@@ -134,8 +129,6 @@ public class MembershipDAO {
     }
 
 
-
-
     public void insert(Membership membership) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
@@ -185,7 +178,7 @@ public class MembershipDAO {
         return list;
     }
 
-    /** Returns the current ACTIVE membership for a client, if one exists. */
+
     public Optional<Membership> findActiveByClient(int clientId) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ACTIVE_BY_CLIENT)) {
@@ -260,7 +253,7 @@ public class MembershipDAO {
         }
     }
 
-    /** Returns all ACTIVE memberships whose end_date is on or before the given date string (yyyy-MM-dd). */
+
     public List<Membership> findExpiringBefore(Date date) {
         var role = SessionManager.getInstance().getRole();
         if (role == TrainerRole.TRAINER) {
@@ -308,7 +301,7 @@ public class MembershipDAO {
         }
     }
 
-    /** Updates only the status column. */
+
     public void updateStatus(int membershipId, MembershipStatus status) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_STATUS)) {

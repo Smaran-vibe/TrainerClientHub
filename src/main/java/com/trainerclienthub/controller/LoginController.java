@@ -25,11 +25,8 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
 
+    // FXML fields (login form)
 
-
-    /**
-     * Single field — accepts either an email address or a Nepal phone number.
-     */
     @FXML
     private TextField emailField;
     @FXML
@@ -45,25 +42,25 @@ public class LoginController implements Initializable {
     @FXML
     private Label errorLabel;
 
-    //  Services
 
+    // Auth/service layer
     private final TrainerService trainerService = new TrainerService();
 
-    //  Initialise
 
     @Override
+    // Set initial UI state 
     public void initialize(URL location, ResourceBundle resources) {
         clearError();
 
-        // Enter key on either field fires the login button
+
         emailField.setOnKeyPressed(this::handleKeyPress);
         passwordField.setOnKeyPressed(this::handleKeyPress);
 
-        // Clear inline error as soon as the user starts correcting input
+
         emailField.textProperty().addListener((obs, o, n) -> clearError());
         passwordField.textProperty().addListener((obs, o, n) -> clearError());
 
-        // Auto-focus the identifier field when the view loads
+
         Platform.runLater(() -> emailField.requestFocus());
 
         passwordVisibleField.managedProperty().bind(showPasswordToggle.selectedProperty());
@@ -73,16 +70,16 @@ public class LoginController implements Initializable {
         passwordVisibleField.textProperty().bindBidirectional(passwordField.textProperty());
     }
 
-    //  Event handlers
 
     @FXML
+    // Validate input, authenticate, then sends to the right dashboard
     private void handleLogin(ActionEvent event) {
         clearError();
 
         String identifier = emailField.getText();
         String password = passwordField.getText();
 
-        //  Both fields must be filled before we hit the database
+
         if (identifier == null || identifier.isBlank()
                 || password == null || password.isBlank()) {
             String msg = "Please enter your email/phone number and password.";
@@ -94,7 +91,7 @@ public class LoginController implements Initializable {
         setFormLoading(true);
 
         try {
-            // Delegate — service accepts email or phone, returns Trainer with role
+
             Trainer trainer = trainerService.authenticate(identifier, password);
 
             SessionManager.getInstance().login(trainer);
@@ -110,7 +107,7 @@ public class LoginController implements Initializable {
             passwordField.clear();
             passwordField.requestFocus();
 
-            // Map each distinct error to the most appropriate Alert type
+
             String lowerMsg = msg.toLowerCase();
             if (lowerMsg.contains("account does not exist")) {
                 showAlert(Alert.AlertType.ERROR, "Account Not Found",
@@ -140,7 +137,6 @@ public class LoginController implements Initializable {
         ViewLoader.navigateTo(stage, "RegisterView.fxml", "TCH — Create Account");
     }
 
-    // Private helpers
 
     private void handleKeyPress(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {
@@ -165,9 +161,7 @@ public class LoginController implements Initializable {
         loginButton.setText(loading ? "Logging in..." : "LOGIN");
     }
 
-    /**
-     * Shows a modal JavaFX Alert dialog.
-     */
+
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -178,7 +172,6 @@ public class LoginController implements Initializable {
 
     @FXML
     private void handleShowPasswordToggle(ActionEvent event) {
-
 
 
         boolean showing = showPasswordToggle.isSelected();

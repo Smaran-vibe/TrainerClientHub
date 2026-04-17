@@ -4,13 +4,11 @@ import com.trainerclienthub.DAO.ClientDAO;
 import com.trainerclienthub.model.Client;
 import com.trainerclienthub.model.Gender;
 import com.trainerclienthub.util.ValidationUtil;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 public class ClientService {
-    
 
     private final ClientDAO clientDAO;
 
@@ -18,11 +16,10 @@ public class ClientService {
         this.clientDAO = new ClientDAO();
     }
 
-
     public Client addClient(String name, int age, Gender gender, String phone,
-                            String email, int sessionBalance,
-                            BigDecimal weightKg, int trainerId) {
-
+            String email, int sessionBalance,
+            BigDecimal weightKg, int trainerId) {
+        // basic field checks before touching the DB
         ValidationUtil.requireNonBlank(name, "Client name");
         ValidationUtil.requireValidAge(age);
         if (gender == null) {
@@ -34,23 +31,24 @@ public class ClientService {
         ValidationUtil.requireValidClientWeight(weightKg);
         ValidationUtil.requirePositiveInt(trainerId, "Trainer ID");
 
+        
         String normalizedEmail = email.trim().toLowerCase();
         if (clientDAO.findByEmail(normalizedEmail).isPresent()) {
             throw new IllegalArgumentException(
                     "A client with this email already exists: " + email);
         }
 
+        // phone stays as-is but trimmed — no lowercasing needed
         String normalizedPhone = phone.trim();
         if (clientDAO.phoneExists(normalizedPhone)) {
             throw new IllegalArgumentException("A client with this phone number already exists!");
         }
 
         Client client = new Client(name, age, gender, phone, email,
-                                   sessionBalance, weightKg, trainerId);
+                sessionBalance, weightKg, trainerId);
         clientDAO.insert(client);
         return client;
     }
-
 
     public Optional<Client> findById(int clientId) {
         ValidationUtil.requirePositiveInt(clientId, "Client ID");
@@ -73,10 +71,11 @@ public class ClientService {
 
     public List<Client> search(String keyword) {
         ValidationUtil.requireNonBlank(keyword, "Search keyword");
-        return clientDAO.search(keyword.trim());
+        return clientDAO.search(keyword.trim()); 
     }
 
     public void updateClient(Client client) {
+        
         ValidationUtil.requirePositiveInt(client.getClientId(), "Client ID");
         ValidationUtil.requireNonBlank(client.getName(), "Client name");
         ValidationUtil.requireValidAge(client.getAge());
@@ -85,7 +84,7 @@ public class ClientService {
         ValidationUtil.requireNonNegativeInt(client.getSessionBalance(), "Session balance");
         ValidationUtil.requireValidClientWeight(client.getWeightKg());
 
-
+        // make sure the email isn't taken by a different client
         Optional<Client> existing = clientDAO.findByEmail(client.getEmail());
         if (existing.isPresent() && existing.get().getClientId() != client.getClientId()) {
             throw new IllegalArgumentException(
@@ -95,12 +94,14 @@ public class ClientService {
         clientDAO.update(client);
     }
 
+    // set a client's session balance to a specific value
     public void updateSessionBalance(int clientId, int newBalance) {
         ValidationUtil.requirePositiveInt(clientId, "Client ID");
         ValidationUtil.requireNonNegativeInt(newBalance, "Session balance");
         clientDAO.updateSessionBalance(clientId, newBalance);
     }
 
+    // add sessions to a client's balance
     public void addSessions(int clientId, int sessionsToAdd) {
         ValidationUtil.requirePositiveInt(clientId, "Client ID");
         ValidationUtil.requirePositiveInt(sessionsToAdd, "Sessions to add");
@@ -109,6 +110,7 @@ public class ClientService {
 
     public void deleteClient(int clientId) {
         ValidationUtil.requirePositiveInt(clientId, "Client ID");
+        // make sure client exists
         if (clientDAO.findById(clientId).isEmpty()) {
             throw new IllegalStateException("No client found with ID: " + clientId);
         }

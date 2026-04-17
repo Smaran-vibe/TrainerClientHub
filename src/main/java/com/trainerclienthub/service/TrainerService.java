@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class TrainerService {
-    // Encapsulates trainer authentication and profile access.
+
 
     private final TrainerDAO trainerDAO;
 
@@ -125,7 +125,7 @@ public class TrainerService {
     }
 
     public void updateProfile(Trainer trainer, Trainer requestingTrainer) {
-        boolean isSelf  = trainer.getTrainerId() == requestingTrainer.getTrainerId();
+        boolean isSelf = trainer.getTrainerId() == requestingTrainer.getTrainerId();
         boolean isAdmin = requestingTrainer.isAdmin();
 
         if (!isSelf && !isAdmin) {
@@ -133,7 +133,7 @@ public class TrainerService {
                     "You can only edit your own profile unless you are an admin.");
         }
 
-        ValidationUtil.requireNonBlank(trainer.getName(),  "Name");
+        ValidationUtil.requireNonBlank(trainer.getName(), "Name");
         ValidationUtil.requireValidEmail(trainer.getEmail());
         ValidationUtil.requireValidNepalPhone(trainer.getPhone());
 

@@ -127,7 +127,6 @@ public class ReportDAO {
     }
 
 
-    /** Reports are immutable once generated — no update method is provided. */
     public void delete(int reportId) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(DELETE)) {

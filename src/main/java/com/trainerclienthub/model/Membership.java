@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 
 public class Membership {
 
-    // Fields
-
     private int membershipId;
     private int clientId;
     private int planId;
@@ -15,26 +13,22 @@ public class Membership {
     private MembershipStatus status;
     private LocalDateTime createdAt;
 
-    // Constructors
-    public Membership() {}
+    public Membership() {
+    }
 
-    /**
-     * Constructor used when creating a new membership for a client.
-     */
+    // Default constructor for new memberships
     public Membership(int clientId, int planId, LocalDate startDate, LocalDate endDate) {
         setClientId(clientId);
         setPlanId(planId);
         setStartDate(startDate);
         setEndDate(endDate);
-        this.status = MembershipStatus.ACTIVE;
+        this.status = MembershipStatus.ACTIVE; // New memberships default to active
         this.createdAt = LocalDateTime.now();
     }
 
-    /**
-     * Full constructor used when reconstructing a membership from the database.
-     */
+    // Constructor for loading existing records from DB
     public Membership(int membershipId, int clientId, int planId, LocalDate startDate,
-                      LocalDate endDate, MembershipStatus status, LocalDateTime createdAt) {
+            LocalDate endDate, MembershipStatus status, LocalDateTime createdAt) {
         this.membershipId = membershipId;
         setClientId(clientId);
         setPlanId(planId);
@@ -43,8 +37,6 @@ public class Membership {
         setStatus(status);
         this.createdAt = createdAt;
     }
-
-    //Getters & Setters
 
     public int getMembershipId() {
         return membershipId;
@@ -95,6 +87,7 @@ public class Membership {
         if (endDate == null) {
             throw new IllegalArgumentException("End date must not be null.");
         }
+        // Validation to prevent chronological errors
         if (startDate != null && !endDate.isAfter(startDate)) {
             throw new IllegalArgumentException("End date must be after start date.");
         }
@@ -120,23 +113,16 @@ public class Membership {
         this.createdAt = createdAt;
     }
 
-    // Convenience methods
-
-    /**
-     * Returns {@code true} if this membership is currently active and has not
-     * passed its end date.
-     */
+    // Checks if the membership is currently valid based on date and status
     public boolean isCurrentlyActive() {
         return status == MembershipStatus.ACTIVE
                 && !LocalDate.now().isAfter(endDate);
     }
 
-
+    // Helper to identify expired memberships for renewal reports
     public boolean isPastExpiry() {
         return LocalDate.now().isAfter(endDate);
     }
-
-    //  Object overrides
 
     @Override
     public String toString() {
@@ -152,8 +138,10 @@ public class Membership {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Membership)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Membership))
+            return false;
         Membership other = (Membership) o;
         return membershipId == other.membershipId;
     }

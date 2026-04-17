@@ -11,9 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * DAO for {@link Payment} — handles all SQL operations on the {@code payment} table.
- */
+
 public class PaymentDAO {
 
 
@@ -35,10 +33,10 @@ public class PaymentDAO {
 
     private static final String SELECT_ALL_WITH_CLIENT =
             "SELECT p.payment_id, p.client_id, p.membership_id, p.amount, " +
-            "p.payment_date, p.payment_method, p.payment_status, c.name AS client_name " +
-            "FROM payment p " +
-            "JOIN client c ON p.client_id = c.client_id " +
-            "ORDER BY p.payment_date DESC";
+                    "p.payment_date, p.payment_method, p.payment_status, c.name AS client_name " +
+                    "FROM payment p " +
+                    "JOIN client c ON p.client_id = c.client_id " +
+                    "ORDER BY p.payment_date DESC";
 
     private static final String UPDATE =
             "UPDATE payment SET client_id = ?, membership_id = ?, amount = ?, payment_date = ?, " +
@@ -172,7 +170,7 @@ public class PaymentDAO {
         }
     }
 
-    /** Updates only the payment status column. */
+
     public void updateStatus(int paymentId, PaymentStatus status) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_STATUS)) {
@@ -204,16 +202,12 @@ public class PaymentDAO {
         updateStatusAndMethod(paymentId, PaymentStatus.valueOf(newStatus.toUpperCase().trim()), method);
     }
 
-    /**
-     * Updates the payment status by ID. Accepts status as string (e.g. "COMPLETED", "PENDING", "REFUNDED", "FAILED").
-     */
+
     public void updatePaymentStatus(int paymentId, String newStatus) {
         updateStatus(paymentId, PaymentStatus.valueOf(newStatus.toUpperCase().trim()));
     }
 
-    /**
-     * Returns the sum of amounts for payments with status COMPLETED within the date range.
-     */
+
     public java.math.BigDecimal sumCompletedAmountByDateRange(Date from, Date to) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(SUM_COMPLETED_BY_DATE_RANGE)) {
@@ -230,9 +224,7 @@ public class PaymentDAO {
         }
     }
 
-    /**
-     * Returns the sum of amounts for all payments with status COMPLETED.
-     */
+
     public java.math.BigDecimal sumCompletedAmount() {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(SUM_COMPLETED_ALL);
@@ -281,10 +273,7 @@ public class PaymentDAO {
         return payment;
     }
 
-    /**
-     * Returns the most recent {@code limit} payment rows, ordered newest-first.
-     *
-     */
+
     public List<Payment> findRecent(int limit) {
         String sql = "SELECT * FROM payment ORDER BY payment_date DESC LIMIT ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();

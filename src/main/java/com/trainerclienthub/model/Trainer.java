@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 
 public class Trainer {
 
-    // Fields
-
     private int trainerId;
     private String name;
     private String email;
@@ -14,27 +12,22 @@ public class Trainer {
     private TrainerRole role;
     private LocalDateTime createdAt;
 
-    //  Constructors
+    public Trainer() {
+    }
 
-    public Trainer() {}
-
-    /**
-     * Full constructor used when creating a new trainer record.
-     */
+    // Standard constructor for new trainer registrations
     public Trainer(String name, String email, String phone, String passwordHash) {
         setName(name);
         setEmail(email);
         setPhone(phone);
         setPasswordHash(passwordHash);
-        this.role      = TrainerRole.TRAINER;   // safe default for self-registration
+        this.role = TrainerRole.TRAINER; // Defaults to basic trainer role
         this.createdAt = LocalDateTime.now();
     }
 
-    /**
-     * Constructor with explicit role — used by an admin creating another account.
-     */
+    // Constructor used when specific roles (like ADMIN) need to be assigned
     public Trainer(String name, String email, String phone,
-                   String passwordHash, TrainerRole role) {
+            String passwordHash, TrainerRole role) {
         setName(name);
         setEmail(email);
         setPhone(phone);
@@ -43,13 +36,10 @@ public class Trainer {
         this.createdAt = LocalDateTime.now();
     }
 
-    /**
-     * Full constructor used when reconstructing a trainer from the database.
-
-     */
+    // Full constructor for reconstructing trainer objects from database records
     public Trainer(int trainerId, String name, String email,
-                   String phone, String passwordHash,
-                   TrainerRole role, LocalDateTime createdAt) {
+            String phone, String passwordHash,
+            TrainerRole role, LocalDateTime createdAt) {
         this.trainerId = trainerId;
         setName(name);
         setEmail(email);
@@ -58,8 +48,6 @@ public class Trainer {
         setRole(role);
         this.createdAt = createdAt;
     }
-
-    //  Getters & Setters
 
     public int getTrainerId() {
         return trainerId;
@@ -85,6 +73,7 @@ public class Trainer {
     }
 
     public void setEmail(String email) {
+        // Regex check for standard email structure
         if (email == null || !email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
             throw new IllegalArgumentException("Invalid email format: " + email);
         }
@@ -95,13 +84,13 @@ public class Trainer {
         return phone;
     }
 
-
     public void setPhone(String phone) {
         if (phone == null || phone.isBlank()) {
             throw new IllegalArgumentException("Trainer phone must not be blank.");
         }
         String trimmed = phone.trim();
-        // Accepts: +977XXXXXXXXXX | 977XXXXXXXXXX | XXXXXXXXXX  (X = 10 local digits)
+
+        // Specific validation for Nepal phone formats (+977, 977, or local 10-digit)
         if (!trimmed.matches("^(\\+977|977)?[0-9]{10}$")) {
             throw new IllegalArgumentException(
                     "Invalid Nepal phone number: \"" + trimmed + "\". "
@@ -133,7 +122,7 @@ public class Trainer {
         this.role = role;
     }
 
-
+    // Helper method for authorization checks in controllers
     public boolean isAdmin() {
         return role == TrainerRole.ADMIN;
     }
@@ -145,8 +134,6 @@ public class Trainer {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
-    //  Object overrides
 
     @Override
     public String toString() {
@@ -161,8 +148,10 @@ public class Trainer {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Trainer)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Trainer))
+            return false;
         Trainer other = (Trainer) o;
         return trainerId == other.trainerId;
     }

@@ -43,42 +43,63 @@ public class ReportController implements Initializable {
 
     //  FXML — top bar + sidebar
 
-    @FXML private Label      avatarLabel;
-    @FXML private HBox       navMemberships;
-    @FXML private HBox       navPayments;
-    @FXML private HBox       navTrainers;
-    @FXML private DatePicker fromDate;
-    @FXML private DatePicker toDate;
-    @FXML private Button     generateBtn;
+    @FXML
+    private Label avatarLabel;
+    @FXML
+    private HBox navMemberships;
+    @FXML
+    private HBox navPayments;
+    @FXML
+    private HBox navTrainers;
+    @FXML
+    private DatePicker fromDate;
+    @FXML
+    private DatePicker toDate;
+    @FXML
+    private Button generateBtn;
 
     //  FXML — stat cards
 
-    @FXML private VBox   totalRevenueCard;
-    @FXML private Label totalRevenueStat;
-    @FXML private Label newMembersStat;
-    @FXML private Label sessionsCompletedStat;
-    @FXML private Label avgWorkoutsStat;
+    @FXML
+    private VBox totalRevenueCard;
+    @FXML
+    private Label totalRevenueStat;
+    @FXML
+    private Label newMembersStat;
+    @FXML
+    private Label sessionsCompletedStat;
+    @FXML
+    private Label avgWorkoutsStat;
 
     // FXML  Chart 1: Client Workout Progress (LineChart)
 
-    @FXML private ComboBox<Client>           workoutClientFilter;
-    @FXML private LineChart<String, Number>  workoutProgressChart;
+    @FXML
+    private ComboBox<Client> workoutClientFilter;
+    @FXML
+    private LineChart<String, Number> workoutProgressChart;
 
     // FXML  Chart 2: Gym Workout Volume (BarChart)
 
-    @FXML private BarChart<String, Number>   gymVolumeChart;
+    @FXML
+    private BarChart<String, Number> gymVolumeChart;
 
     //  FXML Chart 3: Most Active Clients (BarChart)
 
-    @FXML private BarChart<String, Number> activeClientsChart;
+    @FXML
+    private BarChart<String, Number> activeClientsChart;
 
     //  FXML legacy charts + gym-wide sections (hidden for TRAINER)
 
-    @FXML private VBox                       gymVolumeChartSection;
-    @FXML private VBox                       membershipDistributionSection;
-    @FXML private VBox                       revenueTrendChartSection;
-    @FXML private PieChart                   membershipPieChart;
-    @FXML private LineChart<String, Number>  revenueTrendChart;
+    @FXML
+    private VBox gymVolumeChartSection;
+    @FXML
+    private VBox membershipDistributionSection;
+    @FXML
+    private VBox revenueTrendChartSection;
+    @FXML
+    private PieChart membershipPieChart;
+    @FXML
+    private LineChart<String, Number> revenueTrendChart;
 
     //  Service
 
@@ -86,9 +107,8 @@ public class ReportController implements Initializable {
 
     // State
 
-    /** Number of past weeks shown on the weekly charts. */
-    private static final int WEEKS          = 8;
-    /** Top entries shown in the Most Active leaderboard. */
+    private static final int WEEKS = 8;
+
     private static final int LEADERBOARD_SIZE = 3;
 
     //  Initialise
@@ -105,37 +125,49 @@ public class ReportController implements Initializable {
 
     private void applyRoleBasedUI() {
         boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
-        if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
-        if (navPayments != null)    { navPayments.setVisible(!isTrainer);    navPayments.setManaged(!isTrainer); }
-        if (navTrainers != null)    { navTrainers.setVisible(!isTrainer);    navTrainers.setManaged(!isTrainer); }
-        if (totalRevenueCard != null)           { totalRevenueCard.setVisible(!isTrainer);           totalRevenueCard.setManaged(!isTrainer); }
-        if (gymVolumeChartSection != null)       { gymVolumeChartSection.setVisible(!isTrainer);       gymVolumeChartSection.setManaged(!isTrainer); }
-        if (revenueTrendChartSection != null)    { revenueTrendChartSection.setVisible(!isTrainer);    revenueTrendChartSection.setManaged(!isTrainer); }
-        if (membershipDistributionSection != null) { membershipDistributionSection.setVisible(!isTrainer); membershipDistributionSection.setManaged(!isTrainer); }
+        if (navMemberships != null) {
+            navMemberships.setVisible(!isTrainer);
+            navMemberships.setManaged(!isTrainer);
+        }
+        if (navPayments != null) {
+            navPayments.setVisible(!isTrainer);
+            navPayments.setManaged(!isTrainer);
+        }
+        if (navTrainers != null) {
+            navTrainers.setVisible(!isTrainer);
+            navTrainers.setManaged(!isTrainer);
+        }
+        if (totalRevenueCard != null) {
+            totalRevenueCard.setVisible(!isTrainer);
+            totalRevenueCard.setManaged(!isTrainer);
+        }
+        if (gymVolumeChartSection != null) {
+            gymVolumeChartSection.setVisible(!isTrainer);
+            gymVolumeChartSection.setManaged(!isTrainer);
+        }
+        if (revenueTrendChartSection != null) {
+            revenueTrendChartSection.setVisible(!isTrainer);
+            revenueTrendChartSection.setManaged(!isTrainer);
+        }
+        if (membershipDistributionSection != null) {
+            membershipDistributionSection.setVisible(!isTrainer);
+            membershipDistributionSection.setManaged(!isTrainer);
+        }
     }
 
     //  Handlers
 
-    /**
-     * Triggered by the Generate button. Re-loads all charts and stat cards
-     * using the currently selected date range.
-     */
     @FXML
     private void handleGenerate() {
         if (!validateDateRange()) return;
         loadAllCharts();
     }
 
-    /**
-     * Triggered when the user selects a different client in the client filter
-     * ComboBox. Refreshes only the "Client Workout Progress" LineChart.
-     */
     @FXML
     private void handleClientFilterChanged() {
         loadClientWorkoutProgressChart();
     }
 
-    /** Export placeholder — wired to the existing Export button. */
     @FXML
     private void handleExportReport() {
         System.out.println("Export requested — PDF export not yet implemented.");
@@ -143,13 +175,40 @@ public class ReportController implements Initializable {
 
     // Sidebar navigation
 
-    @FXML private void handleNavDashboard(MouseEvent e)   { navigateTo("DashboardView.fxml",          "TCH — Dashboard"); }
-    @FXML private void handleNavClients(MouseEvent e)     { navigateTo("ClientManagementView.fxml",   "TCH — Clients"); }
-    @FXML private void handleNavWorkouts(MouseEvent e)    { navigateTo("WorkoutTrackingView.fxml",    "TCH — Workouts"); }
-    @FXML private void handleNavMemberships(MouseEvent e) { navigateTo("MembershipManagementView.fxml","TCH — Memberships"); }
-    @FXML private void handleNavSessions(MouseEvent e)    { navigateTo("SessionManagementView.fxml",  "TCH — Sessions"); }
-    @FXML private void handleNavPayments(MouseEvent e)    { navigateTo("Payments.fxml",                "TCH — Payments"); }
-    @FXML private void handleNavTrainers(MouseEvent e)    { navigateTo("Trainers.fxml",                "TCH — Trainers"); }
+    @FXML
+    private void handleNavDashboard(MouseEvent e) {
+        navigateTo("DashboardView.fxml", "TCH — Dashboard");
+    }
+
+    @FXML
+    private void handleNavClients(MouseEvent e) {
+        navigateTo("ClientManagementView.fxml", "TCH — Clients");
+    }
+
+    @FXML
+    private void handleNavWorkouts(MouseEvent e) {
+        navigateTo("WorkoutTrackingView.fxml", "TCH — Workouts");
+    }
+
+    @FXML
+    private void handleNavMemberships(MouseEvent e) {
+        navigateTo("MembershipManagementView.fxml", "TCH — Memberships");
+    }
+
+    @FXML
+    private void handleNavSessions(MouseEvent e) {
+        navigateTo("SessionManagementView.fxml", "TCH — Sessions");
+    }
+
+    @FXML
+    private void handleNavPayments(MouseEvent e) {
+        navigateTo("Payments.fxml", "TCH — Payments");
+    }
+
+    @FXML
+    private void handleNavTrainers(MouseEvent e) {
+        navigateTo("Trainers.fxml", "TCH — Trainers");
+    }
 
     @FXML
     private void handleLogout(MouseEvent e) {
@@ -160,10 +219,9 @@ public class ReportController implements Initializable {
 
     // Data loading
 
-    /** Loads every chart and all stat cards in the correct order. */
     private void loadAllCharts() {
         LocalDate from = fromDate.getValue();
-        LocalDate to   = toDate.getValue();
+        LocalDate to = toDate.getValue();
         Integer trainerId = getTrainerIdForDataScope();
 
         populateStatCards(from, to, trainerId);
@@ -174,7 +232,6 @@ public class ReportController implements Initializable {
         loadMembershipDistributionChart();
     }
 
-    /** Returns trainer ID when TRAINER role (for data isolation), null when ADMIN. */
     private Integer getTrainerIdForDataScope() {
         if (SessionManager.getInstance().getRole() != TrainerRole.TRAINER) return null;
         var t = SessionManager.getInstance().getCurrentTrainer();
@@ -191,8 +248,8 @@ public class ReportController implements Initializable {
         workoutProgressChart.getData().clear();
 
         Client selected = workoutClientFilter.getValue();
-        LocalDate to    = toDate.getValue();
-        LocalDate from  = to.minusWeeks(WEEKS);
+        LocalDate to = toDate.getValue();
+        LocalDate from = to.minusWeeks(WEEKS);
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
 
@@ -396,7 +453,6 @@ public class ReportController implements Initializable {
 
     // Setup helpers
 
-    /** Reads the logged-in trainer's initial and puts it in the avatar circle. */
     private void populateAvatarLabel() {
         var trainer = SessionManager.getInstance().getCurrentTrainer();
         if (trainer != null && !trainer.getName().isBlank()) {
@@ -404,7 +460,6 @@ public class ReportController implements Initializable {
         }
     }
 
-    /** Sets fromDate to 8 weeks ago and toDate to today as sensible defaults. */
     private void setDefaultDateRange() {
         toDate.setValue(LocalDate.now());
         fromDate.setValue(LocalDate.now().minusWeeks(WEEKS));
@@ -417,7 +472,7 @@ public class ReportController implements Initializable {
         workoutProgressChart.setCreateSymbols(true);
 
         CategoryAxis lineX = (CategoryAxis) workoutProgressChart.getXAxis();
-        NumberAxis   lineY = (NumberAxis)   workoutProgressChart.getYAxis();
+        NumberAxis lineY = (NumberAxis) workoutProgressChart.getYAxis();
         lineX.setLabel("Week");
         lineY.setLabel("Volume (kg)");
         lineX.setTickLabelRotation(-35);
@@ -427,7 +482,7 @@ public class ReportController implements Initializable {
         gymVolumeChart.setLegendVisible(false);
 
         CategoryAxis gymX = (CategoryAxis) gymVolumeChart.getXAxis();
-        NumberAxis   gymY = (NumberAxis)   gymVolumeChart.getYAxis();
+        NumberAxis gymY = (NumberAxis) gymVolumeChart.getYAxis();
         gymX.setLabel("Week");
         gymY.setLabel("Volume (kg)");
         gymX.setTickLabelRotation(-35);
@@ -437,17 +492,12 @@ public class ReportController implements Initializable {
         activeClientsChart.setLegendVisible(false);
 
         CategoryAxis actX = (CategoryAxis) activeClientsChart.getXAxis();
-        NumberAxis   actY = (NumberAxis)   activeClientsChart.getYAxis();
+        NumberAxis actY = (NumberAxis) activeClientsChart.getYAxis();
         actX.setLabel("Client");
         actY.setLabel("Sessions");
         actX.setTickLabelRotation(-25);
     }
 
-    /**
-     * Loads all clients from the service into the client filter ComboBox.
-     * Displays client names and re-triggers the LineChart on selection.
-     * For TRAINER role, only shows that trainer's clients.
-     */
     private void loadClientFilterComboBox() {
         List<Client> clients = reportService.getAllClients(getTrainerIdForDataScope());
         ObservableList<Client> items = FXCollections.observableArrayList(clients);
@@ -493,13 +543,9 @@ public class ReportController implements Initializable {
                 node.setStyle("-fx-bar-fill: #CCFF00;"));
     }
 
-    /**
-     * Validates that both date pickers have values and that fromDate is
-     * not after toDate.
-     */
     private boolean validateDateRange() {
         LocalDate from = fromDate.getValue();
-        LocalDate to   = toDate.getValue();
+        LocalDate to = toDate.getValue();
 
         if (from == null || to == null) {
             fromDate.setStyle("-fx-border-color: #FF4444;");
@@ -518,7 +564,6 @@ public class ReportController implements Initializable {
         return true;
     }
 
-    /** Centralises scene switching for all sidebar nav items. */
     private void navigateTo(String fxml, String title) {
         Stage stage = (Stage) generateBtn.getScene().getWindow();
         ViewLoader.navigateTo(stage, fxml, title);

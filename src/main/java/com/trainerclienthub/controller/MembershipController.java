@@ -42,77 +42,113 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Function;
 
-/**
- * Controller for {@code MembershipManagementView.fxml}.
- *
- * <p>Manages two tabs: All Memberships and Membership Plans.
- * Delegates all business logic to {@link MembershipService}.</p>
- */
+
 public class MembershipController implements Initializable {
 
-    // ── FXML — top bar + sidebar ───────────────────────────────────────────────
-    @FXML private Label avatarLabel;
-    @FXML private HBox navMemberships;
-    @FXML private HBox navPayments;
-    @FXML private HBox navTrainers;
 
-    // ── FXML — Memberships tab ────────────────────────────────────────────────
-    @FXML private TabPane membershipTabs;
-    @FXML private TextField  membershipSearchField;
-    @FXML private ComboBox<String> statusFilter;
-    @FXML private Button     assignMembershipBtn;
-    @FXML private Button     renewBtn;
-    @FXML private Button     cancelMembershipBtn;
+    @FXML
+    private Label avatarLabel;
+    @FXML
+    private HBox navMemberships;
+    @FXML
+    private HBox navPayments;
+    @FXML
+    private HBox navTrainers;
 
-    @FXML private TableView<Membership>                 membershipTable;
-    @FXML private TableColumn<Membership, Integer>      colMemId;
-    @FXML private TableColumn<Membership, String>       colMemClient;
-    @FXML private TableColumn<Membership, String>       colMemPlan;
-    @FXML private TableColumn<Membership, String>       colMemType;
-    @FXML private TableColumn<Membership, LocalDate>    colMemStart;
-    @FXML private TableColumn<Membership, LocalDate>    colMemEnd;
-    @FXML private TableColumn<Membership, String>       colMemStatus;
-    @FXML private TableColumn<Membership, Long>         colDaysLeft;
 
-    // ── FXML — Plans tab ─────────────────────────────────────────────────────
-    @FXML private Button     addPlanBtn;
-    @FXML private Button     editPlanBtn;
-    @FXML private Button     deletePlanBtn;
+    @FXML
+    private TabPane membershipTabs;
+    @FXML
+    private TextField membershipSearchField;
+    @FXML
+    private ComboBox<String> statusFilter;
+    @FXML
+    private Button assignMembershipBtn;
+    @FXML
+    private Button renewBtn;
+    @FXML
+    private Button cancelMembershipBtn;
 
-    @FXML private TableView<MembershipPlan>              planTable;
-    @FXML private TableColumn<MembershipPlan, Integer>   colPlanId;
-    @FXML private TableColumn<MembershipPlan, String>    colPlanName;
-    @FXML private TableColumn<MembershipPlan, String>    colPlanType;
-    @FXML private TableColumn<MembershipPlan, Integer>   colPlanDuration;
-    @FXML private TableColumn<MembershipPlan, BigDecimal> colPlanPrice;
+    @FXML
+    private TableView<Membership> membershipTable;
+    @FXML
+    private TableColumn<Membership, Integer> colMemId;
+    @FXML
+    private TableColumn<Membership, String> colMemClient;
+    @FXML
+    private TableColumn<Membership, String> colMemPlan;
+    @FXML
+    private TableColumn<Membership, String> colMemType;
+    @FXML
+    private TableColumn<Membership, LocalDate> colMemStart;
+    @FXML
+    private TableColumn<Membership, LocalDate> colMemEnd;
+    @FXML
+    private TableColumn<Membership, String> colMemStatus;
+    @FXML
+    private TableColumn<Membership, Long> colDaysLeft;
 
-    // ── FXML — assign/edit form ───────────────────────────────────────────────
-    @FXML private VBox      membershipFormPanel;
-    @FXML private Label     membershipFormTitle;
-    @FXML private ComboBox<Client> fMemClient;
-    @FXML private ComboBox<MembershipPlan> fMemPlan;
-    @FXML private VBox      planPreviewBox;
-    @FXML private Label     planPreviewName;
-    @FXML private Label     planPreviewPrice;
-    @FXML private Label     planPreviewDays;
-    @FXML private DatePicker fMemStartDate;
-    @FXML private DatePicker fMemEndDate;
-    @FXML private ComboBox<String> fPaymentMethod;
-    @FXML private Label     memFormErrorLabel;
-    @FXML private Button    saveMemBtn;
 
-    // ── State ─────────────────────────────────────────────────────────────────
+    @FXML
+    private Button addPlanBtn;
+    @FXML
+    private Button editPlanBtn;
+    @FXML
+    private Button deletePlanBtn;
+
+    @FXML
+    private TableView<MembershipPlan> planTable;
+    @FXML
+    private TableColumn<MembershipPlan, Integer> colPlanId;
+    @FXML
+    private TableColumn<MembershipPlan, String> colPlanName;
+    @FXML
+    private TableColumn<MembershipPlan, String> colPlanType;
+    @FXML
+    private TableColumn<MembershipPlan, Integer> colPlanDuration;
+    @FXML
+    private TableColumn<MembershipPlan, BigDecimal> colPlanPrice;
+
+
+    @FXML
+    private VBox membershipFormPanel;
+    @FXML
+    private Label membershipFormTitle;
+    @FXML
+    private ComboBox<Client> fMemClient;
+    @FXML
+    private ComboBox<MembershipPlan> fMemPlan;
+    @FXML
+    private VBox planPreviewBox;
+    @FXML
+    private Label planPreviewName;
+    @FXML
+    private Label planPreviewPrice;
+    @FXML
+    private Label planPreviewDays;
+    @FXML
+    private DatePicker fMemStartDate;
+    @FXML
+    private DatePicker fMemEndDate;
+    @FXML
+    private ComboBox<String> fPaymentMethod;
+    @FXML
+    private Label memFormErrorLabel;
+    @FXML
+    private Button saveMemBtn;
+
+
     private final MembershipService membershipService = new MembershipService();
-    private final ClientService     clientService     = new ClientService();
-    private final PaymentService    paymentService    = new PaymentService();
+    private final ClientService clientService = new ClientService();
+    private final PaymentService paymentService = new PaymentService();
 
-    private final ObservableList<Membership>    memberships = FXCollections.observableArrayList();
-    private FilteredList<Membership>             filteredMemberships;
-    private final ObservableList<MembershipPlan> plans      = FXCollections.observableArrayList();
+    private final ObservableList<Membership> memberships = FXCollections.observableArrayList();
+    private FilteredList<Membership> filteredMemberships;
+    private final ObservableList<MembershipPlan> plans = FXCollections.observableArrayList();
 
-    // ── Initialise ────────────────────────────────────────────────────────────
 
     @Override
+    // Setup tables/forms and load current memberships/plans
     public void initialize(URL location, ResourceBundle resources) {
         populateAvatarLabel();
         applyRoleBasedUI();
@@ -132,14 +168,23 @@ public class MembershipController implements Initializable {
         wireSearchAndFilter();
     }
 
+    // Trainers shouldn't see admin-only navigation
     private void applyRoleBasedUI() {
         boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
-        if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
-        if (navPayments != null)    { navPayments.setVisible(!isTrainer);    navPayments.setManaged(!isTrainer); }
-        if (navTrainers != null)    { navTrainers.setVisible(!isTrainer);    navTrainers.setManaged(!isTrainer); }
+        if (navMemberships != null) {
+            navMemberships.setVisible(!isTrainer);
+            navMemberships.setManaged(!isTrainer);
+        }
+        if (navPayments != null) {
+            navPayments.setVisible(!isTrainer);
+            navPayments.setManaged(!isTrainer);
+        }
+        if (navTrainers != null) {
+            navTrainers.setVisible(!isTrainer);
+            navTrainers.setManaged(!isTrainer);
+        }
     }
 
-    // ── Table configuration ───────────────────────────────────────────────────
 
     private void configureMembershipTable() {
         colMemId.setCellValueFactory(new PropertyValueFactory<>("membershipId"));
@@ -169,15 +214,20 @@ public class MembershipController implements Initializable {
                         data.getValue().getStatus().name()));
 
         colMemStatus.setCellFactory(col -> new TableCell<>() {
-            @Override protected void updateItem(String item, boolean empty) {
+            @Override
+            protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) { setText(null); setStyle(""); return; }
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                    return;
+                }
                 setText(item);
                 setStyle(switch (item) {
-                    case "ACTIVE"    -> "-fx-text-fill:#CCFF00; -fx-font-weight:bold;";
-                    case "EXPIRED"   -> "-fx-text-fill:#FF4444; -fx-font-weight:bold;";
+                    case "ACTIVE" -> "-fx-text-fill:#CCFF00; -fx-font-weight:bold;";
+                    case "EXPIRED" -> "-fx-text-fill:#FF4444; -fx-font-weight:bold;";
                     case "CANCELLED" -> "-fx-text-fill:#AAAAAA;";
-                    default          -> "";
+                    default -> "";
                 });
             }
         });
@@ -201,6 +251,7 @@ public class MembershipController implements Initializable {
         planTable.setItems(plans);
     }
 
+    // Refresh memberships and re-apply the current filter (if any)
     private void loadMemberships() {
         memberships.setAll(membershipService.findAll());
         if (filteredMemberships != null) {
@@ -223,7 +274,7 @@ public class MembershipController implements Initializable {
         if (filteredMemberships == null) return;
 
         String keyword = membershipSearchField.getText().trim().toLowerCase();
-        String status  = statusFilter.getValue();
+        String status = statusFilter.getValue();
 
         filteredMemberships.setPredicate(membership -> {
             boolean keywordMatches = keyword.isEmpty() || matchesClientName(membership, keyword);
@@ -240,7 +291,6 @@ public class MembershipController implements Initializable {
         return client.map(c -> c.getName().toLowerCase().contains(keyword)).orElse(false);
     }
 
-    // ── Membership tab handlers ───────────────────────────────────────────────
 
     @FXML
     private void handleAssignMembership(ActionEvent event) {
@@ -248,7 +298,8 @@ public class MembershipController implements Initializable {
         loadFormDropdowns();
         fMemStartDate.setValue(LocalDate.now());
         fMemEndDate.setValue(null);
-        planPreviewBox.setVisible(false); planPreviewBox.setManaged(false);
+        planPreviewBox.setVisible(false);
+        planPreviewBox.setManaged(false);
         hideFormError();
         showFormPanel();
     }
@@ -273,7 +324,7 @@ public class MembershipController implements Initializable {
         try {
             membershipService.renewMembership(selected.getMembershipId(), newEnd);
 
-            // Record payment for renewal if plan has a price
+
             planOpt.ifPresent(plan -> {
                 if (plan.getPrice() != null
                         && plan.getPrice().compareTo(java.math.BigDecimal.ZERO) > 0) {
@@ -298,7 +349,10 @@ public class MembershipController implements Initializable {
     @FXML
     private void handleCancelMembership(ActionEvent event) {
         Membership selected = membershipTable.getSelectionModel().getSelectedItem();
-        if (selected == null) { showAlert(Alert.AlertType.WARNING, "No Selection", "Select a membership to cancel."); return; }
+        if (selected == null) {
+            showAlert(Alert.AlertType.WARNING, "No Selection", "Select a membership to cancel.");
+            return;
+        }
 
         Optional<ButtonType> confirm = showConfirm("Cancel Membership",
                 "Cancel this membership?", "The record will be kept for history.");
@@ -315,8 +369,8 @@ public class MembershipController implements Initializable {
         }
     }
 
-    // ── Plan tab handlers ─────────────────────────────────────────────────────
 
+    // Open dialog to create a new membership plan
     @FXML
     private void handleAddPlan(ActionEvent event) {
         openPlanDialog(null, "Plan Created", planName -> "Membership plan \"" + planName + "\" created.");
@@ -332,16 +386,23 @@ public class MembershipController implements Initializable {
         openPlanDialog(selected, "Plan Updated",
                 planName -> "Membership plan \"" + planName + "\" updated successfully.");
     }
-    // replaced by modal implementation above
+
 
     @FXML
     private void handleDeletePlan(ActionEvent event) {
         MembershipPlan selected = planTable.getSelectionModel().getSelectedItem();
-        if (selected == null) { showAlert(Alert.AlertType.WARNING, "No Selection", "Select a plan to delete."); return; }
+        if (selected == null) {
+            showAlert(Alert.AlertType.WARNING, "No Selection", "Select a plan to delete.");
+            return;
+        }
         Optional<ButtonType> confirm = showConfirm("Delete Plan", "Delete \"" + selected.getPlanName() + "\"?", "");
         if (confirm.isPresent() && confirm.get() == ButtonType.OK) {
-            try { membershipService.deletePlan(selected.getPlanId()); loadPlans(); }
-            catch (Exception ex) { showAlert(Alert.AlertType.ERROR, "Failed", ex.getMessage()); }
+            try {
+                membershipService.deletePlan(selected.getPlanId());
+                loadPlans();
+            } catch (Exception ex) {
+                showAlert(Alert.AlertType.ERROR, "Failed", ex.getMessage());
+            }
         }
     }
 
@@ -374,7 +435,6 @@ public class MembershipController implements Initializable {
         }
     }
 
-    // ── Assign form ───────────────────────────────────────────────────────────
 
     @FXML
     private void handlePlanSelected(ActionEvent event) {
@@ -383,12 +443,15 @@ public class MembershipController implements Initializable {
         planPreviewName.setText(plan.getPlanName());
         planPreviewPrice.setText("Rs " + plan.getPrice().toPlainString());
         planPreviewDays.setText(plan.getDurationDays() + " days");
-        planPreviewBox.setVisible(true); planPreviewBox.setManaged(true);
+        planPreviewBox.setVisible(true);
+        planPreviewBox.setManaged(true);
         autoFillEndDate();
     }
 
     @FXML
-    private void handleStartDateSelected(ActionEvent event) { autoFillEndDate(); }
+    private void handleStartDateSelected(ActionEvent event) {
+        autoFillEndDate();
+    }
 
     private void autoFillEndDate() {
         MembershipPlan plan = fMemPlan.getValue();
@@ -398,20 +461,33 @@ public class MembershipController implements Initializable {
         }
     }
 
+    // Create/update a membership from the form fields
     @FXML
     private void handleSaveMembership(ActionEvent event) {
         hideFormError();
         Client client = fMemClient.getValue();
         MembershipPlan plan = fMemPlan.getValue();
         LocalDate start = fMemStartDate.getValue();
-        LocalDate end   = fMemEndDate.getValue();
+        LocalDate end = fMemEndDate.getValue();
 
-        if (client == null) { showFormError("Please select a client."); return; }
-        if (plan   == null) { showFormError("Please select a membership plan."); return; }
-        if (start  == null) { showFormError("Please select a start date."); return; }
-        if (end    == null) { showFormError("Please select an end date."); return; }
+        if (client == null) {
+            showFormError("Please select a client.");
+            return;
+        }
+        if (plan == null) {
+            showFormError("Please select a membership plan.");
+            return;
+        }
+        if (start == null) {
+            showFormError("Please select a start date.");
+            return;
+        }
+        if (end == null) {
+            showFormError("Please select an end date.");
+            return;
+        }
 
-        // Determine payment method — default CASH if the field is not on the form
+
         PaymentMethod paymentMethod = PaymentMethod.CASH;
         if (fPaymentMethod != null && fPaymentMethod.getValue() != null) {
             try {
@@ -422,7 +498,7 @@ public class MembershipController implements Initializable {
         }
 
         try {
-            // 1. Assign the membership
+
             Membership membership = membershipService.assignMembership(
                     client.getClientId(), plan.getPlanId(), start, end);
 
@@ -456,44 +532,109 @@ public class MembershipController implements Initializable {
         }
     }
 
-    @FXML private void handleCancelMemForm(ActionEvent event) { hideFormPanel(); }
+    @FXML
+    private void handleCancelMemForm(ActionEvent event) {
+        hideFormPanel();
+    }
 
-    // ── Form helpers ──────────────────────────────────────────────────────────
 
     private void loadFormDropdowns() {
         fMemClient.setCellFactory(lv -> new ListCell<>() {
-            @Override protected void updateItem(Client c, boolean empty) { super.updateItem(c, empty); setText(empty || c == null ? null : c.getName()); }
+            @Override
+            protected void updateItem(Client c, boolean empty) {
+                super.updateItem(c, empty);
+                setText(empty || c == null ? null : c.getName());
+            }
         });
         fMemClient.setButtonCell(new ListCell<>() {
-            @Override protected void updateItem(Client c, boolean empty) { super.updateItem(c, empty); setText(empty || c == null ? "Select client..." : c.getName()); }
+            @Override
+            protected void updateItem(Client c, boolean empty) {
+                super.updateItem(c, empty);
+                setText(empty || c == null ? "Select client..." : c.getName());
+            }
         });
         fMemClient.setItems(FXCollections.observableArrayList(clientService.findAll()));
 
         fMemPlan.setCellFactory(lv -> new ListCell<>() {
-            @Override protected void updateItem(MembershipPlan p, boolean empty) { super.updateItem(p, empty); setText(empty || p == null ? null : p.getPlanName()); }
+            @Override
+            protected void updateItem(MembershipPlan p, boolean empty) {
+                super.updateItem(p, empty);
+                setText(empty || p == null ? null : p.getPlanName());
+            }
         });
         fMemPlan.setButtonCell(new ListCell<>() {
-            @Override protected void updateItem(MembershipPlan p, boolean empty) { super.updateItem(p, empty); setText(empty || p == null ? "Select plan..." : p.getPlanName()); }
+            @Override
+            protected void updateItem(MembershipPlan p, boolean empty) {
+                super.updateItem(p, empty);
+                setText(empty || p == null ? "Select plan..." : p.getPlanName());
+            }
         });
         fMemPlan.setItems(FXCollections.observableArrayList(membershipService.findAllPlans()));
     }
 
-    private void showFormPanel()  { membershipFormPanel.setVisible(true);  membershipFormPanel.setManaged(true); }
-    private void hideFormPanel()  { membershipFormPanel.setVisible(false); membershipFormPanel.setManaged(false); }
-    private void showFormError(String msg) { memFormErrorLabel.setText(msg); memFormErrorLabel.setVisible(true); memFormErrorLabel.setManaged(true); }
-    private void hideFormError()           { memFormErrorLabel.setText(""); memFormErrorLabel.setVisible(false); memFormErrorLabel.setManaged(false); }
+    private void showFormPanel() {
+        membershipFormPanel.setVisible(true);
+        membershipFormPanel.setManaged(true);
+    }
 
-    // ── Sidebar navigation ────────────────────────────────────────────────────
+    private void hideFormPanel() {
+        membershipFormPanel.setVisible(false);
+        membershipFormPanel.setManaged(false);
+    }
 
-    @FXML private void handleNavDashboard(MouseEvent e)  { navigate("DashboardView.fxml",           "TCH — Dashboard"); }
-    @FXML private void handleNavClients(MouseEvent e)    { navigate("ClientManagementView.fxml",    "TCH — Clients"); }
-    @FXML private void handleNavWorkouts(MouseEvent e)   { navigate("WorkoutTrackingView.fxml",     "TCH — Workouts"); }
-    @FXML private void handleNavSessions(MouseEvent e)   { navigate("SessionManagementView.fxml",   "TCH — Sessions"); }
-    @FXML private void handleNavPayments(MouseEvent e)   { navigate("Payments.fxml",                "TCH — Payments"); }
-    @FXML private void handleNavTrainers(MouseEvent e)   { navigate("Trainers.fxml",                "TCH — Trainers"); }
-    @FXML private void handleNavReports(MouseEvent e)    { navigate("ReportsView.fxml",             "TCH — Reports"); }
+    private void showFormError(String msg) {
+        memFormErrorLabel.setText(msg);
+        memFormErrorLabel.setVisible(true);
+        memFormErrorLabel.setManaged(true);
+    }
 
-    @FXML private void handleLogout(MouseEvent e) { SessionManager.getInstance().logout(); navigate("LoginView.fxml", "TCH — Login"); }
+    private void hideFormError() {
+        memFormErrorLabel.setText("");
+        memFormErrorLabel.setVisible(false);
+        memFormErrorLabel.setManaged(false);
+    }
+
+
+    @FXML
+    private void handleNavDashboard(MouseEvent e) {
+        navigate("DashboardView.fxml", "TCH — Dashboard");
+    }
+
+    @FXML
+    private void handleNavClients(MouseEvent e) {
+        navigate("ClientManagementView.fxml", "TCH — Clients");
+    }
+
+    @FXML
+    private void handleNavWorkouts(MouseEvent e) {
+        navigate("WorkoutTrackingView.fxml", "TCH — Workouts");
+    }
+
+    @FXML
+    private void handleNavSessions(MouseEvent e) {
+        navigate("SessionManagementView.fxml", "TCH — Sessions");
+    }
+
+    @FXML
+    private void handleNavPayments(MouseEvent e) {
+        navigate("Payments.fxml", "TCH — Payments");
+    }
+
+    @FXML
+    private void handleNavTrainers(MouseEvent e) {
+        navigate("Trainers.fxml", "TCH — Trainers");
+    }
+
+    @FXML
+    private void handleNavReports(MouseEvent e) {
+        navigate("ReportsView.fxml", "TCH — Reports");
+    }
+
+    @FXML
+    private void handleLogout(MouseEvent e) {
+        SessionManager.getInstance().logout();
+        navigate("LoginView.fxml", "TCH — Login");
+    }
 
     private void populateAvatarLabel() {
         var t = SessionManager.getInstance().getCurrentTrainer();
@@ -506,12 +647,18 @@ public class MembershipController implements Initializable {
     }
 
     private void showAlert(Alert.AlertType type, String title, String msg) {
-        Alert a = new Alert(type); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
+        Alert a = new Alert(type);
+        a.setTitle(title);
+        a.setHeaderText(null);
+        a.setContentText(msg);
+        a.showAndWait();
     }
 
     private Optional<ButtonType> showConfirm(String title, String header, String content) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-        a.setTitle(title); a.setHeaderText(header); a.setContentText(content);
+        a.setTitle(title);
+        a.setHeaderText(header);
+        a.setContentText(content);
         return a.showAndWait();
     }
 }

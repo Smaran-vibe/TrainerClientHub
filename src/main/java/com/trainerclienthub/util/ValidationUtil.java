@@ -3,21 +3,18 @@ package com.trainerclienthub.util;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-
 public final class ValidationUtil {
 
-    public static final String EMAIL_REGEX =
-            "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
+    public static final String EMAIL_REGEX = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
 
-    public static final String NEPAL_PHONE_REGEX =
-            "^(\\+977|977)?[0-9]{10}$";
+    public static final String NEPAL_PHONE_REGEX = "^(\\+977|977)?[0-9]{10}$";
 
-    //  Age constants
+    // Age constants
 
     public static final int MIN_AGE = 10;
     public static final int MAX_AGE = 100;
 
-    //  Weight constants
+    // Weight constants
 
     public static final BigDecimal MIN_CLIENT_WEIGHT = new BigDecimal("20.00");
     public static final BigDecimal MAX_CLIENT_WEIGHT = new BigDecimal("300.00");
@@ -28,19 +25,13 @@ public final class ValidationUtil {
         throw new UnsupportedOperationException("ValidationUtil is a utility class.");
     }
 
-
-    //  Email
+    // Email
 
     public static boolean isValidEmail(String email) {
         return email != null && email.matches(EMAIL_REGEX);
     }
 
-    /**
-     * Ensures the email is valid, throwing an exception if not.
-     *
-     * @param email value to validate
-     * @throws IllegalArgumentException if invalid
-     */
+    // Ensures the email is in a valid format.
     public static void requireValidEmail(String email) {
         if (!isValidEmail(email)) {
             throw new IllegalArgumentException(
@@ -52,7 +43,6 @@ public final class ValidationUtil {
         return phone != null && phone.trim().matches(NEPAL_PHONE_REGEX);
     }
 
-
     public static void requireValidNepalPhone(String phone) {
         if (!isValidNepalPhone(phone)) {
             throw new IllegalArgumentException(
@@ -61,12 +51,8 @@ public final class ValidationUtil {
         }
     }
 
+    // Age
 
-    //  Age
-
-    /**
-     * Checks if age is within the allowed bounds.
-     */
     public static boolean isValidAge(int age) {
         return age >= MIN_AGE && age <= MAX_AGE;
     }
@@ -82,27 +68,22 @@ public final class ValidationUtil {
         }
     }
 
+    // Date of birth
 
-    //  Date of birth
-
-
-    /**
-     * Checks if the date of birth implies a valid age and is not in the future.
-     */
     public static boolean isValidDateOfBirth(LocalDate dob) {
-        if (dob == null) return false;
+        if (dob == null)
+            return false;
         LocalDate today = LocalDate.now();
-        if (dob.isAfter(today)) return false;
+        if (dob.isAfter(today))
+            return false;
 
         int impliedAge = today.getYear() - dob.getYear();
-        if (today.getDayOfYear() < dob.getDayOfYear()) impliedAge--;
+        if (today.getDayOfYear() < dob.getDayOfYear())
+            impliedAge--;
 
         return impliedAge >= MIN_AGE && impliedAge <= MAX_AGE;
     }
 
-    /**
-     * Ensures the date of birth implies a valid age and is not in the future.
-     */
     public static void requireValidDateOfBirth(LocalDate dob) {
         if (dob == null) {
             throw new IllegalArgumentException("Date of birth must not be null.");
@@ -118,20 +99,12 @@ public final class ValidationUtil {
         }
     }
 
+    // Dates — general purpose
 
-    //  Dates — general purpose
-
-
-    /**
-     * Checks if the date is today or in the past.
-     */
     public static boolean isNotFuture(LocalDate date) {
         return date != null && !date.isAfter(LocalDate.now());
     }
 
-    /**
-     * Ensures the date is not in the future.
-     */
     public static void requireNotFutureDate(LocalDate date, String label) {
         if (date == null) {
             throw new IllegalArgumentException(label + " must not be null.");
@@ -141,9 +114,6 @@ public final class ValidationUtil {
         }
     }
 
-    /**
-     * Ensures the end date strictly follows the start date.
-     */
     public static void requireEndAfterStart(LocalDate startDate, LocalDate endDate) {
         if (startDate == null) {
             throw new IllegalArgumentException("Start date must not be null.");
@@ -157,13 +127,6 @@ public final class ValidationUtil {
         }
     }
 
-
-    //  Numeric positivity helpers
-
-
-    /**
-     * Ensures the integer is strictly greater than zero.
-     */
     public static void requirePositiveInt(int value, String label) {
         if (value <= 0) {
             throw new IllegalArgumentException(
@@ -171,9 +134,6 @@ public final class ValidationUtil {
         }
     }
 
-    /**
-     * Ensures the BigDecimal is strictly greater than zero.
-     */
     public static void requirePositiveDecimal(BigDecimal value, String label) {
         if (value == null || value.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException(
@@ -181,9 +141,6 @@ public final class ValidationUtil {
         }
     }
 
-    /**
-     * Ensures the integer is zero or greater.
-     */
     public static void requireNonNegativeInt(int value, String label) {
         if (value < 0) {
             throw new IllegalArgumentException(
@@ -191,24 +148,17 @@ public final class ValidationUtil {
         }
     }
 
-    //  String helpers
+    // String helpers
 
-
-    /**
-     * Ensures the string is not null or blank.
-     */
     public static void requireNonBlank(String value, String label) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(label + " must not be blank.");
         }
     }
 
-    //  Password
+    // Password
 
-
-    /**
-     * Ensures the password meets minimum length requirements.
-     */
+    // Ensures the password meets minimum complexity requirements.
     public static void requireValidPassword(String password) {
         if (password == null || password.length() < 8) {
             throw new IllegalArgumentException(
@@ -216,22 +166,15 @@ public final class ValidationUtil {
         }
     }
 
-    /**
-     * Ensures both passwords match.
-     */
+    // Ensures both password match
     public static void requirePasswordsMatch(String password, String confirmPassword) {
         if (password == null || !password.equals(confirmPassword)) {
             throw new IllegalArgumentException("Passwords do not match.");
         }
     }
 
+    // Ensures the client weight is within allowed bounds.
 
-    //  Client weight
-
-
-    /**
-     * Ensures the client weight is within allowed bounds.
-     */
     public static void requireValidClientWeight(BigDecimal weightKg) {
         if (weightKg == null) {
             throw new IllegalArgumentException("Weight must not be null.");

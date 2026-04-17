@@ -1,4 +1,5 @@
 package com.trainerclienthub.service;
+
 import com.trainerclienthub.DAO.ClientDAO;
 import com.trainerclienthub.DAO.ExerciseDAO;
 import com.trainerclienthub.DAO.PaymentDAO;
@@ -23,24 +24,23 @@ import java.util.List;
 import java.util.Map;
 
 public class ReportService {
-    // Generates reporting datasets across the app.
 
 
-    private final ClientDAO   clientDAO;
-    private final WorkoutDAO  workoutDAO;
+    private final ClientDAO clientDAO;
+    private final WorkoutDAO workoutDAO;
     private final ExerciseDAO exerciseDAO;
-    private final SessionDAO  sessionDAO;
-    private final PaymentDAO  paymentDAO;
+    private final SessionDAO sessionDAO;
+    private final PaymentDAO paymentDAO;
 
     private static final DateTimeFormatter WEEK_FMT =
             DateTimeFormatter.ofPattern("dd MMM");
 
     public ReportService() {
-        this.clientDAO   = new ClientDAO();
-        this.workoutDAO  = new WorkoutDAO();
+        this.clientDAO = new ClientDAO();
+        this.workoutDAO = new WorkoutDAO();
         this.exerciseDAO = new ExerciseDAO();
-        this.sessionDAO  = new SessionDAO();
-        this.paymentDAO  = new PaymentDAO();
+        this.sessionDAO = new SessionDAO();
+        this.paymentDAO = new PaymentDAO();
     }
 
 
@@ -49,7 +49,7 @@ public class ReportService {
         return getClientWorkoutProgress(clientId, weeks, from, to, null);
     }
 
-    /** @param trainerId if non-null (TRAINER), restricts to workouts logged by that trainer */
+
     public Map<String, BigDecimal> getClientWorkoutProgress(
             int clientId, int weeks, LocalDate from, LocalDate to, Integer trainerId) {
 
@@ -83,7 +83,7 @@ public class ReportService {
         return getAllClients(null);
     }
 
-    /** @param trainerId if non-null (TRAINER), returns only that trainer's clients */
+
     public List<Client> getAllClients(Integer trainerId) {
         return trainerId != null ? clientDAO.findByTrainer(trainerId) : clientDAO.findAll();
     }
@@ -94,7 +94,7 @@ public class ReportService {
         return getGymWorkoutVolume(weeks, from, to, null);
     }
 
-    /** @param trainerId if non-null (TRAINER), restricts to workouts for that trainer's clients */
+
     public Map<String, BigDecimal> getGymWorkoutVolume(
             int weeks, LocalDate from, LocalDate to, Integer trainerId) {
 
@@ -126,7 +126,7 @@ public class ReportService {
         return getMostActiveClients(from, to, limit, null);
     }
 
-    /** @param trainerId if non-null (TRAINER), restricts to sessions for that trainer only */
+
     public Map<String, Integer> getMostActiveClients(
             LocalDate from, LocalDate to, int limit, Integer trainerId) {
 
@@ -167,7 +167,7 @@ public class ReportService {
         return getNewMembersCount(from, to, null);
     }
 
-    /** @param trainerId if non-null (TRAINER), restricts to that trainer's clients */
+
     public int getNewMembersCount(LocalDate from, LocalDate to, Integer trainerId) {
         List<Client> clients = trainerId != null ? clientDAO.findByTrainer(trainerId) : clientDAO.findAll();
         return (int) clients.stream()
@@ -183,13 +183,13 @@ public class ReportService {
         return getCompletedSessionsCount(from, to, null);
     }
 
-    /** @param trainerId if non-null (TRAINER), restricts to sessions for that trainer only */
+
     public int getCompletedSessionsCount(LocalDate from, LocalDate to, Integer trainerId) {
         List<Session> sessions = trainerId != null ? sessionDAO.findByTrainer(trainerId) : sessionDAO.findAll();
         return (int) sessions.stream()
                 .filter(s -> s.getStatus() == SessionStatus.COMPLETED)
                 .filter(s -> !s.getSessionDate().isBefore(from)
-                          && !s.getSessionDate().isAfter(to))
+                        && !s.getSessionDate().isAfter(to))
                 .count();
     }
 
@@ -197,7 +197,7 @@ public class ReportService {
         return getAvgWorkoutsPerMember(from, to, null);
     }
 
-    /** @param trainerId if non-null (TRAINER), restricts to that trainer's clients and workouts */
+
     public String getAvgWorkoutsPerMember(LocalDate from, LocalDate to, Integer trainerId) {
         List<Client> clients = trainerId != null ? clientDAO.findByTrainer(trainerId) : clientDAO.findAll();
         if (clients.isEmpty()) return "0";
@@ -205,7 +205,7 @@ public class ReportService {
         List<Workout> workouts = trainerId != null ? workoutDAO.findByTrainer(trainerId) : workoutDAO.findAll();
         long totalWorkouts = workouts.stream()
                 .filter(w -> !w.getWorkoutDate().isBefore(from)
-                          && !w.getWorkoutDate().isAfter(to))
+                        && !w.getWorkoutDate().isAfter(to))
                 .count();
 
         double avg = (double) totalWorkouts / clients.size();
@@ -228,7 +228,7 @@ public class ReportService {
     }
 
     private String weekLabelFor(LocalDate date, int weeks, LocalDate to) {
-        LocalDate slotEnd   = to;
+        LocalDate slotEnd = to;
         for (int i = 0; i < weeks; i++) {
             LocalDate slotStart = slotEnd.minusDays(6);
             if (!date.isBefore(slotStart) && !date.isAfter(slotEnd)) {

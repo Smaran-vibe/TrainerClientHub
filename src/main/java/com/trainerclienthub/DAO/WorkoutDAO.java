@@ -15,10 +15,10 @@ public class WorkoutDAO {
     private static final String INSERT =
             "INSERT INTO workout (client_id, trainer_id, workout_date, total_volume, notes) VALUES (?, ?, ?, ?, ?)";
 
-private static final String WORKOUT_SELECT_BASE =
-        "SELECT w.*, t.name AS trainer_name " +
-        "FROM workout w " +
-        "JOIN trainer t ON w.trainer_id = t.trainer_id ";
+    private static final String WORKOUT_SELECT_BASE =
+            "SELECT w.*, t.name AS trainer_name " +
+                    "FROM workout w " +
+                    "JOIN trainer t ON w.trainer_id = t.trainer_id ";
 
     private static final String SELECT_BY_ID =
             WORKOUT_SELECT_BASE + "WHERE w.workout_id = ?";
@@ -37,7 +37,7 @@ private static final String WORKOUT_SELECT_BASE =
 
     private static final String UPDATE =
             "UPDATE workout SET client_id = ?, trainer_id = ?, workout_date = ?, total_volume = ?, notes = ? " +
-            "WHERE workout_id = ?";
+                    "WHERE workout_id = ?";
 
     private static final String UPDATE_TOTAL_VOLUME =
             "UPDATE workout SET total_volume = ? WHERE workout_id = ?";
@@ -93,7 +93,7 @@ private static final String WORKOUT_SELECT_BASE =
         return list;
     }
 
-    /** Returns workouts for a client within a date range (inclusive). */
+
     public List<Workout> findByClientAndDateRange(int clientId, Date from, Date to) {
         List<Workout> list = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -157,7 +157,7 @@ private static final String WORKOUT_SELECT_BASE =
         }
     }
 
-    /** Updates only the {@code total_volume} column after exercises are modified. */
+
     public void updateTotalVolume(int workoutId, java.math.BigDecimal totalVolume) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_TOTAL_VOLUME)) {

@@ -38,7 +38,8 @@
             <HBox alignment="CENTER_LEFT" spacing="12">
                 <Label styleClass="section-title" text="Trainer Directory"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="addTrainerBtn" styleClass="btn-primary" text="+ Add New Trainer" onAction="#handleAddTrainer"/>
+                <Button fx:id="addTrainerBtn" styleClass="btn-primary" text="+ Add New Trainer"
+                        onAction="#handleAddTrainer"/>
             </HBox>
             <TableView fx:id="trainerTable" VBox.vgrow="ALWAYS" styleClass="table-view">
                 <columns>

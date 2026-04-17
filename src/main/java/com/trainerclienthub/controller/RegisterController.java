@@ -15,45 +15,56 @@ import java.util.ResourceBundle;
 
 public class RegisterController implements Initializable {
 
-    //  FXML injections
 
-    @FXML private TextField     nameField;
-    @FXML private TextField     emailField;
-    @FXML private TextField     phoneField;
-    @FXML private PasswordField confirmPasswordField;
-    @FXML private Button        registerButton;
-    @FXML private Hyperlink     loginLink;
-    @FXML private Label         errorLabel;
-    @FXML private TextField passwordVisibleField;
-    @FXML private PasswordField passwordField;
-    @FXML private ToggleButton showPasswordToggle;
-    @FXML private TextField confirmPasswordVisibleField;
-    @FXML private ToggleButton showConfirmPasswordToggle;
+    // FXML fields (register form)
+    @FXML
+    private TextField nameField;
+    @FXML
+    private TextField emailField;
+    @FXML
+    private TextField phoneField;
+    @FXML
+    private PasswordField confirmPasswordField;
+    @FXML
+    private Button registerButton;
+    @FXML
+    private Hyperlink loginLink;
+    @FXML
+    private Label errorLabel;
+    @FXML
+    private TextField passwordVisibleField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private ToggleButton showPasswordToggle;
+    @FXML
+    private TextField confirmPasswordVisibleField;
+    @FXML
+    private ToggleButton showConfirmPasswordToggle;
 
 
-    //  Services
-
+    // Auth/service layer
     private final TrainerService trainerService = new TrainerService();
 
-    //  Initialise
 
     @Override
+    // Set initial UI state and hook up show/hide password toggles
     public void initialize(URL location, ResourceBundle resources) {
         clearError();
         Platform.runLater(() -> nameField.requestFocus());
 
-        // Clear inline error whenever the user edits any field
+
         nameField.textProperty().addListener((o, ov, nv) -> clearError());
         emailField.textProperty().addListener((o, ov, nv) -> clearError());
         phoneField.textProperty().addListener((o, ov, nv) -> clearError());
-        //  MAIN PASSWORD BINDINGS
+
         passwordVisibleField.managedProperty().bind(showPasswordToggle.selectedProperty());
         passwordVisibleField.visibleProperty().bind(showPasswordToggle.selectedProperty());
         passwordField.managedProperty().bind(showPasswordToggle.selectedProperty().not());
         passwordField.visibleProperty().bind(showPasswordToggle.selectedProperty().not());
         passwordVisibleField.textProperty().bindBidirectional(passwordField.textProperty());
 
-        //  CONFIRM PASSWORD BINDINGS
+
         confirmPasswordVisibleField.managedProperty().bind(showConfirmPasswordToggle.selectedProperty());
         confirmPasswordVisibleField.visibleProperty().bind(showConfirmPasswordToggle.selectedProperty());
         confirmPasswordField.managedProperty().bind(showConfirmPasswordToggle.selectedProperty().not());
@@ -62,19 +73,18 @@ public class RegisterController implements Initializable {
     }
 
 
-    //  Event handlers
-
     @FXML
+    // Validate input, create account, then route to login
     private void handleRegister(ActionEvent event) {
         clearError();
 
-        String name    = nameField.getText();
-        String email   = emailField.getText();
-        String phone   = phoneField.getText();
-        String pass    = passwordField.getText();
+        String name = nameField.getText();
+        String email = emailField.getText();
+        String phone = phoneField.getText();
+        String pass = passwordField.getText();
         String confirm = confirmPasswordField.getText();
 
-        // UI-level checks (fast, no DB call)
+
         if (name == null || name.isBlank()) {
             showFieldError("Please enter your full name.", nameField);
             return;
@@ -90,7 +100,7 @@ public class RegisterController implements Initializable {
                     phoneField);
             return;
         }
-        if (pass == null || pass.length() < 8 ) {
+        if (pass == null || pass.length() < 8) {
             showFieldError("Password must be at least 8 characters.", passwordField);
             return;
         }
@@ -108,7 +118,7 @@ public class RegisterController implements Initializable {
             return;
         }
 
-// ── Disable button to prevent double-submit ───────────────────────────
+
         registerButton.setDisable(true);
         registerButton.setText("Creating account...");
 
@@ -155,12 +165,12 @@ public class RegisterController implements Initializable {
     }
 
     @FXML
+    // Go back to login screen
     private void handleLoginLink(ActionEvent event) {
         Stage stage = (Stage) loginLink.getScene().getWindow();
         ViewLoader.navigateTo(stage, "LoginView.fxml", "TCH — Login");
     }
 
-    //  Private helpers
 
     private void showFieldError(String message, Control field) {
         showInlineError(message);
@@ -186,6 +196,7 @@ public class RegisterController implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
     @FXML
     private void handleShowPasswordToggle(ActionEvent event) {
         boolean showing = showPasswordToggle.isSelected();

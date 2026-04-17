@@ -1,0 +1,43 @@
+### Build Folders ###
+target/
+out/
+build/
+
+### Maven (DO NOT ignore pom.xml!) ###
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+dependency-reduced-pom.xml
+.mvn/timing.properties
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### Java & Logs ###
+*.class
+*.log
+*.jar
+*.war
+*.ear
+# We want to keep the Maven wrapper jar so other computers can build it!
+!/.mvn/wrapper/maven-wrapper.jar
+
+### Mac OS / Windows ###
+.DS_Store
+Thumbs.db
+
+### VS Code & Other IDEs ###
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+.apt_generated
+
+### Security / Secrets ###
+.env
+# Ignore database credentials
+src/main/resources/db.properties

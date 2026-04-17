@@ -16,38 +16,54 @@
         <VBox styleClass="sidebar" spacing="0">
             <VBox styleClass="sidebar-logo-box" spacing="4">
                 <Label styleClass="sidebar-logo-title" text="TCH"/>
-                <Label styleClass="sidebar-logo-sub"   text="TRAINER CLIENT HUB"/>
+                <Label styleClass="sidebar-logo-sub" text="TRAINER CLIENT HUB"/>
             </VBox>
             <Region styleClass="sidebar-divider"/>
             <Label styleClass="sidebar-section-label" text="MAIN MENU"/>
-            <HBox fx:id="navDashboard" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavDashboard">
-                <Label styleClass="nav-icon" text="⊞"/><Label text="Dashboard"/>
+            <HBox fx:id="navDashboard" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavDashboard">
+                <Label styleClass="nav-icon" text="⊞"/>
+                <Label text="Dashboard"/>
             </HBox>
             <HBox styleClass="nav-item, nav-item-active" spacing="12" alignment="CENTER_LEFT">
-                <Label styleClass="nav-icon" text="👥"/><Label text="Clients"/>
+                <Label styleClass="nav-icon" text="👥"/>
+                <Label text="Clients"/>
             </HBox>
-            <HBox fx:id="navWorkouts" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavWorkouts">
-                <Label styleClass="nav-icon" text="🏋"/><Label text="Workouts"/>
+            <HBox fx:id="navWorkouts" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavWorkouts">
+                <Label styleClass="nav-icon" text="🏋"/>
+                <Label text="Workouts"/>
             </HBox>
-            <HBox fx:id="navMemberships" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavMemberships">
-                <Label styleClass="nav-icon" text="🪪"/><Label text="Memberships"/>
+            <HBox fx:id="navMemberships" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavMemberships">
+                <Label styleClass="nav-icon" text="🪪"/>
+                <Label text="Memberships"/>
             </HBox>
-            <HBox fx:id="navSessions" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavSessions">
-                <Label styleClass="nav-icon" text="📅"/><Label text="Sessions"/>
+            <HBox fx:id="navSessions" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavSessions">
+                <Label styleClass="nav-icon" text="📅"/>
+                <Label text="Sessions"/>
             </HBox>
-            <HBox fx:id="navPayments" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavPayments">
-                <Label styleClass="nav-icon" text="💳"/><Label text="Payments"/>
+            <HBox fx:id="navPayments" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavPayments">
+                <Label styleClass="nav-icon" text="💳"/>
+                <Label text="Payments"/>
             </HBox>
-            <HBox fx:id="navTrainers" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavTrainers">
-                <Label styleClass="nav-icon" text="🧑‍🏫"/><Label text="Trainers"/>
+            <HBox fx:id="navTrainers" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavTrainers">
+                <Label styleClass="nav-icon" text="🧑‍🏫"/>
+                <Label text="Trainers"/>
             </HBox>
-            <HBox fx:id="navReports" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavReports">
-                <Label styleClass="nav-icon" text="📊"/><Label text="Reports"/>
+            <HBox fx:id="navReports" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavReports">
+                <Label styleClass="nav-icon" text="📊"/>
+                <Label text="Reports"/>
             </HBox>
             <Region VBox.vgrow="ALWAYS"/>
             <Region styleClass="sidebar-divider"/>
             <HBox styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleLogout">
-                <Label styleClass="nav-icon" text="⏻"/><Label text="Logout" style="-fx-text-fill:#AAAAAA;"/>
+                <Label styleClass="nav-icon" text="⏻"/>
+                <Label text="Logout" style="-fx-text-fill:#AAAAAA;"/>
             </HBox>
         </VBox>
     </left>
@@ -90,15 +106,15 @@
             <!-- Table -->
             <TableView fx:id="clientTable" VBox.vgrow="ALWAYS" styleClass="table-view">
                 <columns>
-                    <TableColumn fx:id="colId"             text="ID"         prefWidth="60"/>
-                    <TableColumn fx:id="colName"           text="NAME"       prefWidth="160"/>
-                    <TableColumn fx:id="colAge"            text="AGE"        prefWidth="60"/>
-                    <TableColumn fx:id="colGender"         text="GENDER"     prefWidth="90"/>
-                    <TableColumn fx:id="colPhone"          text="PHONE"      prefWidth="150"/>
-                    <TableColumn fx:id="colEmail"          text="EMAIL"      prefWidth="200"/>
-                    <TableColumn fx:id="colWeight"         text="WEIGHT (KG)" prefWidth="110"/>
-                    <TableColumn fx:id="colSessionBalance" text="SESSIONS"   prefWidth="90"/>
-                    <TableColumn fx:id="colStatus"         text="STATUS"     prefWidth="100"/>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+                    <TableColumn fx:id="colName" text="NAME" prefWidth="160"/>
+                    <TableColumn fx:id="colAge" text="AGE" prefWidth="60"/>
+                    <TableColumn fx:id="colGender" text="GENDER" prefWidth="90"/>
+                    <TableColumn fx:id="colPhone" text="PHONE" prefWidth="150"/>
+                    <TableColumn fx:id="colEmail" text="EMAIL" prefWidth="200"/>
+                    <TableColumn fx:id="colWeight" text="WEIGHT (KG)" prefWidth="110"/>
+                    <TableColumn fx:id="colSessionBalance" text="SESSIONS" prefWidth="90"/>
+                    <TableColumn fx:id="colStatus" text="STATUS" prefWidth="100"/>
                 </columns>
                 <placeholder>
                     <Label text="No clients found." style="-fx-text-fill:#555555; -fx-font-size:14px;"/>
@@ -123,7 +139,7 @@
             <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS"
                         style="-fx-background: transparent; -fx-background-color: transparent;">
 
-                <VBox spacing="12" minHeight="-Infinity" style= "fx-padding:0, 5, 20, 0;">
+                <VBox spacing="12" minHeight="-Infinity" style="fx-padding:0, 5, 20, 0;">
 
                     <Label fx:id="formTitle" styleClass="form-panel-title" text="Add New Client"/>
                     <Region styleClass="divider-line"/>
@@ -136,12 +152,14 @@
                     <HBox spacing="10">
                         <VBox spacing="3" HBox.hgrow="ALWAYS">
                             <Label styleClass="form-label" text="AGE *"/>
-                            <TextField fx:id="fAge" styleClass="text-field" prefWidth="400" maxWidth="Infinity" promptText="22"/>
+                            <TextField fx:id="fAge" styleClass="text-field" prefWidth="400" maxWidth="Infinity"
+                                       promptText="22"/>
                         </VBox>
 
                         <VBox spacing="5" HBox.hgrow="ALWAYS">
                             <Label styleClass="form-label" text="GENDER *"/>
-                            <ComboBox fx:id="fGender" styleClass="combo-box" prefWidth="500" maxWidth="Infinity" promptText="Select"/>
+                            <ComboBox fx:id="fGender" styleClass="combo-box" prefWidth="500" maxWidth="Infinity"
+                                      promptText="Select"/>
                         </VBox>
                     </HBox>
 

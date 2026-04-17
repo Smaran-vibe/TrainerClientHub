@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * DAO for {@link Exercise} — handles all SQL operations on the {@code exercise} table.
- */
+
 public class ExerciseDAO {
 
 
@@ -53,7 +51,7 @@ public class ExerciseDAO {
         }
     }
 
-    /** Bulk-inserts a list of exercises for a single workout in one batch. */
+
     public void insertBatch(List<Exercise> exercises) {
         if (exercises == null || exercises.isEmpty()) return;
 
@@ -96,7 +94,7 @@ public class ExerciseDAO {
         }
     }
 
-    /** Returns all exercises belonging to a specific workout, ordered by insertion. */
+
     public List<Exercise> findByWorkout(int workoutId) {
         List<Exercise> list = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -142,7 +140,7 @@ public class ExerciseDAO {
         }
     }
 
-    /** Deletes all exercises belonging to a workout (complement to CASCADE). */
+
     public void deleteByWorkout(int workoutId) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(DELETE_BY_WORKOUT)) {

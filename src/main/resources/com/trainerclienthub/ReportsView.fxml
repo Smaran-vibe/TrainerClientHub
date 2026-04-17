@@ -15,7 +15,7 @@
         <VBox styleClass="sidebar" spacing="0">
             <VBox styleClass="sidebar-logo-box" spacing="4">
                 <Label styleClass="sidebar-logo-title" text="TCH"/>
-                <Label styleClass="sidebar-logo-sub"   text="TRAINER CLIENT HUB"/>
+                <Label styleClass="sidebar-logo-sub" text="TRAINER CLIENT HUB"/>
             </VBox>
             <Region styleClass="sidebar-divider"/>
             <Label styleClass="sidebar-section-label" text="MAIN MENU"/>
@@ -45,11 +45,13 @@
                 <Label styleClass="nav-icon" text="📅"/>
                 <Label text="Sessions"/>
             </HBox>
-            <HBox fx:id="navPayments" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavPayments">
+            <HBox fx:id="navPayments" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavPayments">
                 <Label styleClass="nav-icon" text="💳"/>
                 <Label text="Payments"/>
             </HBox>
-            <HBox fx:id="navTrainers" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT" onMouseClicked="#handleNavTrainers">
+            <HBox fx:id="navTrainers" styleClass="nav-item" spacing="12" alignment="CENTER_LEFT"
+                  onMouseClicked="#handleNavTrainers">
                 <Label styleClass="nav-icon" text="🧑‍🏫"/>
                 <Label text="Trainers"/>
             </HBox>
@@ -71,7 +73,7 @@
     </left>
 
 
-      <!-- TOP: Top bar with date-range controls -->
+    <!-- TOP: Top bar with date-range controls -->
     <top>
         <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="0">
             <VBox spacing="2">
@@ -87,7 +89,7 @@
                 <Label style="-fx-text-fill:#AAAAAA; -fx-font-size:12px;" text="From"/>
                 <DatePicker fx:id="fromDate" styleClass="date-picker" prefWidth="140"/>
                 <Label style="-fx-text-fill:#AAAAAA; -fx-font-size:12px;" text="To"/>
-                <DatePicker fx:id="toDate"   styleClass="date-picker" prefWidth="140"/>
+                <DatePicker fx:id="toDate" styleClass="date-picker" prefWidth="140"/>
                 <Button fx:id="generateBtn"
                         styleClass="btn-primary"
                         text="Generate"
@@ -104,7 +106,7 @@
     </top>
 
 
-<!--        CENTER: Scrollable charts area-->
+    <!--        CENTER: Scrollable charts area-->
 
     <center>
         <ScrollPane fitToWidth="true" styleClass="scroll-pane">
@@ -269,7 +271,8 @@
                                   labelsVisible="true"/>
                     </VBox>
 
-                    <VBox fx:id="revenueTrendChartSection" styleClass="chart-container" spacing="10" HBox.hgrow="ALWAYS">
+                    <VBox fx:id="revenueTrendChartSection" styleClass="chart-container" spacing="10"
+                          HBox.hgrow="ALWAYS">
                         <Label text="Monthly Revenue Trend"
                                style="-fx-text-fill:#FFFFFF;
                                       -fx-font-size:14px;

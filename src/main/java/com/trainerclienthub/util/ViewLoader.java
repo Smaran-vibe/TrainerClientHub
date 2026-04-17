@@ -7,9 +7,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-/**
- * Utility class for loading FXML views and switching scenes.
- */
+
 public class ViewLoader {
 
     private static final String FXML_BASE = "/com/trainerclienthub/";

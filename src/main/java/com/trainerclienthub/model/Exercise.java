@@ -3,35 +3,20 @@ package com.trainerclienthub.model;
 import java.math.BigDecimal;
 
 public class Exercise {
-
-    // ── Fields ──────────────────────────────────────────────────────────────
-
-    private int exerciseId;
+   private int exerciseId;
     private int workoutId;
     private String exerciseName;
     private int sets;
     private int reps;
     private BigDecimal weightKg;
-
-    /** Derived: sets × reps × weightKg. Recalculated on any component change. */
     private BigDecimal volume;
 
-    //  Constructors
+    public Exercise() {
+    }
 
-    /** Default constructor required by the DAO layer when mapping ResultSets. */
-    public Exercise() {}
-
-    /**
-     * Constructor used when adding a new exercise to a workout.
-     *
-     * @param workoutId    FK referencing the parent workout (must be > 0)
-     * @param exerciseName name of the exercise (e.g. "Bench Press")
-     * @param sets         number of sets performed (must be > 0)
-     * @param reps         number of reps per set (must be > 0)
-     * @param weightKg     weight used in kilograms (must be >= 0)
-     */
+    // For creating new exercises
     public Exercise(int workoutId, String exerciseName,
-                    int sets, int reps, BigDecimal weightKg) {
+            int sets, int reps, BigDecimal weightKg) {
         setWorkoutId(workoutId);
         setExerciseName(exerciseName);
         setSets(sets);
@@ -39,18 +24,9 @@ public class Exercise {
         setWeightKg(weightKg);
     }
 
-    /**
-     * Full constructor used when reconstructing an exercise from the database.
-     *
-     * @param exerciseId   database primary key
-     * @param workoutId    FK referencing the parent workout
-     * @param exerciseName name of the exercise
-     * @param sets         number of sets
-     * @param reps         number of reps per set
-     * @param weightKg     weight in kilograms
-     */
+    // For loading existing exercises with fixed ID
     public Exercise(int exerciseId, int workoutId, String exerciseName,
-                    int sets, int reps, BigDecimal weightKg) {
+            int sets, int reps, BigDecimal weightKg) {
         this.exerciseId = exerciseId;
         setWorkoutId(workoutId);
         setExerciseName(exerciseName);
@@ -59,12 +35,7 @@ public class Exercise {
         setWeightKg(weightKg);
     }
 
-    // ── Volume calculation ────────────────────────────────────────────────────
-
-    /**
-     * Recalculates volume as {@code sets × reps × weightKg}.
-     * Called internally whenever any of the three components change.
-     */
+    // Automatically called whenever sets, reps, or weight changes
     private void recalculateVolume() {
         if (weightKg != null && sets > 0 && reps > 0) {
             this.volume = weightKg
@@ -74,8 +45,6 @@ public class Exercise {
             this.volume = BigDecimal.ZERO;
         }
     }
-
-    // ── Getters & Setters ────────────────────────────────────────────────────
 
     public int getExerciseId() {
         return exerciseId;
@@ -136,22 +105,13 @@ public class Exercise {
         return weightKg;
     }
 
-    /**
-     * Sets the weight for this exercise.
-     *
-     * <p>Weight must be strictly greater than zero — bodyweight exercises
-     * should use a symbolic minimum (e.g. 1 kg) rather than 0, because
-     * a volume of 0 makes the exercise invisible in progress charts.</p>
-     *
-     * @param weightKg weight in kilograms (must be &gt; 0 and &le; 500)
-     * @throws IllegalArgumentException if weight is null, zero, or negative
-     */
     public void setWeightKg(BigDecimal weightKg) {
         if (weightKg == null || weightKg.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException(
                     "Exercise weight must be greater than 0 kg. "
-                    + "For bodyweight exercises use a minimum value of 1 kg.");
+                            + "For bodyweight exercises use a minimum value of 1 kg.");
         }
+        // Safety cap for data entry errors
         if (weightKg.compareTo(new BigDecimal("500.00")) > 0) {
             throw new IllegalArgumentException(
                     "Exercise weight cannot exceed 500 kg. Provided: " + weightKg);
@@ -160,16 +120,9 @@ public class Exercise {
         recalculateVolume();
     }
 
-    /**
-     * Returns the computed volume (sets × reps × weightKg).
-     * This value is read-only from outside the class; it is always
-     * derived from the three component fields.
-     */
     public BigDecimal getVolume() {
         return (volume != null) ? volume : BigDecimal.ZERO;
     }
-
-    // ── Object overrides ─────────────────────────────────────────────────────
 
     @Override
     public String toString() {
@@ -186,8 +139,10 @@ public class Exercise {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Exercise)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Exercise))
+            return false;
         Exercise other = (Exercise) o;
         return exerciseId == other.exerciseId;
     }

@@ -36,19 +36,19 @@ import java.util.ResourceBundle;
 
 public class SessionController implements Initializable {
 
-    //  FXML — top bar + sidebar
+    
     @FXML private Label avatarLabel;
     @FXML private HBox navMemberships;
     @FXML private HBox navPayments;
     @FXML private HBox navTrainers;
 
-    //  FXML — stat cards
+    
     @FXML private Label scheduledTodayLabel;
     @FXML private Label completedTodayLabel;
     @FXML private Label cancelledTodayLabel;
     @FXML private Label weeklyTotalLabel;
 
-    // FXML — filters
+    
     @FXML private TextField          sessionSearchField;
     @FXML private DatePicker         dateFilter;
     @FXML private ComboBox<String>   statusFilterCombo;
@@ -56,7 +56,7 @@ public class SessionController implements Initializable {
     @FXML private Button             completeSessionBtn;
     @FXML private Button             cancelSessionBtn;
 
-    // FXML — table
+    
     @FXML private TableView<Session>               sessionTable;
     @FXML private TableColumn<Session, Integer>    colSessionId;
     @FXML private TableColumn<Session, String>     colSessionClient;
@@ -66,7 +66,7 @@ public class SessionController implements Initializable {
     @FXML private TableColumn<Session, String>     colSessionStatus;
     @FXML private TableColumn<Session, String>     colSessionNotes;
 
-    // FXML — schedule form
+    
     @FXML private VBox sessionFormPanel;
     @FXML private Label             sessionFormTitle;
     @FXML private ComboBox<Client>  fSessionClient;
@@ -78,7 +78,7 @@ public class SessionController implements Initializable {
     @FXML private Label             sessionFormErrorLabel;
     @FXML private Button            saveSessionBtn;
 
-    //  State
+    
     private final SessionService sessionService = new SessionService();
     private final ClientService  clientService  = new ClientService();
     private final TrainerService trainerService = new TrainerService();
@@ -86,29 +86,31 @@ public class SessionController implements Initializable {
     private final ObservableList<Session> allSessions = FXCollections.observableArrayList();
     private FilteredList<Session> filteredSessions;
 
-    // Initialise
+    
 
     @Override
+    // Setup table/filters and load initial session list
     public void initialize(URL location, ResourceBundle resources) {
         populateAvatarLabel();
         applyRoleBasedUI();
         configureTable();
         loadSessions();
-        filteredSessions = new FilteredList<>(allSessions);
+        filteredSessions = new FilteredList<>(allSessions, session -> true);
         sessionTable.setItems(filteredSessions);
         populateStatCards();
-        wireFilters();
         statusFilterCombo.setItems(FXCollections.observableArrayList(
                 "SCHEDULED",
                 "COMPLETED",
                 "CANCELLED"));
         statusFilterCombo.setValue("SCHEDULED");
+        wireFilters();
         applyFilters();
         loadClientFormComboBox();
         hideFormPanel();
         hideFormError();
     }
 
+    // Trainers have a limited sidebar compared to admins
     private void applyRoleBasedUI() {
         boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
         if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
@@ -116,7 +118,7 @@ public class SessionController implements Initializable {
         if (navTrainers != null)    { navTrainers.setVisible(!isTrainer);    navTrainers.setManaged(!isTrainer); }
     }
 
-    //  Table
+    
 
     private void configureTable() {
         colSessionId.setCellValueFactory(new PropertyValueFactory<>("sessionId"));
@@ -153,6 +155,7 @@ public class SessionController implements Initializable {
 
     }
 
+    // Refresh sessions and re-apply current filters
     private void loadSessions() {
         allSessions.setAll(sessionService.findAll());
         if (filteredSessions != null) {
@@ -160,7 +163,7 @@ public class SessionController implements Initializable {
         }
     }
 
-    //  Stat cards
+    
 
     private void populateStatCards() {
         List<Session> sessions = new ArrayList<>(allSessions);
@@ -173,7 +176,7 @@ public class SessionController implements Initializable {
         completedTodayLabel.setText(String.valueOf(completed));
         cancelledTodayLabel.setText(String.valueOf(cancelled));
 
-        // Weekly total: sessions from Monday of current week
+        
         LocalDate today = LocalDate.now();
         LocalDate monday = today.with(java.time.DayOfWeek.MONDAY);
         long weekly = sessions.stream()
@@ -183,11 +186,12 @@ public class SessionController implements Initializable {
         weeklyTotalLabel.setText(String.valueOf(weekly));
     }
 
-    // Filters
+    
 
     private void wireFilters() {
-        sessionSearchField.textProperty().addListener((o, ov, nv) -> applyFilters());
-        statusFilterCombo.setOnAction(e -> applyFilters());
+        sessionSearchField.textProperty().addListener((obs, oldValue, newValue) -> applyFilters());
+        dateFilter.valueProperty().addListener((obs, oldValue, newValue) -> applyFilters());
+        statusFilterCombo.valueProperty().addListener((obs, oldValue, newValue) -> applyFilters());
     }
 
     @FXML
@@ -198,19 +202,25 @@ public class SessionController implements Initializable {
     private void applyFilters() {
         if (filteredSessions == null) return;
 
-        String keyword = sessionSearchField.getText().trim().toLowerCase();
+        String keyword = sessionSearchField.getText() == null
+                ? ""
+                : sessionSearchField.getText().trim().toLowerCase();
         String status  = statusFilterCombo.getValue();
         LocalDate date = dateFilter.getValue();
 
         filteredSessions.setPredicate(session -> {
             boolean statusMatches = status == null || status.isBlank()
-                    || session.getStatus().name().equals(status);
+                    || session.getStatus().name().equalsIgnoreCase(status);
 
             boolean dateMatches = date == null || session.getSessionDate().equals(date);
-            boolean searchMatches = keyword.isEmpty() || matchesClientOrTrainer(session, keyword);
+            boolean searchMatches = keyword.isEmpty()
+                    || matchesClientOrTrainer(session, keyword)
+                    || String.valueOf(session.getSessionId()).contains(keyword)
+                    || (session.getNotes() != null && session.getNotes().toLowerCase().contains(keyword));
 
             return statusMatches && dateMatches && searchMatches;
         });
+        sessionTable.setItems(filteredSessions);
     }
 
     private boolean matchesClientOrTrainer(Session session, String keyword) {
@@ -228,7 +238,7 @@ public class SessionController implements Initializable {
         return fallbackTrainer.contains(keyword);
     }
 
-    //  Action handlers
+    
 
     @FXML
     private void handleScheduleSession(ActionEvent event) {
@@ -291,7 +301,7 @@ public class SessionController implements Initializable {
         }
     }
 
-    //  Form
+    
 
     private void loadClientFormComboBox() {
         fSessionClient.setCellFactory(lv -> new ListCell<>() {
@@ -317,6 +327,7 @@ public class SessionController implements Initializable {
     }
 
     @FXML
+    // Save form changes (add or edit session)
     private void handleSaveSession(ActionEvent event) {
         hideFormError();
         Client client = fSessionClient.getValue();
@@ -364,7 +375,7 @@ public class SessionController implements Initializable {
 
     @FXML private void handleCancelSessionForm(ActionEvent event) { hideFormPanel(); }
 
-    //  Helpers
+    
 
     private void showFormPanel()  { sessionFormPanel.setVisible(true);  sessionFormPanel.setManaged(true); }
     private void hideFormPanel()  { sessionFormPanel.setVisible(false); sessionFormPanel.setManaged(false); }

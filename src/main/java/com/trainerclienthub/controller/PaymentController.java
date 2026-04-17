@@ -41,25 +41,37 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
-/**
- * Simplified payments dashboard that exposes a fullscreen table of payment records.
- */
+
 public class PaymentController implements Initializable {
 
-    @FXML private Label avatarLabel;
-    @FXML private HBox navMemberships;
-    @FXML private HBox navPayments;
-    @FXML private HBox navTrainers;
-    @FXML private TextField searchField;
-    @FXML private ComboBox<String> statusFilterCombo;
-    @FXML private TableView<Payment> paymentTable;
-    @FXML private TableColumn<Payment, String> colPaymentId;
-    @FXML private TableColumn<Payment, String> colClientName;
-    @FXML private TableColumn<Payment, String> colAmount;
-    @FXML private TableColumn<Payment, String> colPaymentDate;
-    @FXML private TableColumn<Payment, String> colMethod;
-    @FXML private TableColumn<Payment, String> colStatus;
-    @FXML private TableColumn<Payment, Void> colAction;
+    @FXML
+    private Label avatarLabel;
+    @FXML
+    private HBox navMemberships;
+    @FXML
+    private HBox navPayments;
+    @FXML
+    private HBox navTrainers;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private ComboBox<String> statusFilterCombo;
+    @FXML
+    private TableView<Payment> paymentTable;
+    @FXML
+    private TableColumn<Payment, String> colPaymentId;
+    @FXML
+    private TableColumn<Payment, String> colClientName;
+    @FXML
+    private TableColumn<Payment, String> colAmount;
+    @FXML
+    private TableColumn<Payment, String> colPaymentDate;
+    @FXML
+    private TableColumn<Payment, String> colMethod;
+    @FXML
+    private TableColumn<Payment, String> colStatus;
+    @FXML
+    private TableColumn<Payment, Void> colAction;
 
     private final PaymentService paymentService = new PaymentService();
     private ObservableList<Payment> payments = FXCollections.observableArrayList();
@@ -68,6 +80,7 @@ public class PaymentController implements Initializable {
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
     @Override
+    // Payments screen setup: table, filters, initial load
     public void initialize(URL location, ResourceBundle resources) {
         applyRoleBasedUI();
         configureTable();
@@ -76,13 +89,24 @@ public class PaymentController implements Initializable {
         populateAvatarLabel();
     }
 
+    // Trainers have fewer navigation options
     private void applyRoleBasedUI() {
         boolean isTrainer = SessionManager.getInstance().getRole() == TrainerRole.TRAINER;
-        if (navMemberships != null) { navMemberships.setVisible(!isTrainer); navMemberships.setManaged(!isTrainer); }
-        if (navPayments != null)    { navPayments.setVisible(!isTrainer);    navPayments.setManaged(!isTrainer); }
-        if (navTrainers != null)    { navTrainers.setVisible(!isTrainer);    navTrainers.setManaged(!isTrainer); }
+        if (navMemberships != null) {
+            navMemberships.setVisible(!isTrainer);
+            navMemberships.setManaged(!isTrainer);
+        }
+        if (navPayments != null) {
+            navPayments.setVisible(!isTrainer);
+            navPayments.setManaged(!isTrainer);
+        }
+        if (navTrainers != null) {
+            navTrainers.setVisible(!isTrainer);
+            navTrainers.setManaged(!isTrainer);
+        }
     }
 
+    // Wire search box and status filter dropdown
     private void setupSearchAndFilter() {
         statusFilterCombo.setItems(FXCollections.observableArrayList("All", "COMPLETED", "PENDING", "REFUNDED", "FAILED"));
         statusFilterCombo.setValue("All");
@@ -144,10 +168,10 @@ public class PaymentController implements Initializable {
                 setText(item);
                 setStyle(switch (item) {
                     case "COMPLETED" -> "-fx-text-fill:#CCFF00; -fx-font-weight:bold;";
-                    case "PENDING"   -> "-fx-text-fill:#FFAA00; -fx-font-weight:bold;";
-                    case "REFUNDED"  -> "-fx-text-fill:#AAAAAA;";
-                    case "FAILED"    -> "-fx-text-fill:#FF4444;";
-                    default          -> "";
+                    case "PENDING" -> "-fx-text-fill:#FFAA00; -fx-font-weight:bold;";
+                    case "REFUNDED" -> "-fx-text-fill:#AAAAAA;";
+                    case "FAILED" -> "-fx-text-fill:#FF4444;";
+                    default -> "";
                 });
             }
         });
@@ -181,6 +205,7 @@ public class PaymentController implements Initializable {
         paymentTable.setPlaceholder(new Label("No payments available."));
     }
 
+    // Load payments from the service and refresh the table
     private void loadPayments() {
         List<Payment> loaded = paymentService.findAll();
         payments.setAll(loaded);
@@ -283,41 +308,49 @@ public class PaymentController implements Initializable {
         }
     }
 
-    // Sidebar navigation
 
-    @FXML private void handleNavDashboard(MouseEvent event) {
+    @FXML
+    private void handleNavDashboard(MouseEvent event) {
         navigate("DashboardView.fxml", "TCH — Dashboard");
     }
 
-    @FXML private void handleNavClients(MouseEvent event) {
+    @FXML
+    private void handleNavClients(MouseEvent event) {
         navigate("ClientManagementView.fxml", "TCH — Clients");
     }
 
-    @FXML private void handleNavWorkouts(MouseEvent event) {
+    @FXML
+    private void handleNavWorkouts(MouseEvent event) {
         navigate("WorkoutTrackingView.fxml", "TCH — Workouts");
     }
 
-    @FXML private void handleNavMemberships(MouseEvent event) {
+    @FXML
+    private void handleNavMemberships(MouseEvent event) {
         navigate("MembershipManagementView.fxml", "TCH — Memberships");
     }
 
-    @FXML private void handleNavSessions(MouseEvent event) {
+    @FXML
+    private void handleNavSessions(MouseEvent event) {
         navigate("SessionManagementView.fxml", "TCH — Sessions");
     }
 
-    @FXML private void handleNavPayments(MouseEvent event) {
+    @FXML
+    private void handleNavPayments(MouseEvent event) {
         navigate("Payments.fxml", "TCH — Payments");
     }
 
-    @FXML private void handleNavTrainers(MouseEvent event) {
+    @FXML
+    private void handleNavTrainers(MouseEvent event) {
         navigate("Trainers.fxml", "TCH — Trainers");
     }
 
-    @FXML private void handleNavReports(MouseEvent event) {
+    @FXML
+    private void handleNavReports(MouseEvent event) {
         navigate("ReportsView.fxml", "TCH — Reports");
     }
 
     @FXML
+    // Log out and return to login
     private void handleLogout(MouseEvent event) {
         SessionManager.getInstance().logout();
         Stage stage = (Stage) paymentTable.getScene().getWindow();
