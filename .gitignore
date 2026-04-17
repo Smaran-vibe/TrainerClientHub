@@ -3,7 +3,7 @@ target/
 out/
 build/
 
-### Maven (DO NOT ignore pom.xml!) ###
+### Maven
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -22,7 +22,7 @@ dependency-reduced-pom.xml
 *.jar
 *.war
 *.ear
-# We want to keep the Maven wrapper jar so other computers can build it!
+
 !/.mvn/wrapper/maven-wrapper.jar
 
 ### Mac OS / Windows ###
@@ -39,5 +39,9 @@ Thumbs.db
 
 ### Security / Secrets ###
 .env
-# Ignore database credentials
+
 src/main/resources/db.properties
+code.png
+modify_comment.py
+mvnw
+mvnw.cmd
