@@ -56,6 +56,7 @@ cd TrainerClientHub
 ```
 
 ## Dependencies
+
 xml
 <!-- pom.xml -->
 <dependency>org.openjfx : javafx-controls : 21.0.2</dependency>
